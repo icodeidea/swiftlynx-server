@@ -1,0 +1,26 @@
+{
+  "name": "swiftlynx-server",
+  "version": "1.0.0",
+  "description": "swiftlynx means project funding, investment and trading",
+  "main": "index.js",
+  "scripts": {
+    "test": "jest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/icodeidea/swiftlynx-server.git"
+  },
+  "keywords": [
+    "trading",
+    "funds",
+    "difi",
+    "blockchain",
+    "investment"
+  ],
+  "author": "Longinus King",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/icodeidea/swiftlynx-server/issues"
+  },
+  "homepage": "https://github.com/icodeidea/swiftlynx-server#readme"
+}
