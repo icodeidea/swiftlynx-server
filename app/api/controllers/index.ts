@@ -6,3 +6,6 @@ export * from './wallet';
 export * from './access';
 export * from './jwt';
 export * from './user';
+export * from './market';
+export * from './project';
+export * from './contract';

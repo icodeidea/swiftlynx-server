@@ -1,5 +1,13 @@
 import { Request, NextFunction } from 'express';
-import { AuthSchema, FeedSchema, CommentSchema, WalletSchema  } from '../validations';
+import { 
+  AuthSchema, 
+  FeedSchema, 
+  CommentSchema, 
+  WalletSchema,
+  MarketSchema, 
+  ProjectSchema,
+  ContractShema 
+} from '../validations';
 
 class Validator {
   async signup(req: Request, _, next: NextFunction) {
@@ -164,6 +172,75 @@ class Validator {
       next(e);
     }
   }
+
+  /**
+   * Market Validators
+   */
+
+  async addMarket(req: Request, _, next: NextFunction) {
+    try {
+      const validation = MarketSchema.addMarketSchema.validate({
+        ...req.body
+      });
+      if (validation.error) {
+        return next(validation.error);
+      }
+      return next();
+    } catch (e) {
+      next(e);
+    }
+  }
+
+  /**
+   *  project Validators
+   */
+
+   async startProject(req: Request, _, next: NextFunction) {
+    try {
+      const validation = ProjectSchema.startProjectSchema.validate({
+        ...req.body
+      });
+      if (validation.error) {
+        return next(validation.error);
+      }
+      return next();
+    } catch (e) {
+      next(e);
+    }
+  }
+
+  /**
+   * contract validators
+   */
+
+   async addContract(req: Request, _, next: NextFunction) {
+    try {
+      const validation = ContractShema.addContractSchema.validate({
+        ...req.body
+      });
+      if (validation.error) {
+        return next(validation.error);
+      }
+      return next();
+    } catch (e) {
+      next(e);
+    }
+  }
+
+  async signContract(req: Request, _, next: NextFunction) {
+    try {
+      const validation = ContractShema.signContractSchema.validate({
+        ...req.body
+      });
+      if (validation.error) {
+        return next(validation.error);
+      }
+      return next();
+    } catch (e) {
+      next(e);
+    }
+  }
+  
 
 }
 

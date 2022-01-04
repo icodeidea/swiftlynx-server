@@ -6,6 +6,9 @@ import feed from './routes/feed';
 import comment from './routes/comment';
 import transaction from './routes/transaction';
 import wallet from './routes/wallet';
+import market from './routes/market';
+import project from './routes/project';
+import contract from './routes/contract';
 // guaranteed to get dependencies
 export default (): Router => {
   const app = Router();
@@ -15,5 +18,8 @@ export default (): Router => {
   comment(app);
   transaction(app);
   wallet(app);
+  market(app);
+  project(app);
+  contract(app);
   return app;
 };

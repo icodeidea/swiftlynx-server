@@ -69,10 +69,48 @@ export default async ({ expressApp }): Promise<void> => {
     model: require('../models/appSettings').default,
   };
 
+  const tradeModel = {
+    name: 'tradeModel',
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    model: require('../models/trade').default,
+  };
+
+  const contractModel = {
+    name: 'contractModel',
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    model: require('../models/contract').default,
+  };
+
+  const marketModel = {
+    name: 'marketModel',
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    model: require('../models/market').default,
+  };
+
+  const projectModel = {
+    name: 'projectModel',
+    // eslint-disable-next-line @typescript-eslint/no-var-requires
+    model: require('../models/project').default,
+  };
+
   // It returns the agenda instance because it's needed in the subsequent loaders
   const { agenda } = await dependencyInjectorLoader({
     mongoConnection,
-    models: [ userModel, APIKeyModel, walletModel, feedModel, commentModel, activityModel, transactionModel ],
+    models: [ 
+      userModel, 
+      APIKeyModel, 
+      walletModel, 
+      feedModel, 
+      commentModel, 
+      activityModel, 
+      transactionModel,
+      appSettingModel,
+      tradeModel,
+      contractModel,
+      marketModel,
+      projectModel
+
+     ],
   });
   Logger.info('✌️ Dependency Injector loaded');
 

@@ -7,7 +7,11 @@ import {
   IComment, 
   ITransaction, 
   IActivity,
-  IAppSetting 
+  IAppSetting,
+  ITrade,
+  IContract,
+  IMarket,
+  IProject
 } from '../../interfaces';
 
 declare global {
@@ -26,5 +30,9 @@ declare global {
       export type ActivityModel = Model<IActivity & Document>;
       export type TransactionModel = Model<ITransaction & Document>;
       export type AppSettingModel = Model<IAppSetting & Document>;
+      export type TradeModel = Model<ITrade & Document>;
+      export type ContractModel = Model<IContract & Document>;
+      export type MarketModel = Model<IMarket & Document>;
+      export type ProjectModel = Model<IProject & Document>;
     }
   }

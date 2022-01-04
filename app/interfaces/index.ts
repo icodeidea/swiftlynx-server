@@ -5,3 +5,7 @@ export * from './IFeed';
 export * from './IComment';
 export * from './IActivity';
 export * from './IAppSetting';
+export * from './ITrade';
+export * from './IContract';
+export * from './IMarket';
+export * from './IProject';
