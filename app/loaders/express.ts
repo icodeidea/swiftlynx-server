@@ -1,9 +1,11 @@
 import express from 'express';
 import cookieParser from 'cookie-parser';
+import swaggerUi from 'swagger-ui-express';
 // import { errors } from 'celebrate';
 import cors from 'cors';
 import routes from '../api';
 import config from '../config';
+import swagger from '../config/swagger';
 
 const setPaginationOptions = (req, res, next) => {
   const { page = 1, limit = 10, offset = 0 } = req.query;
@@ -28,6 +30,9 @@ export default ({ app }: { app: express.Application }) => {
     },
     methods: allowedMethods,
   };
+
+  // Api documentation
+  app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swagger.config));
 
   app.get('/status', (req, res) => {
     res.status(200).json({ result: 'working' });

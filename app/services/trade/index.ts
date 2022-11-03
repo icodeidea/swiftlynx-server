@@ -1,5 +1,5 @@
 import { Service, Inject } from 'typedi';
-import { IContractUpdateStatisticsDTO, ITradeInputDTO, ITrade } from '../../interfaces';
+import { IContractUpdateStatisticsDTO, ITradeInputDTO, ITrade, IContract } from '../../interfaces';
 import { Document } from 'mongoose';
 import { SystemError } from '../../utils';
 
@@ -7,6 +7,7 @@ import { SystemError } from '../../utils';
 export class TradeService {
   constructor(
     @Inject('tradeModel') private tradeModel: Models.TradeModel,
+    @Inject('contractModel') private contractModel: Models.ContractModel,
     @Inject('logger') private logger: { silly(arg0: string): void; error(arg0: unknown): void },
   ) {}
 
@@ -39,7 +40,7 @@ export class TradeService {
     try {
       this.logger.silly('getting contract record');
 
-      const contractRecord : IContract & Document = await this.contractModel
+      const contractRecord : Array<IContract> = await this.contractModel
         .find({$or: [
             { 'id': contractOrProjectId },
             { 'projectId': contractOrProjectId },

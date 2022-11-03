@@ -1,0 +1,148 @@
+paths:
+  /socials/comment:
+    get:
+      tags:
+        - Socials
+      produces:
+        - application/json
+      security:
+        - Bearer: []
+      parameters:
+        - in: query
+          name: commentId
+          required: true
+          type: string
+      responses:
+        200:
+          description: Success
+        400:
+          description: Error
+        500:
+          description: Server down
+
+    post:
+      tags:
+        - Socials
+      produces:
+        - application/json
+      security:
+        - Bearer: []
+      parameters:
+        - in: body
+          name: request
+          required: true
+          schema:
+            $ref: "#/definitions/createComment"
+      responses:
+        200:
+          description: Success
+        400:
+          description: Error
+        500:
+          description: Server down
+
+    put:
+      tags:
+        - Socials
+      produces:
+        - application/json
+      security:
+        - Bearer: []
+      parameters:
+        - in: body
+          name: request
+          required: true
+          schema:
+            $ref: "#/definitions/updateComment"
+      responses:
+        200:
+          description: Success
+        400:
+          description: Error
+        500:
+          description: Server down
+
+    delete:
+      tags:
+        - Socials
+      produces:
+        - application/json
+      security:
+        - Bearer: []
+      parameters:
+        - in: body
+          name: request
+          required: true
+          schema:
+            $ref: "#/definitions/deleteComment"
+      responses:
+        200:
+          description: Success
+        400:
+          description: Error
+        500:
+          description: Server down
+
+
+  /socials/comment/filter:
+    get:
+      tags:
+        - Socials
+      produces:
+        - application/json
+      security:
+        - Bearer: []
+      parameters:
+        - in: query
+          name: q
+          type: string
+        - in: query
+          name: userId
+          type: string
+        - in: query
+          name: campaignId
+          type: string
+        - in: query
+          name: page
+          default: 1
+          type: integer
+        - in: query
+          name: pageSize
+          default: 10
+          type: integer
+      responses:
+        200:
+          description: Success
+        400:
+          description: Error
+        500:
+          description: Server down
+
+definitions:
+  createComment:
+    type: object
+    properties:
+      campaignId:
+        type: string
+        required: true
+      comment:
+        type: string
+        required: true
+  updateComment:
+    type: object
+    properties:
+      campaignId:
+        type: string
+        required: true
+      commentId:
+        type: string
+        required: true
+      comment:
+        type: string
+        required: true
+  deleteComment:
+    type: object
+    properties:
+      commentId:
+        type: string
+        required: true

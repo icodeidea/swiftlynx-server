@@ -27,11 +27,11 @@ export class AuthService {
 
   public async SignUp(userInputDTO: IUserInputDTO): Promise<string> {
     try {
-      throw new SystemError(401, 'System under maintenance, try again later');
+      // throw new SystemError(401, 'System under maintenance, try again later');
       console.log('this is email', userInputDTO.email);
       const exists = await this.isUsed({ email: userInputDTO.email });
       if (exists) {
-        throw new SystemError(200, 'email or username already in use');
+        throw new SystemError(401, 'email or username already in use');
       }
       if(userInputDTO.referer){
         const refUser = await this.userModel.findOne({refId: userInputDTO.referer});
@@ -425,7 +425,8 @@ export class AuthService {
       const userRecord = await this.userModel.findById(decodedToken._id);
 
       this.logger.silly('Extracting user tokenVersion...');
-      const user = userRecord.toObject();
+      // const user = userRecord.toObject();
+      const user = userRecord;
 
       Reflect.deleteProperty(user, 'password');
       Reflect.deleteProperty(user, 'salt');

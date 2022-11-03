@@ -35,13 +35,13 @@ export class ProjectService {
     }
   }
 
-  public async getProject(projectId: string | null): Promise<(IProject & Document) | any> {
+  public async getProject(projectId: string | null | any): Promise<(IProject & Document) | any> {
     try {
       this.logger.silly('getting project record');
 
       if(!projectId || projectId === null) return await this.projectModel.find();
 
-      const projectRecord : IProject & Document = await this.projectModel
+      const projectRecord: Array<IProject> = await this.projectModel
         .find({$or: [
             { 'id': projectId },
             { 'marketId': projectId },
