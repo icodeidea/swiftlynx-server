@@ -9,7 +9,8 @@ if (process.env.NODE_ENV === 'development' && envFound.error) {
 }
 
 export default {
-  appName: 'BeeNg',
+  "version": "1.0.0",
+  appName: 'Swiftlynx',
   environment: process.env.NODE_ENV,
   /**
    * Server Listening Port

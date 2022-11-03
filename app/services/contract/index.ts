@@ -71,7 +71,7 @@ export class ContractService {
     try {
       this.logger.silly('getting contract record');
 
-      const contractRecord : IContract & Document = await this.contractModel
+      const contractRecord : Array<IContract> = await this.contractModel
         .find({$or: [
             { 'id': contractOrProjectId },
             { 'projectId': contractOrProjectId },

@@ -5,6 +5,8 @@
   "main": "build/app.js",
   "scripts": {
     "start": "node build/app.js",
+    "build": "tsc --build",
+    "dev": "nodemon --exec ts-node app/app.ts",
     "inspect": "nodemon --inspect app/app.ts",
     "test": "jest"
   },
@@ -59,6 +61,8 @@
     "rate-limiter-flexible": "^2.2.2",
     "reflect-metadata": "^0.1.13",
     "slugify": "^1.6.0",
+    "swagger-jsdoc": "^6.2.5",
+    "swagger-ui-express": "^4.5.0",
     "typedi": "^0.10.0",
     "web3": "^1.6.0",
     "winston": "^3.3.3"

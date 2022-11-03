@@ -26,7 +26,7 @@ export class MarketService {
     }
   }
 
-  public async getMarket(MarketId: string | null): Promise<(IMarket & Document) | any> {
+  public async getMarket(MarketId: string | null | any): Promise<(IMarket & Document) | any> {
     try {
       this.logger.silly('getting market record');
 
