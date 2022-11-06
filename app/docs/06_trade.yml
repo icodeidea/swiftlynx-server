@@ -1,0 +1,55 @@
+paths:
+  /api/v1/trade/list-trade:
+    get:
+      tags:
+        - Trade
+      produces:
+        - application/json
+      security:
+        - Bearer: []
+      parameters:
+        - in: query
+          name: page
+          type: integer
+          default: 1
+        - in: query
+          name: pageSize
+          type: integer
+          default: 10
+      responses:
+        200:
+          description: Success
+        400:
+          description: Error
+        500:
+          description: Server down
+
+  /api/v1/contract/sign-contract:
+    post:
+      tags:
+        - Trade
+      produces:
+        - application/json
+      security:
+        - Bearer: []
+      parameters:
+        - in: body
+          name: request
+          required: true
+          schema:
+            $ref: "#/definitions/signContract"
+      responses:
+        200:
+          description: Success
+        400:
+          description: Error
+        500:
+          description: Server down
+
+definitions:
+  signContract:
+    type: object
+    properties:
+      contractId:
+        type: string
+        required: true

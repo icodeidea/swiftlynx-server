@@ -1,0 +1,16 @@
+paths:
+  /api/v1/market/list-market:
+    get:
+      tags:
+        - Market
+      produces:
+        - application/json
+      security:
+        - Bearer: []
+      responses:
+        200:
+          description: Success
+        400:
+          description: Error
+        500:
+          description: Server down

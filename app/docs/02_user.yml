@@ -1,5 +1,5 @@
 paths:
-  /user:
+  /api/v1/user:
     get:
       tags:
         - User
@@ -15,7 +15,7 @@ paths:
         500:
           description: Server down
 
-  /user/subscribe-to-newsletter:
+  /api/v1/user/subscribe-to-newsletter:
     put:
       tags:
         - User
@@ -35,7 +35,7 @@ paths:
         500:
           description: Server down
 
-  /user/mail-support:
+  /api/v1/user/mail-support:
     post:
       tags:
         - User
@@ -55,7 +55,7 @@ paths:
         500:
           description: Server down
 
-  /user/verify-phone:
+  /api/v1/user/verify-phone:
     get:
       tags:
         - User
@@ -75,7 +75,7 @@ paths:
         500:
           description: Server down
 
-  /user/log-other-devices-out:
+  /api/v1/user/log-other-devices-out:
     post:
       tags:
         - User
@@ -91,7 +91,7 @@ paths:
         500:
           description: Server down
 
-  /user/sign-out:
+  /api/v1/user/sign-out:
     post:
       tags:
         - User
@@ -107,7 +107,7 @@ paths:
         500:
           description: Server down
 
-  /user/update-password:
+  /api/v1/user/update-password:
     put:
       tags:
         - User
@@ -129,7 +129,7 @@ paths:
         500:
           description: Server down
 
-  /user/update-profile:
+  /api/v1/user/update-profile:
     put:
       tags:
         - User
@@ -151,7 +151,7 @@ paths:
         500:
           description: Server down
 
-  /user/kpi-analytic:
+  /api/v1/user/kpi-analytic:
     get:
       tags:
         - User
@@ -167,7 +167,7 @@ paths:
         500:
           description: Server down
 
-  /user/refresh-token:
+  /api/v1/user/refresh-token:
     post:
       tags:
         - User

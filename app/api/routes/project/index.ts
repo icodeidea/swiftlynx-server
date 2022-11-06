@@ -10,7 +10,7 @@ export default (app: Router): Router => {
   app.use('/project', projectRouter);
 
   //start a project
-  projectRouter.route('/start-project').post(middlewares.isAuth, middlewares.attachCurrentUser, validator.startProject, startProject);
+  projectRouter.route('/create-project').post(middlewares.isAuth, middlewares.attachCurrentUser, validator.startProject, startProject);
 
   //list project
   projectRouter.route('/list-project').get(getProject);

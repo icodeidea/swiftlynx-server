@@ -1,9 +1,15 @@
 import Joi from 'joi';
+import passwordComplexity from 'joi-password-complexity';
 
 export const signupSchema = Joi.object({
-  email: Joi.string().required(),
-  password: Joi.string().required(),
+  firstname: Joi.string().required(),
+  lastname: Joi.string().required(),
+  accountType: Joi.string().valid('individual', 'organisation').required(),
+  email: Joi.string().email().required(),
+  password: passwordComplexity(),
   username: Joi.string().required(),
+  dob: Joi.date(),
+  gender: Joi.string(),
   referer: Joi.string(),
 });
 

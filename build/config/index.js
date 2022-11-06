@@ -14,6 +14,7 @@ exports.default = {
     "version": "1.0.0",
     appName: 'Swiftlynx',
     environment: process.env.NODE_ENV,
+    supportMail: 'admin@mad9aija.com',
     /**
      * Server Listening Port
      */
@@ -77,7 +78,7 @@ exports.default = {
         allowedOrigin: [
             "http://localhost:3000",
             "http://localhost:4000",
-            "https://beeng.vercel.app",
+            "https://swiftlynx.vercel.app",
         ],
         allowedHeaders: [
             "Content-Type",

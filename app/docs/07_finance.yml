@@ -1,0 +1,34 @@
+paths:
+  /api/v1/transaction/list:
+    get:
+      tags:
+        - Finance
+      produces:
+        - application/json
+      security:
+        - Bearer: []
+      parameters:
+        - in: query
+          name: q
+          type: string
+        - in: query
+          name: category
+          type: string
+        - in: query
+          name: userId
+          type: string
+        - in: query
+          name: page
+          type: integer
+          default: 1
+        - in: query
+          name: pageSize
+          type: integer
+          default: 10
+      responses:
+        200:
+          description: Success
+        400:
+          description: Error
+        500:
+          description: Server down

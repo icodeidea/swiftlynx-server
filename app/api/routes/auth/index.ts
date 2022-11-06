@@ -9,13 +9,13 @@ export default (app: Router): Router => {
   app.use('/auth', authRouter);
 
   //signup
-  authRouter.route('/signup').post(validator.signup, AuthController.signup);
+  authRouter.route('/sign-up').post(validator.signup, AuthController.signup);
 
   //sigin
-  authRouter.route('/signin').post(validator.signin, AuthController.signin);
+  authRouter.route('/sign-in').post(validator.signin, AuthController.signin);
 
   //Google Auth
-  authRouter.route('/googleAuth').post(validator.OAuth, AuthController.googleAuth);
+  authRouter.route('/google-auth').post(validator.OAuth, AuthController.googleAuth);
 
   //verifyMail
   authRouter.route('/verify/:token').get(AuthController.verifyEmail);
@@ -24,7 +24,7 @@ export default (app: Router): Router => {
 
   authRouter.route('/reset/:token').post(validator.validatePassword, AuthController.updatePassword);
 
-  authRouter.route('/resetPassword').post(validator.resetPassword, middlewares.isAuth, middlewares.attachCurrentUser, AuthController.authedUpdatePassword);
+  authRouter.route('/reset-password').post(validator.resetPassword, middlewares.isAuth, middlewares.attachCurrentUser, AuthController.authedUpdatePassword);
 
   // resend verification mail replacement
   authRouter.route('/resend-verify-mail').post(validator.validateEmail, AuthController.resendVerificationMail);

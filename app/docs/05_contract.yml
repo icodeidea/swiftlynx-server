@@ -1,0 +1,147 @@
+paths:
+  /api/v1/contract/list-contract:
+    get:
+      tags:
+        - Contract
+      produces:
+        - application/json
+      security:
+        - Bearer: []
+      parameters:
+        - in: query
+          name: page
+          type: integer
+          default: 1
+        - in: query
+          name: pageSize
+          type: integer
+          default: 10
+      responses:
+        200:
+          description: Success
+        400:
+          description: Error
+        500:
+          description: Server down
+
+  /api/v1/contract/add-contract:
+    post:
+      tags:
+        - Contract
+      produces:
+        - application/json
+      security:
+        - Bearer: []
+      parameters:
+        - in: body
+          name: request
+          required: true
+          schema:
+            $ref: "#/definitions/addContract"
+      responses:
+        200:
+          description: Success
+        400:
+          description: Error
+        500:
+          description: Server down
+
+  /api/v1/contract/update:
+    put:
+      tags:
+        - Contract
+      produces:
+        - application/json
+      security:
+        - Bearer: []
+      parameters:
+        - in: body
+          name: request
+          required: true
+          schema:
+            $ref: "#/definitions/updateContract"
+      responses:
+        200:
+          description: Success
+        400:
+          description: Error
+        500:
+          description: Server down
+
+  /api/v1/contract/delete:
+    delete:
+      tags:
+        - Contract
+      produces:
+        - application/json
+      security:
+        - Bearer: []
+      parameters:
+        - in: body
+          name: request
+          required: true
+          schema:
+            $ref: "#/definitions/deleteContract"
+      responses:
+        200:
+          description: Success
+        400:
+          description: Error
+        500:
+          description: Server down
+
+definitions:
+  addContract:
+    type: object
+    properties:
+      projectId:
+        type: string
+        required: true
+      contractName:
+        type: string
+        required: true
+      fixedAmount:
+        type: number
+        required: true
+      minAmount:
+        type: number
+        required: true
+      maxAmount:
+        type: number
+        required: true
+      type:
+        type: string
+        required: true
+        enum: ["SWIFT_LOAN", "PEER_TO_PEER_LOAN"]
+      interest:
+        type: float
+        required: true
+      maturityTime: 
+        type: string
+        required: true
+  deleteContract:
+    type: object
+    properties:
+      contractId:
+        type: string
+        required: true
+  updateContract:
+    type: object
+    properties:
+      contractId:
+        type: string
+      contractName:
+        type: string
+      fixedAmount:
+        type: number
+      minAmount:
+        type: number
+      maxAmount:
+        type: number
+      type:
+        type: string
+        enum: ["SWIFT_LOAN", "PEER_TO_PEER_LOAN"]
+      interest:
+        type: float
+      maturityTime: 
+        type: string
