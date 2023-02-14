@@ -5,11 +5,11 @@ const User = new mongoose.Schema(
   {
     firstname: {
       type: String,
-      required: [true, 'Please provide your firstname'],
+      // required: [true, 'Please provide your firstname'],
     },
     lastname: {
       type: String,
-      required: [true, 'Please provide your lastname'],
+      // required: [true, 'Please provide your lastname'],
     },
     username: {
       type: String,
@@ -20,8 +20,8 @@ const User = new mongoose.Schema(
     refId: {
       type: String,
       lowercase: true,
-      unique: true,
-      required: [true, 'Please enter a username'],
+      // unique: true,
+      // required: [true, 'Please enter a username'],
       index: true,
     },
     referer: {

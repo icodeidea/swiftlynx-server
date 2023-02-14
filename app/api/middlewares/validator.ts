@@ -13,9 +13,7 @@ class Validator {
   async signup(req: Request, _, next: NextFunction) {
     try {
       const validation = AuthSchema.signupSchema.validate({
-        username: req.body.username,
-        email: req.body.email,
-        password: req.body.password,
+        ...req.body
       });
       if (validation.error) {
         return next(validation.error);

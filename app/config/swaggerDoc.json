@@ -1,0 +1,1535 @@
+{
+    "swaggerDoc": {
+      "info": {
+        "version": "1.0.0",
+        "description": "#\n\n### Test login\n\nEmail: kingsleyonyeneke@gmail.com\nPassword: 09034128815@@Lk\n",
+        "title": "Swiftlynx (development)",
+        "contact": {
+          "name": "IcodeIdea",
+          "email": "icodeidea@gmail.com"
+        },
+        "servers": [
+          {
+            "url": "http://localhost:4000"
+          }
+        ]
+      },
+      "swagger": "2.0",
+      "paths": {
+        "/api/v1/auth/sign-up": {
+          "post": {
+            "tags": [
+              "Authentication"
+            ],
+            "produces": [
+              "application/json"
+            ],
+            "parameters": [
+              {
+                "in": "body",
+                "name": "request",
+                "required": true,
+                "schema": {
+                  "$ref": "#/definitions/signUp"
+                }
+              }
+            ],
+            "responses": {
+              "200": {
+                "description": "Success"
+              },
+              "400": {
+                "description": "Error"
+              },
+              "500": {
+                "description": "Server down"
+              }
+            }
+          }
+        },
+        "/api/v1/auth/sign-in": {
+          "post": {
+            "tags": [
+              "Authentication"
+            ],
+            "produces": [
+              "application/json"
+            ],
+            "parameters": [
+              {
+                "in": "body",
+                "name": "request",
+                "required": true,
+                "schema": {
+                  "$ref": "#/definitions/signIn"
+                }
+              }
+            ],
+            "responses": {
+              "200": {
+                "description": "Success"
+              },
+              "400": {
+                "description": "Error"
+              },
+              "500": {
+                "description": "Server down"
+              }
+            }
+          }
+        },
+        "/auth/verify": {
+          "post": {
+            "tags": [
+              "Authentication"
+            ],
+            "produces": [
+              "application/json"
+            ],
+            "parameters": [
+              {
+                "in": "query",
+                "name": "email",
+                "type": "string"
+              },
+              {
+                "in": "query",
+                "name": "token",
+                "type": "string"
+              }
+            ],
+            "responses": {
+              "200": {
+                "description": "Success"
+              },
+              "400": {
+                "description": "Error"
+              },
+              "500": {
+                "description": "Server down"
+              }
+            }
+          }
+        },
+        "/auth/initiate-reset": {
+          "post": {
+            "tags": [
+              "Authentication"
+            ],
+            "produces": [
+              "application/json"
+            ],
+            "parameters": [
+              {
+                "in": "body",
+                "name": "request",
+                "required": true,
+                "schema": {
+                  "$ref": "#/definitions/initiateReset"
+                }
+              }
+            ],
+            "responses": {
+              "200": {
+                "description": "Success"
+              },
+              "400": {
+                "description": "Error"
+              },
+              "500": {
+                "description": "Server down"
+              }
+            }
+          }
+        },
+        "/auth/verify-reset": {
+          "get": {
+            "tags": [
+              "Authentication"
+            ],
+            "produces": [
+              "application/json"
+            ],
+            "parameters": [
+              {
+                "in": "query",
+                "name": "token",
+                "required": true,
+                "type": "string"
+              }
+            ],
+            "responses": {
+              "200": {
+                "description": "Success"
+              },
+              "400": {
+                "description": "Error"
+              },
+              "500": {
+                "description": "Server down"
+              }
+            }
+          }
+        },
+        "/auth/reset-password": {
+          "put": {
+            "tags": [
+              "Authentication"
+            ],
+            "produces": [
+              "application/json"
+            ],
+            "parameters": [
+              {
+                "in": "body",
+                "name": "request",
+                "required": true,
+                "schema": {
+                  "$ref": "#/definitions/resetPassword"
+                }
+              }
+            ],
+            "responses": {
+              "200": {
+                "description": "Success"
+              },
+              "400": {
+                "description": "Error"
+              },
+              "500": {
+                "description": "Server down"
+              }
+            }
+          }
+        },
+        "/api/v1/user": {
+          "get": {
+            "tags": [
+              "User"
+            ],
+            "produces": [
+              "application/json"
+            ],
+            "security": [
+              {
+                "Bearer": []
+              }
+            ],
+            "responses": {
+              "200": {
+                "description": "Success"
+              },
+              "400": {
+                "description": "Error"
+              },
+              "500": {
+                "description": "Server down"
+              }
+            }
+          }
+        },
+        "/api/v1/user/subscribe-to-newsletter": {
+          "put": {
+            "tags": [
+              "User"
+            ],
+            "produces": [
+              "application/json"
+            ],
+            "parameters": [
+              {
+                "in": "body",
+                "name": "request",
+                "required": true,
+                "schema": {
+                  "$ref": "#/definitions/subscribeNewsletter"
+                }
+              }
+            ],
+            "responses": {
+              "200": {
+                "description": "Success"
+              },
+              "400": {
+                "description": "Error"
+              },
+              "500": {
+                "description": "Server down"
+              }
+            }
+          }
+        },
+        "/api/v1/user/mail-support": {
+          "post": {
+            "tags": [
+              "User"
+            ],
+            "produces": [
+              "application/json"
+            ],
+            "parameters": [
+              {
+                "in": "body",
+                "name": "request",
+                "required": true,
+                "schema": {
+                  "$ref": "#/definitions/mailSupport"
+                }
+              }
+            ],
+            "responses": {
+              "200": {
+                "description": "Success"
+              },
+              "400": {
+                "description": "Error"
+              },
+              "500": {
+                "description": "Server down"
+              }
+            }
+          }
+        },
+        "/api/v1/user/verify-phone": {
+          "get": {
+            "tags": [
+              "User"
+            ],
+            "produces": [
+              "application/json"
+            ],
+            "security": [
+              {
+                "Bearer": []
+              }
+            ],
+            "parameters": [
+              {
+                "in": "query",
+                "name": "token",
+                "type": "string"
+              }
+            ],
+            "responses": {
+              "200": {
+                "description": "Success"
+              },
+              "400": {
+                "description": "Error"
+              },
+              "500": {
+                "description": "Server down"
+              }
+            }
+          }
+        },
+        "/api/v1/user/log-other-devices-out": {
+          "post": {
+            "tags": [
+              "User"
+            ],
+            "produces": [
+              "application/json"
+            ],
+            "security": [
+              {
+                "Bearer": []
+              }
+            ],
+            "responses": {
+              "200": {
+                "description": "Success"
+              },
+              "400": {
+                "description": "Error"
+              },
+              "500": {
+                "description": "Server down"
+              }
+            }
+          }
+        },
+        "/api/v1/user/sign-out": {
+          "post": {
+            "tags": [
+              "User"
+            ],
+            "produces": [
+              "application/json"
+            ],
+            "security": [
+              {
+                "Bearer": []
+              }
+            ],
+            "responses": {
+              "200": {
+                "description": "Success"
+              },
+              "400": {
+                "description": "Error"
+              },
+              "500": {
+                "description": "Server down"
+              }
+            }
+          }
+        },
+        "/api/v1/user/update-password": {
+          "put": {
+            "tags": [
+              "User"
+            ],
+            "produces": [
+              "application/json"
+            ],
+            "security": [
+              {
+                "Bearer": []
+              }
+            ],
+            "parameters": [
+              {
+                "in": "body",
+                "name": "request",
+                "required": true,
+                "schema": {
+                  "$ref": "#/definitions/changePassword"
+                }
+              }
+            ],
+            "responses": {
+              "200": {
+                "description": "Success"
+              },
+              "400": {
+                "description": "Error"
+              },
+              "500": {
+                "description": "Server down"
+              }
+            }
+          }
+        },
+        "/api/v1/user/update-profile": {
+          "put": {
+            "tags": [
+              "User"
+            ],
+            "produces": [
+              "application/json"
+            ],
+            "security": [
+              {
+                "Bearer": []
+              }
+            ],
+            "parameters": [
+              {
+                "in": "body",
+                "name": "request",
+                "required": true,
+                "schema": {
+                  "$ref": "#/definitions/editProfile"
+                }
+              }
+            ],
+            "responses": {
+              "200": {
+                "description": "Success"
+              },
+              "400": {
+                "description": "Error"
+              },
+              "500": {
+                "description": "Server down"
+              }
+            }
+          }
+        },
+        "/api/v1/user/kpi-analytic": {
+          "get": {
+            "tags": [
+              "User"
+            ],
+            "produces": [
+              "application/json"
+            ],
+            "security": [
+              {
+                "Bearer": []
+              }
+            ],
+            "responses": {
+              "200": {
+                "description": "Success"
+              },
+              "400": {
+                "description": "Error"
+              },
+              "500": {
+                "description": "Server down"
+              }
+            }
+          }
+        },
+        "/api/v1/user/refresh-token": {
+          "post": {
+            "tags": [
+              "User"
+            ],
+            "produces": [
+              "application/json"
+            ],
+            "security": [
+              {
+                "Bearer": []
+              }
+            ],
+            "responses": {
+              "200": {
+                "description": "Success"
+              },
+              "400": {
+                "description": "Error"
+              },
+              "500": {
+                "description": "Server down"
+              }
+            }
+          }
+        },
+        "/api/v1/market/list-market": {
+          "get": {
+            "tags": [
+              "Market"
+            ],
+            "produces": [
+              "application/json"
+            ],
+            "security": [
+              {
+                "Bearer": []
+              }
+            ],
+            "responses": {
+              "200": {
+                "description": "Success"
+              },
+              "400": {
+                "description": "Error"
+              },
+              "500": {
+                "description": "Server down"
+              }
+            }
+          }
+        },
+        "/api/v1/project/list-project": {
+          "get": {
+            "tags": [
+              "Project"
+            ],
+            "produces": [
+              "application/json"
+            ],
+            "security": [
+              {
+                "Bearer": []
+              }
+            ],
+            "parameters": [
+              {
+                "in": "query",
+                "name": "q",
+                "type": "string"
+              },
+              {
+                "in": "query",
+                "name": "category",
+                "type": "string"
+              },
+              {
+                "in": "query",
+                "name": "userId",
+                "type": "string"
+              },
+              {
+                "in": "query",
+                "name": "page",
+                "type": "integer",
+                "default": 1
+              },
+              {
+                "in": "query",
+                "name": "pageSize",
+                "type": "integer",
+                "default": 10
+              }
+            ],
+            "responses": {
+              "200": {
+                "description": "Success"
+              },
+              "400": {
+                "description": "Error"
+              },
+              "500": {
+                "description": "Server down"
+              }
+            }
+          }
+        },
+        "/api/v1/project/create-project": {
+          "post": {
+            "tags": [
+              "Project"
+            ],
+            "produces": [
+              "application/json"
+            ],
+            "security": [
+              {
+                "Bearer": []
+              }
+            ],
+            "parameters": [
+              {
+                "in": "body",
+                "name": "request",
+                "required": true,
+                "schema": {
+                  "$ref": "#/definitions/createProject"
+                }
+              }
+            ],
+            "responses": {
+              "200": {
+                "description": "Success"
+              },
+              "400": {
+                "description": "Error"
+              },
+              "500": {
+                "description": "Server down"
+              }
+            }
+          }
+        },
+        "/api/v1/project/update": {
+          "put": {
+            "tags": [
+              "Project"
+            ],
+            "produces": [
+              "application/json"
+            ],
+            "security": [
+              {
+                "Bearer": []
+              }
+            ],
+            "parameters": [
+              {
+                "in": "body",
+                "name": "request",
+                "required": true,
+                "schema": {
+                  "$ref": "#/definitions/updateProject"
+                }
+              }
+            ],
+            "responses": {
+              "200": {
+                "description": "Success"
+              },
+              "400": {
+                "description": "Error"
+              },
+              "500": {
+                "description": "Server down"
+              }
+            }
+          }
+        },
+        "/api/v1/project/delete": {
+          "delete": {
+            "tags": [
+              "Project"
+            ],
+            "produces": [
+              "application/json"
+            ],
+            "security": [
+              {
+                "Bearer": []
+              }
+            ],
+            "parameters": [
+              {
+                "in": "body",
+                "name": "request",
+                "required": true,
+                "schema": {
+                  "$ref": "#/definitions/deleteProject"
+                }
+              }
+            ],
+            "responses": {
+              "200": {
+                "description": "Success"
+              },
+              "400": {
+                "description": "Error"
+              },
+              "500": {
+                "description": "Server down"
+              }
+            }
+          }
+        },
+        "/api/v1/contract/list-contract": {
+          "get": {
+            "tags": [
+              "Contract"
+            ],
+            "produces": [
+              "application/json"
+            ],
+            "security": [
+              {
+                "Bearer": []
+              }
+            ],
+            "parameters": [
+              {
+                "in": "query",
+                "name": "page",
+                "type": "integer",
+                "default": 1
+              },
+              {
+                "in": "query",
+                "name": "pageSize",
+                "type": "integer",
+                "default": 10
+              }
+            ],
+            "responses": {
+              "200": {
+                "description": "Success"
+              },
+              "400": {
+                "description": "Error"
+              },
+              "500": {
+                "description": "Server down"
+              }
+            }
+          }
+        },
+        "/api/v1/contract/add-contract": {
+          "post": {
+            "tags": [
+              "Contract"
+            ],
+            "produces": [
+              "application/json"
+            ],
+            "security": [
+              {
+                "Bearer": []
+              }
+            ],
+            "parameters": [
+              {
+                "in": "body",
+                "name": "request",
+                "required": true,
+                "schema": {
+                  "$ref": "#/definitions/addContract"
+                }
+              }
+            ],
+            "responses": {
+              "200": {
+                "description": "Success"
+              },
+              "400": {
+                "description": "Error"
+              },
+              "500": {
+                "description": "Server down"
+              }
+            }
+          }
+        },
+        "/api/v1/contract/update": {
+          "put": {
+            "tags": [
+              "Contract"
+            ],
+            "produces": [
+              "application/json"
+            ],
+            "security": [
+              {
+                "Bearer": []
+              }
+            ],
+            "parameters": [
+              {
+                "in": "body",
+                "name": "request",
+                "required": true,
+                "schema": {
+                  "$ref": "#/definitions/updateContract"
+                }
+              }
+            ],
+            "responses": {
+              "200": {
+                "description": "Success"
+              },
+              "400": {
+                "description": "Error"
+              },
+              "500": {
+                "description": "Server down"
+              }
+            }
+          }
+        },
+        "/api/v1/contract/delete": {
+          "delete": {
+            "tags": [
+              "Contract"
+            ],
+            "produces": [
+              "application/json"
+            ],
+            "security": [
+              {
+                "Bearer": []
+              }
+            ],
+            "parameters": [
+              {
+                "in": "body",
+                "name": "request",
+                "required": true,
+                "schema": {
+                  "$ref": "#/definitions/deleteContract"
+                }
+              }
+            ],
+            "responses": {
+              "200": {
+                "description": "Success"
+              },
+              "400": {
+                "description": "Error"
+              },
+              "500": {
+                "description": "Server down"
+              }
+            }
+          }
+        },
+        "/api/v1/trade/list-trade": {
+          "get": {
+            "tags": [
+              "Trade"
+            ],
+            "produces": [
+              "application/json"
+            ],
+            "security": [
+              {
+                "Bearer": []
+              }
+            ],
+            "parameters": [
+              {
+                "in": "query",
+                "name": "page",
+                "type": "integer",
+                "default": 1
+              },
+              {
+                "in": "query",
+                "name": "pageSize",
+                "type": "integer",
+                "default": 10
+              }
+            ],
+            "responses": {
+              "200": {
+                "description": "Success"
+              },
+              "400": {
+                "description": "Error"
+              },
+              "500": {
+                "description": "Server down"
+              }
+            }
+          }
+        },
+        "/api/v1/contract/sign-contract": {
+          "post": {
+            "tags": [
+              "Trade"
+            ],
+            "produces": [
+              "application/json"
+            ],
+            "security": [
+              {
+                "Bearer": []
+              }
+            ],
+            "parameters": [
+              {
+                "in": "body",
+                "name": "request",
+                "required": true,
+                "schema": {
+                  "$ref": "#/definitions/signContract"
+                }
+              }
+            ],
+            "responses": {
+              "200": {
+                "description": "Success"
+              },
+              "400": {
+                "description": "Error"
+              },
+              "500": {
+                "description": "Server down"
+              }
+            }
+          }
+        },
+        "/api/v1/transaction/list": {
+          "get": {
+            "tags": [
+              "Finance"
+            ],
+            "produces": [
+              "application/json"
+            ],
+            "security": [
+              {
+                "Bearer": []
+              }
+            ],
+            "parameters": [
+              {
+                "in": "query",
+                "name": "q",
+                "type": "string"
+              },
+              {
+                "in": "query",
+                "name": "category",
+                "type": "string"
+              },
+              {
+                "in": "query",
+                "name": "userId",
+                "type": "string"
+              },
+              {
+                "in": "query",
+                "name": "page",
+                "type": "integer",
+                "default": 1
+              },
+              {
+                "in": "query",
+                "name": "pageSize",
+                "type": "integer",
+                "default": 10
+              }
+            ],
+            "responses": {
+              "200": {
+                "description": "Success"
+              },
+              "400": {
+                "description": "Error"
+              },
+              "500": {
+                "description": "Server down"
+              }
+            }
+          }
+        },
+        "/socials/comment": {
+          "get": {
+            "tags": [
+              "Socials"
+            ],
+            "produces": [
+              "application/json"
+            ],
+            "security": [
+              {
+                "Bearer": []
+              }
+            ],
+            "parameters": [
+              {
+                "in": "query",
+                "name": "commentId",
+                "required": true,
+                "type": "string"
+              }
+            ],
+            "responses": {
+              "200": {
+                "description": "Success"
+              },
+              "400": {
+                "description": "Error"
+              },
+              "500": {
+                "description": "Server down"
+              }
+            }
+          },
+          "post": {
+            "tags": [
+              "Socials"
+            ],
+            "produces": [
+              "application/json"
+            ],
+            "security": [
+              {
+                "Bearer": []
+              }
+            ],
+            "parameters": [
+              {
+                "in": "body",
+                "name": "request",
+                "required": true,
+                "schema": {
+                  "$ref": "#/definitions/createComment"
+                }
+              }
+            ],
+            "responses": {
+              "200": {
+                "description": "Success"
+              },
+              "400": {
+                "description": "Error"
+              },
+              "500": {
+                "description": "Server down"
+              }
+            }
+          },
+          "put": {
+            "tags": [
+              "Socials"
+            ],
+            "produces": [
+              "application/json"
+            ],
+            "security": [
+              {
+                "Bearer": []
+              }
+            ],
+            "parameters": [
+              {
+                "in": "body",
+                "name": "request",
+                "required": true,
+                "schema": {
+                  "$ref": "#/definitions/updateComment"
+                }
+              }
+            ],
+            "responses": {
+              "200": {
+                "description": "Success"
+              },
+              "400": {
+                "description": "Error"
+              },
+              "500": {
+                "description": "Server down"
+              }
+            }
+          },
+          "delete": {
+            "tags": [
+              "Socials"
+            ],
+            "produces": [
+              "application/json"
+            ],
+            "security": [
+              {
+                "Bearer": []
+              }
+            ],
+            "parameters": [
+              {
+                "in": "body",
+                "name": "request",
+                "required": true,
+                "schema": {
+                  "$ref": "#/definitions/deleteComment"
+                }
+              }
+            ],
+            "responses": {
+              "200": {
+                "description": "Success"
+              },
+              "400": {
+                "description": "Error"
+              },
+              "500": {
+                "description": "Server down"
+              }
+            }
+          }
+        },
+        "/socials/comment/filter": {
+          "get": {
+            "tags": [
+              "Socials"
+            ],
+            "produces": [
+              "application/json"
+            ],
+            "security": [
+              {
+                "Bearer": []
+              }
+            ],
+            "parameters": [
+              {
+                "in": "query",
+                "name": "q",
+                "type": "string"
+              },
+              {
+                "in": "query",
+                "name": "userId",
+                "type": "string"
+              },
+              {
+                "in": "query",
+                "name": "campaignId",
+                "type": "string"
+              },
+              {
+                "in": "query",
+                "name": "page",
+                "default": 1,
+                "type": "integer"
+              },
+              {
+                "in": "query",
+                "name": "pageSize",
+                "default": 10,
+                "type": "integer"
+              }
+            ],
+            "responses": {
+              "200": {
+                "description": "Success"
+              },
+              "400": {
+                "description": "Error"
+              },
+              "500": {
+                "description": "Server down"
+              }
+            }
+          }
+        },
+        "security": {
+          "0": {
+            "Bearer": []
+          }
+        }
+      },
+      "definitions": {
+        "signIn": {
+          "type": "object",
+          "properties": {
+            "email": {
+              "type": "string",
+              "required": true,
+              "default": "kingsleyonyeneke@gmail.com"
+            },
+            "password": {
+              "type": "string",
+              "required": true,
+              "default": "09034128815@@Lk"
+            }
+          }
+        },
+        "signUp": {
+          "type": "object",
+          "properties": {
+            "email": {
+              "type": "string",
+              "required": true,
+              "default": "kingsleyonyeneke@gmail.com"
+            },
+            "username": {
+              "type": "string",
+              "required": true,
+              "default": "longyking"
+            },
+            "firstname": {
+              "type": "string",
+              "required": true,
+              "default": "Chidi"
+            },
+            "lastname": {
+              "type": "string",
+              "required": true,
+              "default": "Longinus"
+            },
+            "country": {
+              "type": "string",
+              "required": true
+            },
+            "accountType": {
+              "type": "string",
+              "required": true,
+              "enum": [
+                "individual",
+                "organisation"
+              ]
+            },
+            "dob": {
+              "type": "date"
+            },
+            "gender": {
+              "type": "string",
+              "enum": [
+                "male",
+                "female",
+                "undecided"
+              ],
+              "default": "undecided"
+            },
+            "referer": {
+              "type": "string"
+            },
+            "password": {
+              "type": "string",
+              "required": true
+            }
+          }
+        },
+        "initiateReset": {
+          "type": "object",
+          "properties": {
+            "email": {
+              "type": "string",
+              "required": true
+            }
+          }
+        },
+        "resetPassword": {
+          "type": "object",
+          "properties": {
+            "token": {
+              "type": "string",
+              "required": true
+            },
+            "password": {
+              "type": "string"
+            },
+            "logOtherDevicesOut": {
+              "type": "boolean",
+              "default": false
+            }
+          }
+        },
+        "subscribeNewsletter": {
+          "type": "object",
+          "properties": {
+            "email": {
+              "type": "string",
+              "required": true
+            }
+          }
+        },
+        "mailSupport": {
+          "type": "object",
+          "properties": {
+            "email": {
+              "type": "string",
+              "required": true
+            },
+            "subject": {
+              "type": "string",
+              "required": true
+            },
+            "message": {
+              "type": "string",
+              "required": true
+            }
+          }
+        },
+        "changePassword": {
+          "type": "object",
+          "properties": {
+            "password": {
+              "type": "string",
+              "required": true
+            },
+            "newPassword": {
+              "type": "string",
+              "required": true
+            },
+            "logOtherDevicesOut": {
+              "type": "boolean",
+              "default": false
+            }
+          }
+        },
+        "editProfile": {
+          "properties": {
+            "firstname": {
+              "type": "string"
+            },
+            "lastname": {
+              "type": "string"
+            },
+            "avatar": {
+              "type": "string"
+            },
+            "dob": {
+              "type": "string"
+            },
+            "location": {
+              "type": "string"
+            }
+          }
+        },
+        "createProject": {
+          "type": "object",
+          "properties": {
+            "projectName": {
+              "type": "string",
+              "required": true
+            },
+            "projectDescription": {
+              "type": "string",
+              "required": true
+            },
+            "projectCategory": {
+              "type": "string",
+              "required": true
+            },
+            "marketId": {
+              "type": "string",
+              "required": true
+            },
+            "projectType": {
+              "type": "string",
+              "required": true,
+              "enum": [
+                "STARTUP",
+                "OFFICIAL"
+              ]
+            }
+          }
+        },
+        "deleteProject": {
+          "type": "object",
+          "properties": {
+            "projectId": {
+              "type": "string",
+              "required": true
+            }
+          }
+        },
+        "updateProject": {
+          "type": "object",
+          "properties": {
+            "projectId": {
+              "type": "string"
+            },
+            "projectName": {
+              "type": "string"
+            },
+            "projectDescription": {
+              "type": "string"
+            },
+            "projectCategory": {
+              "type": "string"
+            },
+            "marketId": {
+              "type": "string"
+            },
+            "projectType": {
+              "type": "string",
+              "enum": [
+                "STARTUP",
+                "OFFICIAL"
+              ]
+            }
+          }
+        },
+        "addContract": {
+          "type": "object",
+          "properties": {
+            "projectId": {
+              "type": "string",
+              "required": true
+            },
+            "contractName": {
+              "type": "string",
+              "required": true
+            },
+            "fixedAmount": {
+              "type": "number",
+              "required": true
+            },
+            "minAmount": {
+              "type": "number",
+              "required": true
+            },
+            "maxAmount": {
+              "type": "number",
+              "required": true
+            },
+            "type": {
+              "type": "string",
+              "required": true,
+              "enum": [
+                "SWIFT_LOAN",
+                "PEER_TO_PEER_LOAN"
+              ]
+            },
+            "interest": {
+              "type": "float",
+              "required": true
+            },
+            "maturityTime": {
+              "type": "string",
+              "required": true
+            }
+          }
+        },
+        "deleteContract": {
+          "type": "object",
+          "properties": {
+            "contractId": {
+              "type": "string",
+              "required": true
+            }
+          }
+        },
+        "updateContract": {
+          "type": "object",
+          "properties": {
+            "contractId": {
+              "type": "string"
+            },
+            "contractName": {
+              "type": "string"
+            },
+            "fixedAmount": {
+              "type": "number"
+            },
+            "minAmount": {
+              "type": "number"
+            },
+            "maxAmount": {
+              "type": "number"
+            },
+            "type": {
+              "type": "string",
+              "enum": [
+                "SWIFT_LOAN",
+                "PEER_TO_PEER_LOAN"
+              ]
+            },
+            "interest": {
+              "type": "float"
+            },
+            "maturityTime": {
+              "type": "string"
+            }
+          }
+        },
+        "signContract": {
+          "type": "object",
+          "properties": {
+            "contractId": {
+              "type": "string",
+              "required": true
+            }
+          }
+        },
+        "createComment": {
+          "type": "object",
+          "properties": {
+            "campaignId": {
+              "type": "string",
+              "required": true
+            },
+            "comment": {
+              "type": "string",
+              "required": true
+            }
+          }
+        },
+        "updateComment": {
+          "type": "object",
+          "properties": {
+            "campaignId": {
+              "type": "string",
+              "required": true
+            },
+            "commentId": {
+              "type": "string",
+              "required": true
+            },
+            "comment": {
+              "type": "string",
+              "required": true
+            }
+          }
+        },
+        "deleteComment": {
+          "type": "object",
+          "properties": {
+            "commentId": {
+              "type": "string",
+              "required": true
+            }
+          }
+        }
+      },
+      "responses": {},
+      "parameters": {},
+      "securityDefinitions": {
+        "Bearer": {
+          "type": "apiKey",
+          "in": "header",
+          "name": "Authorization"
+        }
+      },
+      "tags": []
+    },
+    "customOptions": {}
+  }

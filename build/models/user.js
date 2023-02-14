@@ -7,11 +7,11 @@ const mongoose_1 = __importDefault(require("mongoose"));
 const User = new mongoose_1.default.Schema({
     firstname: {
         type: String,
-        required: [true, 'Please provide your firstname'],
+        // required: [true, 'Please provide your firstname'],
     },
     lastname: {
         type: String,
-        required: [true, 'Please provide your lastname'],
+        // required: [true, 'Please provide your lastname'],
     },
     username: {
         type: String,
@@ -22,8 +22,8 @@ const User = new mongoose_1.default.Schema({
     refId: {
         type: String,
         lowercase: true,
-        unique: true,
-        required: [true, 'Please enter a username'],
+        // unique: true,
+        // required: [true, 'Please enter a username'],
         index: true,
     },
     referer: {
