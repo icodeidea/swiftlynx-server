@@ -31,7 +31,7 @@ const projectRouter = (0, express_1.Router)();
 exports.default = (app) => {
     app.use('/project', projectRouter);
     //start a project
-    projectRouter.route('/start-project').post(middlewares_1.default.isAuth, middlewares_1.default.attachCurrentUser, middlewares_1.validator.startProject, startProject);
+    projectRouter.route('/create-project').post(middlewares_1.default.isAuth, middlewares_1.default.attachCurrentUser, middlewares_1.validator.startProject, startProject);
     //list project
     projectRouter.route('/list-project').get(getProject);
     return app;

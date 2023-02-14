@@ -4,11 +4,7 @@ const validations_1 = require("../validations");
 class Validator {
     async signup(req, _, next) {
         try {
-            const validation = validations_1.AuthSchema.signupSchema.validate({
-                username: req.body.username,
-                email: req.body.email,
-                password: req.body.password,
-            });
+            const validation = validations_1.AuthSchema.signupSchema.validate(Object.assign({}, req.body));
             if (validation.error) {
                 return next(validation.error);
             }

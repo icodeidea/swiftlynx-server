@@ -2,7 +2,7 @@ import fs from 'fs';
 import swaggerJsDoc, { Options } from 'swagger-jsdoc';
 import appConfig from './index';
 
-const { appName, environment, port, version } = appConfig
+const { appName, environment, port, version, api } = appConfig
 
 const env = environment, displayName = appName ;
 
@@ -18,7 +18,7 @@ const swagger: Options = {
       servers: [{ url: `http://localhost:${port}` }],
     },
   },
-  apis: ['./src/docs/*.yml'],
+  apis: ['./app/docs/*.yml'],
 };
 
 const config = swaggerJsDoc(swagger);

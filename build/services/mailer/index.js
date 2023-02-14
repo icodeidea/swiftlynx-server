@@ -25,14 +25,14 @@ let MailerService = class MailerService {
     }
     async SendWelcomeEmail({ email, verified }) {
         const data = {
-            from: 'Admin <hello@BeeNg.com>',
+            from: 'Admin <${config.supportMail}>',
             to: email,
-            subject: 'Welcome to BeeNg Social Network',
+            subject: 'Welcome to ${config.appName} Social Network',
             html: `
       <br/>
-      Welcome to <a href=${config_1.default.url} target='_blank'>BeeNg</a>
+      Welcome to <a href=${config_1.default.url} target='_blank'>${config_1.default.appName}</a>
       <br/>
-      BeeNg is a blockchained powered news platform
+      ${config_1.default.appName} is a blockchained powered news platform
       <br/>
       <br/>
       Please verify your email by clicking the url below:
@@ -43,7 +43,7 @@ let MailerService = class MailerService {
       <a href="${config_1.default.url}/auth/verify/${verified.token.value}">Verify Account</a>
       <br/>
       Best wishes,
-      BeeNg Team.
+      ${config_1.default.appName} Team.
       `,
         };
         this.emailClient.send(data);
@@ -51,13 +51,13 @@ let MailerService = class MailerService {
     }
     async ResendVerificationMail({ email, username, verified }) {
         const data = {
-            from: 'Admin <hello@BeeNg.com>',
+            from: 'Admin <${config.supportMail}>',
             to: email,
-            subject: 'BeeNg.com Wallet service - Resend Verification',
+            subject: '${config.appName}.com Wallet service - Resend Verification',
             html: `
       Hi there ${username},
       <br/>
-      Welcome to <a href=${config_1.default.url} target='_blank'>BeeNg</a>
+      Welcome to <a href=${config_1.default.url} target='_blank'>${config_1.default.appName}</a>
       <br/><br/>
       Please verify your email by clicking the url below:
       <br/>
@@ -67,7 +67,7 @@ let MailerService = class MailerService {
       <a href="${config_1.default.url}/auth/verify/${verified.token.value}">Verify Account</a>
       <br/>
       Best wishes,
-      BeeNg Team.
+      ${config_1.default.appName} Team.
       `,
         };
         this.emailClient.send(data);
@@ -75,13 +75,13 @@ let MailerService = class MailerService {
     }
     async SendPasswordResetMail({ email, reset }) {
         const data = {
-            from: 'Admin <hello@BeeNg.com>',
+            from: 'Admin <${config.supportMail}>',
             to: email,
             subject: 'Password Reset',
             html: `
       Hi there,
       <br/>
-      Welcome to <a href=${config_1.default.url} target='_blank'>BeeNg</a>
+      Welcome to <a href=${config_1.default.url} target='_blank'>${config_1.default.appName}</a>
       <br/><br/>
       A password reset email has been sent :
       <br/>
@@ -91,7 +91,7 @@ let MailerService = class MailerService {
       <a href="${config_1.default.url}/auth/reset/${reset.token}">Reset Account Password</a>
       <br/>
       Best wishes,
-      BeeNg Team.
+      ${config_1.default.appName} Team.
       `,
         };
         this.emailClient.send(data);

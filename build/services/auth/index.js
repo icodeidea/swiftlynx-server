@@ -40,13 +40,13 @@ let AuthService = class AuthService {
     }
     async SignUp(userInputDTO) {
         try {
+            console.log(userInputDTO);
             // throw new SystemError(401, 'System under maintenance, try again later');
-            console.log('this is email', userInputDTO.email);
             const exists = await this.isUsed({ email: userInputDTO.email });
             if (exists) {
                 throw new utils_1.SystemError(401, 'email or username already in use');
             }
-            if (userInputDTO.referer) {
+            if (userInputDTO === null || userInputDTO === void 0 ? void 0 : userInputDTO.referer) {
                 const refUser = await this.userModel.findOne({ refId: userInputDTO.referer });
                 if (refUser) {
                     userInputDTO.referer = refUser.id;

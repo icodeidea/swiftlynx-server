@@ -73,7 +73,7 @@ class AttachUser {
         else
           res.status(401).json({
             success: false,
-            message: 'wallet setup not completed, goto https://BeeNg.com to finish wallet setup',
+            message: 'wallet setup not completed, goto https://${config.appName}.com to finish wallet setup',
           });
       }
     } catch (e) {

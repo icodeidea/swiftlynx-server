@@ -1,0 +1,143 @@
+paths:
+  /api/v1/project/list-project:
+    get:
+      tags:
+        - Project
+      produces:
+        - application/json
+      security:
+        - Bearer: []
+      parameters:
+        - in: query
+          name: q
+          type: string
+        - in: query
+          name: category
+          type: string
+        - in: query
+          name: userId
+          type: string
+        - in: query
+          name: page
+          type: integer
+          default: 1
+        - in: query
+          name: pageSize
+          type: integer
+          default: 10
+      responses:
+        200:
+          description: Success
+        400:
+          description: Error
+        500:
+          description: Server down
+
+  /api/v1/project/create-project:
+    post:
+      tags:
+        - Project
+      produces:
+        - application/json
+      security:
+        - Bearer: []
+      parameters:
+        - in: body
+          name: request
+          required: true
+          schema:
+            $ref: "#/definitions/createProject"
+      responses:
+        200:
+          description: Success
+        400:
+          description: Error
+        500:
+          description: Server down
+
+  /api/v1/project/update:
+    put:
+      tags:
+        - Project
+      produces:
+        - application/json
+      security:
+        - Bearer: []
+      parameters:
+        - in: body
+          name: request
+          required: true
+          schema:
+            $ref: "#/definitions/updateProject"
+      responses:
+        200:
+          description: Success
+        400:
+          description: Error
+        500:
+          description: Server down
+
+  /api/v1/project/delete:
+    delete:
+      tags:
+        - Project
+      produces:
+        - application/json
+      security:
+        - Bearer: []
+      parameters:
+        - in: body
+          name: request
+          required: true
+          schema:
+            $ref: "#/definitions/deleteProject"
+      responses:
+        200:
+          description: Success
+        400:
+          description: Error
+        500:
+          description: Server down
+
+definitions:
+  createProject:
+    type: object
+    properties:
+      projectName:
+        type: string
+        required: true
+      projectDescription:
+        type: string
+        required: true
+      projectCategory:
+        type: string
+        required: true
+      marketId:
+        type: string
+        required: true
+      projectType:
+        type: string
+        required: true
+        enum: ["STARTUP", "OFFICIAL"]
+  deleteProject:
+    type: object
+    properties:
+      projectId:
+        type: string
+        required: true
+  updateProject:
+    type: object
+    properties:
+      projectId:
+        type: string
+      projectName:
+        type: string
+      projectDescription:
+        type: string
+      projectCategory:
+        type: string
+      marketId:
+        type: string
+      projectType:
+        type: string
+        enum: ["STARTUP", "OFFICIAL"]

@@ -3,16 +3,25 @@ import mongoose from 'mongoose';
 
 const User = new mongoose.Schema(
   {
+    firstname: {
+      type: String,
+      // required: [true, 'Please provide your firstname'],
+    },
+    lastname: {
+      type: String,
+      // required: [true, 'Please provide your lastname'],
+    },
     username: {
       type: String,
       lowercase: true,
+      unique: true,
       required: [true, 'Please enter a username'],
     },
     refId: {
       type: String,
       lowercase: true,
-      unique: true,
-      required: [true, 'Please enter a username'],
+      // unique: true,
+      // required: [true, 'Please enter a username'],
       index: true,
     },
     referer: {
@@ -49,11 +58,21 @@ const User = new mongoose.Schema(
       enum: ['NONE', 'JUNIOR', 'SENIOR', 'STAFF', 'MANAGER', 'DEVOPS', 'SUDO'],
       default: 'NONE',
     },
+    accountType: {
+      type: String,
+      enum: ['individual', 'organisation'],
+      default: 'individual',
+    },
     kpi: {
       usersRefered: { type : Number, default: 0 },
-      feedsEarned: { type: Number, default: 0 },
     },
     country: { type: String },
+    dob: { type: Date },
+    gender: {
+      type: String,
+      enum: ['male', 'female', 'undecided'],
+      default: 'undecided',
+    },
     picture: { type: String, default: "https://www.allthetests.com/quiz22/picture/pic_1171831236_1.png?1592828498"},
     locale: { type: String }, // we track Ips this is where tracked Ips will be placed for good analytics
     lastLogin: {

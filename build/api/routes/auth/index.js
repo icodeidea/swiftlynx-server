@@ -31,16 +31,16 @@ const authRouter = (0, express_1.Router)();
 exports.default = (app) => {
     app.use('/auth', authRouter);
     //signup
-    authRouter.route('/signup').post(middlewares_1.validator.signup, controllers_1.AuthController.signup);
+    authRouter.route('/sign-up').post(middlewares_1.validator.signup, controllers_1.AuthController.signup);
     //sigin
-    authRouter.route('/signin').post(middlewares_1.validator.signin, controllers_1.AuthController.signin);
+    authRouter.route('/sign-in').post(middlewares_1.validator.signin, controllers_1.AuthController.signin);
     //Google Auth
-    authRouter.route('/googleAuth').post(middlewares_1.validator.OAuth, controllers_1.AuthController.googleAuth);
+    authRouter.route('/google-auth').post(middlewares_1.validator.OAuth, controllers_1.AuthController.googleAuth);
     //verifyMail
     authRouter.route('/verify/:token').get(controllers_1.AuthController.verifyEmail);
     authRouter.route('/reset').post(middlewares_1.validator.validateEmail, controllers_1.AuthController.requestPasswordReset);
     authRouter.route('/reset/:token').post(middlewares_1.validator.validatePassword, controllers_1.AuthController.updatePassword);
-    authRouter.route('/resetPassword').post(middlewares_1.validator.resetPassword, middlewares_1.default.isAuth, middlewares_1.default.attachCurrentUser, controllers_1.AuthController.authedUpdatePassword);
+    authRouter.route('/reset-password').post(middlewares_1.validator.resetPassword, middlewares_1.default.isAuth, middlewares_1.default.attachCurrentUser, controllers_1.AuthController.authedUpdatePassword);
     // resend verification mail replacement
     authRouter.route('/resend-verify-mail').post(middlewares_1.validator.validateEmail, controllers_1.AuthController.resendVerificationMail);
     // resendVerificationMail : depricated, didnt comment it out to avoid system break down
