@@ -449,6 +449,27 @@ let AuthService = class AuthService {
             throw new utils_1.SystemError(e.statusCode || 500, e.message);
         }
     }
+    async GetUser({ userId, }) {
+        this.logger.silly('Getting Account...');
+        try {
+            const userRecord = await this.userModel.findById(userId);
+            const wallet = await this.walletModel.findById(userRecord.wallet);
+            if (userRecord) {
+                this.logger.silly('Account Found!');
+                return {
+                    user: userRecord.toJSON(),
+                    wallet
+                };
+            }
+            else {
+                throw new Error('unable to find this account at the moment, please try again later');
+            }
+        }
+        catch (e) {
+            this.logger.error(e);
+            throw new utils_1.SystemError(e.statusCode || 500, e.message);
+        }
+    }
     async DeleteUser({ userId, }) {
         this.logger.silly('Deleting Account...');
         try {
