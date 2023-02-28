@@ -19,6 +19,19 @@ export class UserController {
         }
     };
 
+    static getAccount = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
+      const logger: Logger = Container.get('logger');
+      logger.debug('Calling Get Account with userId: %s', req.currentUser.id);
+      try {
+        const authServiceInstance = Container.get(AuthService);
+        const result = await authServiceInstance.GetUser({ userId: req.currentUser.id });
+        return res.status(200).json({ success: true, data: result, message: 'user found' });
+      } catch (e) {
+        logger.error('🔥 error: %o', e);
+        return next(e);
+      }
+    };
+
     static deleteAccount = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
         const logger: Logger = Container.get('logger');
         logger.debug('Calling Delete Account with userId: %s', req.currentUser.id);

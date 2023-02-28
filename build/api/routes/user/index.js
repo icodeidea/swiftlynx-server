@@ -29,6 +29,7 @@ const controllers_1 = require("../../controllers");
 const userRouter = (0, express_1.Router)();
 exports.default = (app) => {
     app.use('/user', userRouter);
+    userRouter.route('/').get(middlewares_1.default.isAuth, middlewares_1.default.attachCurrentUser, controllers_1.UserController.getAccount);
     //update-account
     userRouter.route('/update-account').post(middlewares_1.validator.updateUser, middlewares_1.default.isAuth, middlewares_1.default.attachCurrentUser, controllers_1.UserController.updateAccount);
     //delete-account
