@@ -32,7 +32,7 @@ exports.updatePasswordSchema = joi_1.default.object({
 exports.authedUpdatePasswordSchema = joi_1.default.object({
     newPassword: joi_1.default.string().required(),
     password: joi_1.default.string().required(),
-    logOtherDevicesOut: joi_1.default.string()
+    logOtherDevicesOut: joi_1.default.boolean()
 });
 exports.userUpdateSchema = joi_1.default.object({
     firstname: joi_1.default.string(),

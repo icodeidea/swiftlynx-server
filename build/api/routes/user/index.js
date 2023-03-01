@@ -32,8 +32,8 @@ exports.default = (app) => {
     userRouter.route('/').get(middlewares_1.default.isAuth, middlewares_1.default.attachCurrentUser, controllers_1.UserController.getAccount);
     //update-account
     userRouter.route('/update-profile').put(middlewares_1.validator.updateUser, middlewares_1.default.isAuth, middlewares_1.default.attachCurrentUser, controllers_1.UserController.updateAccount);
-    //update-account
-    userRouter.route('/update-password').post(middlewares_1.validator.updatePassword, middlewares_1.default.isAuth, middlewares_1.default.attachCurrentUser, controllers_1.UserController.UpdatePassword);
+    //update-password
+    userRouter.route('/update-password').put(middlewares_1.validator.updatePassword, middlewares_1.default.isAuth, middlewares_1.default.attachCurrentUser, controllers_1.UserController.UpdatePassword);
     //delete-account
     userRouter.route('/delete-account').post(middlewares_1.default.isAuth, middlewares_1.default.attachCurrentUser, controllers_1.UserController.deleteAccount);
     return app;

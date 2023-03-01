@@ -31,7 +31,7 @@ export const updatePasswordSchema = Joi.object({
 export const authedUpdatePasswordSchema = Joi.object({
   newPassword: Joi.string().required(),
   password: Joi.string().required(),
-  logOtherDevicesOut: Joi.string()
+  logOtherDevicesOut: Joi.boolean()
 });
 
 export const userUpdateSchema = Joi.object({
