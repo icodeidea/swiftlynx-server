@@ -67,7 +67,7 @@ const User = new mongoose.Schema(
       usersRefered: { type : Number, default: 0 },
     },
     country: { type: String },
-    dob: { type: Date },
+    dob: { type: String },
     gender: {
       type: String,
       enum: ['male', 'female', 'undecided'],
