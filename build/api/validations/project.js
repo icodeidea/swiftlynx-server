@@ -9,6 +9,7 @@ exports.startProjectSchema = joi_1.default.object({
     projectName: joi_1.default.string().required().max(100),
     projectDescription: joi_1.default.string().required().max(100),
     marketId: joi_1.default.string().required().max(1000),
+    projectCategory: joi_1.default.string(),
     projectType: joi_1.default.string().valid("STARTUP", "OFFICIAL").required().max(100),
 });
 //# sourceMappingURL=project.js.map
