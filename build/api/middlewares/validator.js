@@ -123,6 +123,18 @@ class Validator {
             next(e);
         }
     }
+    async updatePassword(req, _, next) {
+        try {
+            const validation = await validations_1.AuthSchema.authedUpdatePasswordSchema.validateAsync(Object.assign({}, req.body));
+            if (validation.error) {
+                return next(validation.error);
+            }
+            return next();
+        }
+        catch (e) {
+            next(e);
+        }
+    }
     /**
      * Wallet Validators
      */

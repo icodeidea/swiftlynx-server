@@ -30,14 +30,16 @@ exports.updatePasswordSchema = joi_1.default.object({
     password: joi_1.default.string().required(),
 });
 exports.authedUpdatePasswordSchema = joi_1.default.object({
-    current: joi_1.default.string().required(),
+    newPassword: joi_1.default.string().required(),
     password: joi_1.default.string().required(),
+    logOtherDevicesOut: joi_1.default.string()
 });
 exports.userUpdateSchema = joi_1.default.object({
-    username: joi_1.default.string(),
-    dateOfBirth: joi_1.default.date(),
+    firstname: joi_1.default.string(),
+    lastname: joi_1.default.string(),
+    dob: joi_1.default.date(),
+    gender: joi_1.default.string(),
     country: joi_1.default.string(),
-    region: joi_1.default.string(),
 });
 exports.onlyEmailSchema = joi_1.default.object({
     email: joi_1.default.string().required(),

@@ -139,6 +139,20 @@ class Validator {
     }
   }
 
+  async updatePassword(req: Request, _, next: NextFunction) {
+    try {
+      const validation = await AuthSchema.authedUpdatePasswordSchema.validateAsync({
+       ...req.body
+      });
+      if (validation.error) {
+        return next(validation.error);
+      }
+      return next();
+    } catch (e) {
+      next(e);
+    }
+  }
+
 
   /**
    * Wallet Validators

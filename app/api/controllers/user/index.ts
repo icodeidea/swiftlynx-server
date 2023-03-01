@@ -32,6 +32,19 @@ export class UserController {
       }
     };
 
+    static UpdatePassword = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
+      const logger: Logger = Container.get('logger');
+      logger.debug('Calling update Account password with userId: %s', req.currentUser.id);
+      try {
+        const authServiceInstance = Container.get(AuthService);
+        const result = await authServiceInstance.AuthedUpdatePassword(req.currentUser.id, req.body.password, req.body.newPassword);
+        return res.status(200).json({ success: true, data: result, message: 'user password updated' });
+      } catch (e) {
+        logger.error('🔥 error: %o', e);
+        return next(e);
+      }
+    };
+
     static deleteAccount = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
         const logger: Logger = Container.get('logger');
         logger.debug('Calling Delete Account with userId: %s', req.currentUser.id);

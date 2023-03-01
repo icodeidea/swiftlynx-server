@@ -34,6 +34,19 @@ UserController.getAccount = async (req, res, next) => {
         return next(e);
     }
 };
+UserController.UpdatePassword = async (req, res, next) => {
+    const logger = typedi_1.Container.get('logger');
+    logger.debug('Calling update Account password with userId: %s', req.currentUser.id);
+    try {
+        const authServiceInstance = typedi_1.Container.get(services_1.AuthService);
+        const result = await authServiceInstance.AuthedUpdatePassword(req.currentUser.id, req.body.password, req.body.newPassword);
+        return res.status(200).json({ success: true, data: result, message: 'user password updated' });
+    }
+    catch (e) {
+        logger.error('🔥 error: %o', e);
+        return next(e);
+    }
+};
 UserController.deleteAccount = async (req, res, next) => {
     const logger = typedi_1.Container.get('logger');
     logger.debug('Calling Delete Account with userId: %s', req.currentUser.id);

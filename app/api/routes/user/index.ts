@@ -10,7 +10,10 @@ export default (app: Router): Router => {
   userRouter.route('/').get(middlewares.isAuth, middlewares.attachCurrentUser, UserController.getAccount);
 
   //update-account
-  userRouter.route('/update-account').post(validator.updateUser, middlewares.isAuth, middlewares.attachCurrentUser, UserController.updateAccount);
+  userRouter.route('/update-profile').put(validator.updateUser, middlewares.isAuth, middlewares.attachCurrentUser, UserController.updateAccount);
+
+  //update-password
+  userRouter.route('/update-password').put(validator.updatePassword, middlewares.isAuth, middlewares.attachCurrentUser, UserController.UpdatePassword);
 
   //delete-account
   userRouter.route('/delete-account').post(middlewares.isAuth, middlewares.attachCurrentUser, UserController.deleteAccount);

@@ -29,15 +29,17 @@ export const updatePasswordSchema = Joi.object({
 });
 
 export const authedUpdatePasswordSchema = Joi.object({
-  current: Joi.string().required(),
+  newPassword: Joi.string().required(),
   password: Joi.string().required(),
+  logOtherDevicesOut: Joi.string()
 });
 
 export const userUpdateSchema = Joi.object({
-  username: Joi.string(),
-  dateOfBirth: Joi.date(),
+  firstname: Joi.string(),
+  lastname: Joi.string(),
+  dob: Joi.date(),
+  gender: Joi.string(),
   country: Joi.string(),
-  region: Joi.string(),
 });
 
 
