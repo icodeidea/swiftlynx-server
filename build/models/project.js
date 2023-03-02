@@ -26,7 +26,7 @@ const Project = new mongoose_1.default.Schema({
     },
     projectBanner: {
         type: String,
-        default: 'path to default image',
+        default: 'http://iconerecife.com.br/wp-content/plugins/uix-page-builder/includes/uixpbform/images/default-cover-6.jpg',
     },
     status: {
         type: String,

@@ -18,7 +18,7 @@ const Market = new mongoose_1.default.Schema({
     },
     sectorAvailable: {
         type: String,
-        enum: ['INVESTMENT', 'LOAN'],
+        enum: ['INVESTMENT', 'LOAN', 'ALL'],
         default: 'ALL',
     },
     kpi: {
