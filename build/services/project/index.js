@@ -83,6 +83,50 @@ let ProjectService = class ProjectService {
             throw new utils_1.SystemError(e.statusCode || 500, e.message);
         }
     }
+    async updateProject(updateProject) {
+        try {
+            this.logger.silly('updating project');
+            const userId = updateProject.userId;
+            const projectId = updateProject.projectId;
+            delete updateProject.userId;
+            delete updateProject.projectId;
+            const projectRecord = await this.projectModel.findOne({ 'id': projectId, userId });
+            if (!projectRecord) {
+                this.logger.silly('project not found');
+                throw new utils_1.SystemError(200, 'project not found');
+            }
+            for (const property in updateProject) {
+                projectRecord[property] = updateProject[property];
+            }
+            return await projectRecord.save();
+        }
+        catch (e) {
+            this.logger.error(e);
+            throw new utils_1.SystemError(e.statusCode || 500, e.message);
+        }
+    }
+    async deleteProject({ userId, projectId }) {
+        this.logger.silly('Deleting Project...');
+        try {
+            const projectRecord = await this.projectModel
+                .findOne({ 'id': projectId, userId });
+            if (!projectRecord) {
+                throw new Error('project not found');
+            }
+            const projectDeleted = await this.projectModel.findByIdAndDelete(projectId);
+            if (projectDeleted) {
+                this.logger.silly('Project deleted!');
+                return 'this project is permanently deleted';
+            }
+            else {
+                throw new Error('this project is unable to delete at the moment, please try again later');
+            }
+        }
+        catch (e) {
+            this.logger.error(e);
+            throw new utils_1.SystemError(e.statusCode || 500, e.message);
+        }
+    }
 };
 ProjectService = __decorate([
     (0, typedi_1.Service)(),

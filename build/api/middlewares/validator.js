@@ -192,6 +192,30 @@ class Validator {
             next(e);
         }
     }
+    async updateProject(req, _, next) {
+        try {
+            const validation = validations_1.ProjectSchema.updateProjectSchema.validate(Object.assign({}, req.body));
+            if (validation.error) {
+                return next(validation.error);
+            }
+            return next();
+        }
+        catch (e) {
+            next(e);
+        }
+    }
+    async deleteProject(req, _, next) {
+        try {
+            const validation = validations_1.ProjectSchema.deleteProjectSchema.validate(Object.assign({}, req.body));
+            if (validation.error) {
+                return next(validation.error);
+            }
+            return next();
+        }
+        catch (e) {
+            next(e);
+        }
+    }
     /**
      * contract validators
      */
