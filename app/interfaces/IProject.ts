@@ -21,6 +21,7 @@ export interface IProject {
   
 export interface IProjectInputDTO {
     userId: string;
+    projectId?: string;
     projectName: string;
     projectDescription: string;
     projectBanner: string;

@@ -26,7 +26,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = require("express");
 const middlewares_1 = __importStar(require("../../middlewares"));
 const controllers_1 = require("../../controllers");
-const { startProject, getProject } = controllers_1.ProjectController;
+const { startProject, getProject, updateProject, deleteProject } = controllers_1.ProjectController;
 const projectRouter = (0, express_1.Router)();
 exports.default = (app) => {
     app.use('/project', projectRouter);
@@ -34,6 +34,10 @@ exports.default = (app) => {
     projectRouter.route('/create-project').post(middlewares_1.default.isAuth, middlewares_1.default.attachCurrentUser, middlewares_1.validator.startProject, startProject);
     //list project
     projectRouter.route('/list-project').get(getProject);
+    //update project
+    projectRouter.route('/update').put(middlewares_1.default.isAuth, middlewares_1.default.attachCurrentUser, middlewares_1.validator.updateProject, updateProject);
+    //delete project
+    projectRouter.route('/delete').delete(middlewares_1.default.isAuth, middlewares_1.default.attachCurrentUser, middlewares_1.validator.deleteProject, deleteProject);
     return app;
 };
 //# sourceMappingURL=index.js.map
