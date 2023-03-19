@@ -13,4 +13,5 @@ export const addContractSchema = Joi.object({
 
 export const signContractSchema = Joi.object({
   contractId: Joi.string().required().max(1000),
+  amount: Joi.string().required()
 });

@@ -17,5 +17,6 @@ exports.addContractSchema = joi_1.default.object({
 });
 exports.signContractSchema = joi_1.default.object({
     contractId: joi_1.default.string().required().max(1000),
+    amount: joi_1.default.string().required()
 });
 //# sourceMappingURL=contract.js.map

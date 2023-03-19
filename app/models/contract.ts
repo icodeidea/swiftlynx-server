@@ -57,7 +57,7 @@ const Contract = new mongoose.Schema(
     slug: {
       type: String,
       default:  function() {
-        slugify(this.projectName);
+        slugify(this.contractName);
       }
     },
     deleted: {
