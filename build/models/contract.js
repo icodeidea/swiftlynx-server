@@ -59,7 +59,7 @@ const Contract = new mongoose_1.default.Schema({
     slug: {
         type: String,
         default: function () {
-            (0, slugify_1.default)(this.projectName);
+            (0, slugify_1.default)(this.contractName);
         }
     },
     deleted: {
