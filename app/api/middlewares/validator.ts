@@ -269,9 +269,38 @@ class Validator {
     }
   }
 
+  async updateContract(req: Request, _, next: NextFunction) {
+    try {
+      const validation = ContractShema.updateContractSchema.validate({
+        ...req.body
+      });
+      if (validation.error) {
+        return next(validation.error);
+      }
+      return next();
+    } catch (e) {
+      next(e);
+    }
+  }
+
+
   async signContract(req: Request, _, next: NextFunction) {
     try {
       const validation = ContractShema.signContractSchema.validate({
+        ...req.body
+      });
+      if (validation.error) {
+        return next(validation.error);
+      }
+      return next();
+    } catch (e) {
+      next(e);
+    }
+  }
+
+  async deleteContract(req: Request, _, next: NextFunction) {
+    try {
+      const validation = ContractShema.getContractSchema.validate({
         ...req.body
       });
       if (validation.error) {

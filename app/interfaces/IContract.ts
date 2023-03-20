@@ -22,6 +22,7 @@ export interface IContract {
   export interface IContractInputDTO {
     userId: string;
     projectId: string;
+    contractId?: string;
     contractName: string;
     fixedAmount?: Number;
     minAmount?: Number;

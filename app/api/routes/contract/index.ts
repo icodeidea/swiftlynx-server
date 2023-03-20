@@ -5,7 +5,9 @@ import { ContractController } from '../../controllers'
 const { 
     addContract, 
     getContract, 
-    signContract 
+    signContract ,
+    updateContract,
+    deleteContract
 } = ContractController;
 
 const contractRouter = Router();
@@ -15,6 +17,12 @@ export default (app: Router): Router => {
 
   //add contract
   contractRouter.route('/add-contract').post(middlewares.isAuth, middlewares.attachCurrentUser, validator.addContract, addContract);
+
+  //update contract
+  contractRouter.route('/update').put(middlewares.isAuth, middlewares.attachCurrentUser, validator.updateContract, updateContract);
+
+  //delete contract
+  contractRouter.route('/delete').delete(middlewares.isAuth, middlewares.attachCurrentUser, validator.deleteContract, deleteContract);
 
   //list contract
   contractRouter.route('/list-contract').get(getContract);

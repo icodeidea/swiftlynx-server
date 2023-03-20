@@ -3,6 +3,7 @@ import { IContractUpdateStatisticsDTO, IContractInputDTO, IContract } from '../.
 import { Document } from 'mongoose';
 import { SystemError } from '../../utils';
 import { ProjectService } from '../project';
+import { TradeService } from '../trade';
 
 @Service()
 export class ContractService {
@@ -10,6 +11,7 @@ export class ContractService {
     @Inject('contractModel') private contractModel: Models.ContractModel,
     @Inject('logger') private logger: { silly(arg0: string): void; error(arg0: unknown): void },
     private project: ProjectService,
+    private trade: TradeService
   ) {}
 
   public async addContract(contract: IContractInputDTO): Promise<IContract> {
@@ -52,7 +54,7 @@ export class ContractService {
         ...amountManager
       });
 
-      await this.project.updateProjectStatistics({
+      this.project.updateProjectStatistics({
           projectId: contract.projectId,
           statistics: {
             totalContract: 1
@@ -83,16 +85,40 @@ export class ContractService {
     }
   }
 
-  public async signContract(contractId: string): Promise<(IContract & Document) | any> {
+  public async signContract(contractId: string, userId: string, amount?: Number): Promise<(IContract & Document) | any> {
     try {
       this.logger.silly('sign contract');
 
       const contractRecord : IContract & Document = await this.contractModel
         .findOne({'id': contractId});
 
-      if(!contractRecord) throw new SystemError(404, `contract with this "contractID: ${contractId}" is not found`);
+      if(!contractRecord) throw new SystemError(404, `contract with this "contractId: ${contractId}" is not found`);
 
-      return contractRecord;
+      if(contractRecord.minAmount && contractRecord.maxAmount){
+        if(contractRecord.minAmount < amount) {throw new SystemError(400, `minimum amount should be up to ${contractRecord.minAmount}`);}
+        if(amount > contractRecord.maxAmount) {throw new SystemError(400, `amount cannot be greater thank ${contractRecord.maxAmount}`);}
+      }
+
+      const tradeRecord = await this.trade.startTrade({
+        userId,
+        amount: contractRecord.fixedAmount ? contractRecord.fixedAmount : amount,
+        projectId: contractRecord.projectId,
+        contractId: contractRecord.id,
+        type: contractRecord.type,
+        status: 'ACTIVE',
+        interest: contractRecord.interest,
+        startDate: `${Date.now()}`,
+        endDate: contractRecord.maturityTime
+      })
+
+      this.project.updateProjectStatistics({
+        projectId: contractRecord.projectId,
+        statistics: {
+          totalTrade: 1
+        }
+      })
+
+      return tradeRecord;
     } catch (e) {
       this.logger.error(e);
       throw new SystemError(e.statusCode || 500, e.message);
@@ -111,6 +137,60 @@ export class ContractService {
       await contractRecord.save();
       return contractRecord;
     } catch (e) {
+      this.logger.error(e);
+      throw new SystemError(e.statusCode || 500, e.message);
+    }
+  }
+
+  public async updateContract(updateContract: IContractInputDTO): Promise<IContract> {
+    try {
+    
+      this.logger.silly('updating contract');
+      const userId = updateContract.userId;
+      const contractId = updateContract.contractId;
+      delete updateContract.userId;
+      delete updateContract.projectId;
+
+      const contractRecord = await this.contractModel.findOne({'id': contractId, userId});
+      if (!contractRecord) {
+        this.logger.silly('contract not found');
+        throw new SystemError(200, 'project not found');
+      }
+      for (const property in updateContract) {
+        contractRecord[property] = updateContract[property];
+      }
+      return await contractRecord.save();
+    } catch (e) {
+      this.logger.error(e);
+      throw new SystemError(e.statusCode || 500, e.message);
+    }
+  }
+
+  public async deleteContract({
+    userId,
+    contractId
+  }: {
+    userId: string;
+    contractId: string;
+  }): Promise<string> {
+    this.logger.silly('Deleting Contract...');
+    try {
+      const contractRecord : IContract & Document = await this.contractModel
+      .findOne({'id': contractId, userId});
+
+      if(!contractRecord){
+        throw new Error('contract not found');
+      }
+      
+      const contractDeleted = await this.contractModel.findByIdAndDelete(contractId);
+      if(contractDeleted) {
+        this.logger.silly('contract deleted!');
+        return 'this contract is permanently deleted';
+      }else{
+        throw new Error('this contract is unable to delete at the moment, please try again later');
+      }
+      
+    } catch(e) {
       this.logger.error(e);
       throw new SystemError(e.statusCode || 500, e.message);
     }
