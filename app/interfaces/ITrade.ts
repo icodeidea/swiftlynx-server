@@ -21,6 +21,6 @@ export interface ITradeInputDTO {
   status: string;
   amount: Number;
   interest: Number;
-  startDate: Date;
-  endDate: Date;
+  startDate: string;
+  endDate: string;
 }

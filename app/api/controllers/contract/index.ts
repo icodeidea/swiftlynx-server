@@ -44,13 +44,45 @@ export class ContractController {
     try {
       const contractId = req.body.contractId;
       const contractServiceInstance = Container.get(ContractService);
-      const data = await contractServiceInstance.getContract(contractId);
+      const data = await contractServiceInstance.signContract(contractId, req.currentUser.id, req?.body?.amount);
       return res.status(201).json({ success: true, data, message: 'contract signed successfully' });
     } catch (e) {
       logger.error('🔥 error: %o', e);
       return next(e);
     }
   };
+
+  static updateContract = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
+    const logger: Logger = Container.get('logger');
+    logger.debug('Calling Update Contract with userId: %s', req.currentUser.id);
+    try {
+      req.body.userId = req.currentUser.id;
+      const contractServiceInstance = Container.get(ContractService);
+      const data = await contractServiceInstance.updateContract(req.body as IContractInputDTO);
+      return res.status(201).json({ success: true, data, message: 'contract updated successfully' });
+    } catch (e) {
+      logger.error('🔥 error: %o', e);
+      return next(e);
+    }
+  };
+
+    // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
+    static deleteContract = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
+      const logger: Logger = Container.get('logger');
+      logger.debug('Calling delete contract endpoint');
+      try {
+        const contractId = req?.body?.contractId;
+        const contractServiceInstance = Container.get(ContractService);
+        const data = await contractServiceInstance.deleteContract({
+          userId: req.currentUser.id,
+          contractId
+        });
+        return res.status(201).json({ success: true, data, message: 'contract(s) deleted successfully' });
+      } catch (e) {
+        logger.error('🔥 error: %o', e);
+        return next(e);
+      }
+    };
 
 
 }
