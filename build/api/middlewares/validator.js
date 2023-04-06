@@ -231,9 +231,33 @@ class Validator {
             next(e);
         }
     }
+    async updateContract(req, _, next) {
+        try {
+            const validation = validations_1.ContractShema.updateContractSchema.validate(Object.assign({}, req.body));
+            if (validation.error) {
+                return next(validation.error);
+            }
+            return next();
+        }
+        catch (e) {
+            next(e);
+        }
+    }
     async signContract(req, _, next) {
         try {
             const validation = validations_1.ContractShema.signContractSchema.validate(Object.assign({}, req.body));
+            if (validation.error) {
+                return next(validation.error);
+            }
+            return next();
+        }
+        catch (e) {
+            next(e);
+        }
+    }
+    async deleteContract(req, _, next) {
+        try {
+            const validation = validations_1.ContractShema.getContractSchema.validate(Object.assign({}, req.body));
             if (validation.error) {
                 return next(validation.error);
             }

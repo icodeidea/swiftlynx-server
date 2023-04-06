@@ -16,6 +16,9 @@ const Market = new mongoose_1.default.Schema({
         enum: ['ACTIVE', 'DECLINED'],
         default: 'ACTIVE',
     },
+    description: {
+        type: String,
+    },
     sectorAvailable: {
         type: String,
         enum: ['INVESTMENT', 'LOAN', 'ALL'],
