@@ -3,6 +3,7 @@ export interface IContract {
     userId: string;
     projectId: string;
     contractName: string;
+    description: string;
     type: string
     status: string;
     fixedAmount: Number;
@@ -24,6 +25,7 @@ export interface IContract {
     projectId: string;
     contractId?: string;
     contractName: string;
+    description?: string;
     fixedAmount?: Number;
     minAmount?: Number;
     maxAmount?: Number;

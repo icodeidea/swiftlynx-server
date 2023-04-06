@@ -16,11 +16,13 @@ exports.ContractService = void 0;
 const typedi_1 = require("typedi");
 const utils_1 = require("../../utils");
 const project_1 = require("../project");
+const trade_1 = require("../trade");
 let ContractService = class ContractService {
-    constructor(contractModel, logger, project) {
+    constructor(contractModel, logger, project, trade) {
         this.contractModel = contractModel;
         this.logger = logger;
         this.project = project;
+        this.trade = trade;
     }
     async addContract(contract) {
         try {
@@ -53,8 +55,8 @@ let ContractService = class ContractService {
             if (amountManager === null) {
                 throw new utils_1.SystemError(400, 'please provide a contract model');
             }
-            const addedContract = await this.contractModel.create(Object.assign({ userId: contract.userId, projectId: contract.projectId, contractName: contract.contractName, type: contract.type, interest: contract.interest, maturityTime: contract.maturityTime }, amountManager));
-            await this.project.updateProjectStatistics({
+            const addedContract = await this.contractModel.create(Object.assign({ userId: contract.userId, projectId: contract.projectId, contractName: contract.contractName, description: contract.description, type: contract.type, interest: contract.interest, maturityTime: contract.maturityTime }, amountManager));
+            this.project.updateProjectStatistics({
                 projectId: contract.projectId,
                 statistics: {
                     totalContract: 1
@@ -82,14 +84,39 @@ let ContractService = class ContractService {
             throw new utils_1.SystemError(e.statusCode || 500, e.message);
         }
     }
-    async signContract(contractId) {
+    async signContract(contractId, userId, amount) {
         try {
             this.logger.silly('sign contract');
             const contractRecord = await this.contractModel
                 .findOne({ 'id': contractId });
             if (!contractRecord)
-                throw new utils_1.SystemError(404, `contract with this "contractID: ${contractId}" is not found`);
-            return contractRecord;
+                throw new utils_1.SystemError(404, `contract with this "contractId: ${contractId}" is not found`);
+            if (contractRecord.minAmount && contractRecord.maxAmount) {
+                if (contractRecord.minAmount > amount) {
+                    throw new utils_1.SystemError(400, `minimum amount should be up to ${contractRecord.minAmount}`);
+                }
+                if (amount > contractRecord.maxAmount) {
+                    throw new utils_1.SystemError(400, `amount cannot be greater thank ${contractRecord.maxAmount}`);
+                }
+            }
+            const tradeRecord = await this.trade.startTrade({
+                userId,
+                amount: contractRecord.fixedAmount ? contractRecord.fixedAmount : amount,
+                projectId: contractRecord.projectId,
+                contractId: contractRecord.id,
+                type: contractRecord.type,
+                status: 'ACTIVE',
+                interest: contractRecord.interest,
+                startDate: `${Date.now()}`,
+                endDate: contractRecord.maturityTime
+            });
+            this.project.updateProjectStatistics({
+                projectId: contractRecord.projectId,
+                statistics: {
+                    totalTrade: 1
+                }
+            });
+            return tradeRecord;
         }
         catch (e) {
             this.logger.error(e);
@@ -113,12 +140,57 @@ let ContractService = class ContractService {
             throw new utils_1.SystemError(e.statusCode || 500, e.message);
         }
     }
+    async updateContract(updateContract) {
+        try {
+            this.logger.silly('updating contract');
+            const userId = updateContract.userId;
+            const contractId = updateContract.contractId;
+            delete updateContract.userId;
+            delete updateContract.projectId;
+            const contractRecord = await this.contractModel.findOne({ 'id': contractId, userId });
+            if (!contractRecord) {
+                this.logger.silly('contract not found');
+                throw new utils_1.SystemError(200, 'project not found');
+            }
+            for (const property in updateContract) {
+                contractRecord[property] = updateContract[property];
+            }
+            return await contractRecord.save();
+        }
+        catch (e) {
+            this.logger.error(e);
+            throw new utils_1.SystemError(e.statusCode || 500, e.message);
+        }
+    }
+    async deleteContract({ userId, contractId }) {
+        this.logger.silly('Deleting Contract...');
+        try {
+            const contractRecord = await this.contractModel
+                .findOne({ 'id': contractId, userId });
+            if (!contractRecord) {
+                throw new Error('contract not found');
+            }
+            const contractDeleted = await this.contractModel.findByIdAndDelete(contractId);
+            if (contractDeleted) {
+                this.logger.silly('contract deleted!');
+                return 'this contract is permanently deleted';
+            }
+            else {
+                throw new Error('this contract is unable to delete at the moment, please try again later');
+            }
+        }
+        catch (e) {
+            this.logger.error(e);
+            throw new utils_1.SystemError(e.statusCode || 500, e.message);
+        }
+    }
 };
 ContractService = __decorate([
     (0, typedi_1.Service)(),
     __param(0, (0, typedi_1.Inject)('contractModel')),
     __param(1, (0, typedi_1.Inject)('logger')),
-    __metadata("design:paramtypes", [Object, Object, project_1.ProjectService])
+    __metadata("design:paramtypes", [Object, Object, project_1.ProjectService,
+        trade_1.TradeService])
 ], ContractService);
 exports.ContractService = ContractService;
 //# sourceMappingURL=index.js.map

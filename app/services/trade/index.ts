@@ -36,6 +36,21 @@ export class TradeService {
     }
   }
 
+  public async getTrades(entityId: string): Promise<(ITrade & Document) | any> {
+    try {
+      this.logger.silly('getting my trade records');
+      const tradeRecords : Array<ITrade> = await this.tradeModel
+      .find({$or: [
+          { 'id': entityId },
+          { 'userId': entityId }
+          // { 'projectId': contractOrProjectId },
+        ]});
+    return tradeRecords;
+    } catch (e) {
+      throw new SystemError(e.statusCode || 500, e.message);
+    }
+  }
+
   public async getContract(contractOrProjectId: string): Promise<(IContract & Document) | any> {
     try {
       this.logger.silly('getting contract record');

@@ -40,13 +40,47 @@ ContractController.getContract = async (req, res, next) => {
 };
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 ContractController.signContract = async (req, res, next) => {
+    var _b;
     const logger = typedi_1.Container.get('logger');
     logger.debug('Calling sign contract endpoint');
     try {
         const contractId = req.body.contractId;
         const contractServiceInstance = typedi_1.Container.get(services_1.ContractService);
-        const data = await contractServiceInstance.getContract(contractId);
+        const data = await contractServiceInstance.signContract(contractId, req.currentUser.id, (_b = req === null || req === void 0 ? void 0 : req.body) === null || _b === void 0 ? void 0 : _b.amount);
         return res.status(201).json({ success: true, data, message: 'contract signed successfully' });
+    }
+    catch (e) {
+        logger.error('🔥 error: %o', e);
+        return next(e);
+    }
+};
+ContractController.updateContract = async (req, res, next) => {
+    const logger = typedi_1.Container.get('logger');
+    logger.debug('Calling Update Contract with userId: %s', req.currentUser.id);
+    try {
+        req.body.userId = req.currentUser.id;
+        const contractServiceInstance = typedi_1.Container.get(services_1.ContractService);
+        const data = await contractServiceInstance.updateContract(req.body);
+        return res.status(201).json({ success: true, data, message: 'contract updated successfully' });
+    }
+    catch (e) {
+        logger.error('🔥 error: %o', e);
+        return next(e);
+    }
+};
+// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
+ContractController.deleteContract = async (req, res, next) => {
+    var _b;
+    const logger = typedi_1.Container.get('logger');
+    logger.debug('Calling delete contract endpoint');
+    try {
+        const contractId = (_b = req === null || req === void 0 ? void 0 : req.body) === null || _b === void 0 ? void 0 : _b.contractId;
+        const contractServiceInstance = typedi_1.Container.get(services_1.ContractService);
+        const data = await contractServiceInstance.deleteContract({
+            userId: req.currentUser.id,
+            contractId
+        });
+        return res.status(201).json({ success: true, data, message: 'contract(s) deleted successfully' });
     }
     catch (e) {
         logger.error('🔥 error: %o', e);

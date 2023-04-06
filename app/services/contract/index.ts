@@ -48,6 +48,7 @@ export class ContractService {
         userId: contract.userId,
         projectId: contract.projectId,
         contractName: contract.contractName,
+        description: contract.description,
         type: contract.type,
         interest: contract.interest,
         maturityTime: contract.maturityTime,
@@ -95,7 +96,7 @@ export class ContractService {
       if(!contractRecord) throw new SystemError(404, `contract with this "contractId: ${contractId}" is not found`);
 
       if(contractRecord.minAmount && contractRecord.maxAmount){
-        if(contractRecord.minAmount < amount) {throw new SystemError(400, `minimum amount should be up to ${contractRecord.minAmount}`);}
+        if(contractRecord.minAmount > amount) {throw new SystemError(400, `minimum amount should be up to ${contractRecord.minAmount}`);}
         if(amount > contractRecord.maxAmount) {throw new SystemError(400, `amount cannot be greater thank ${contractRecord.maxAmount}`);}
       }
 

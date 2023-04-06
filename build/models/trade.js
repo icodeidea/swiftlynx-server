@@ -20,8 +20,8 @@ const Trade = new mongoose_1.default.Schema({
     },
     type: {
         type: String,
-        enum: ['SWIFT_TRADE', 'PEER_TO_PEER_TRADE'],
-        default: 'SWIFT_TRADE',
+        enum: ['SWIFT_LOAN', 'PEER_TO_PEER_LOAN'],
+        default: 'SWIFT_LAOAN',
     },
     status: {
         type: String,

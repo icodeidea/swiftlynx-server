@@ -19,6 +19,9 @@ const Contract = new mongoose_1.default.Schema({
         type: String,
         required: true
     },
+    description: {
+        type: String,
+    },
     type: {
         type: String,
         enum: ['SWIFT_LOAN', 'PEER_TO_PEER_LOAN'],
@@ -31,12 +34,15 @@ const Contract = new mongoose_1.default.Schema({
     },
     fixedAmount: {
         type: Number,
+        default: 0
     },
     minAmount: {
         type: Number,
+        default: 0
     },
     maxAmount: {
         type: Number,
+        default: 0
     },
     interest: {
         type: Number,
