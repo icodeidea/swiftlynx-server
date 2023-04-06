@@ -13,6 +13,7 @@ const wallet_1 = __importDefault(require("./routes/wallet"));
 const market_1 = __importDefault(require("./routes/market"));
 const project_1 = __importDefault(require("./routes/project"));
 const contract_1 = __importDefault(require("./routes/contract"));
+const trade_1 = __importDefault(require("./routes/trade"));
 // guaranteed to get dependencies
 exports.default = () => {
     const app = (0, express_1.Router)();
@@ -25,6 +26,7 @@ exports.default = () => {
     (0, market_1.default)(app);
     (0, project_1.default)(app);
     (0, contract_1.default)(app);
+    (0, trade_1.default)(app);
     return app;
 };
 //# sourceMappingURL=index.js.map

@@ -25,4 +25,5 @@ __exportStar(require("./user"), exports);
 __exportStar(require("./market"), exports);
 __exportStar(require("./project"), exports);
 __exportStar(require("./contract"), exports);
+__exportStar(require("./trade"), exports);
 //# sourceMappingURL=index.js.map

@@ -42,6 +42,21 @@ let TradeService = class TradeService {
             throw new utils_1.SystemError(e.statusCode || 500, e.message);
         }
     }
+    async getTrades(entityId) {
+        try {
+            this.logger.silly('getting my trade records');
+            const tradeRecords = await this.tradeModel
+                .find({ $or: [
+                    { 'id': entityId },
+                    { 'userId': entityId }
+                    // { 'projectId': contractOrProjectId },
+                ] });
+            return tradeRecords;
+        }
+        catch (e) {
+            throw new utils_1.SystemError(e.statusCode || 500, e.message);
+        }
+    }
     async getContract(contractOrProjectId) {
         try {
             this.logger.silly('getting contract record');

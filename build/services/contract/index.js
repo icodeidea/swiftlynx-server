@@ -92,7 +92,7 @@ let ContractService = class ContractService {
             if (!contractRecord)
                 throw new utils_1.SystemError(404, `contract with this "contractId: ${contractId}" is not found`);
             if (contractRecord.minAmount && contractRecord.maxAmount) {
-                if (contractRecord.minAmount < amount) {
+                if (contractRecord.minAmount > amount) {
                     throw new utils_1.SystemError(400, `minimum amount should be up to ${contractRecord.minAmount}`);
                 }
                 if (amount > contractRecord.maxAmount) {

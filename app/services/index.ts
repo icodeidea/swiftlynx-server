@@ -9,3 +9,4 @@ export * from './wallet';
 export * from './market';
 export * from './project';
 export * from './contract';
+export * from './trade';

@@ -9,6 +9,7 @@ import wallet from './routes/wallet';
 import market from './routes/market';
 import project from './routes/project';
 import contract from './routes/contract';
+import trade from './routes/trade';
 // guaranteed to get dependencies
 export default (): Router => {
   const app = Router();
@@ -21,5 +22,6 @@ export default (): Router => {
   market(app);
   project(app);
   contract(app);
+  trade(app);
   return app;
 };
