@@ -9,3 +9,4 @@ export * from './ITrade';
 export * from './IContract';
 export * from './IMarket';
 export * from './IProject';
+export * from './ISafe';

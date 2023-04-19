@@ -267,6 +267,19 @@ class Validator {
             next(e);
         }
     }
+    /// safe 
+    async createSafe(req, _, next) {
+        try {
+            const validation = validations_1.SafeSchema.createSafeSchema.validate(Object.assign({}, req.body));
+            if (validation.error) {
+                return next(validation.error);
+            }
+            return next();
+        }
+        catch (e) {
+            next(e);
+        }
+    }
 }
 const validator = new Validator();
 exports.default = validator;

@@ -25,4 +25,5 @@ __exportStar(require("./ITrade"), exports);
 __exportStar(require("./IContract"), exports);
 __exportStar(require("./IMarket"), exports);
 __exportStar(require("./IProject"), exports);
+__exportStar(require("./ISafe"), exports);
 //# sourceMappingURL=index.js.map

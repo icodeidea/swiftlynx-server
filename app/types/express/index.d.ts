@@ -11,7 +11,8 @@ import {
   ITrade,
   IContract,
   IMarket,
-  IProject
+  IProject,
+  ISafe
 } from '../../interfaces';
 
 declare global {
@@ -34,5 +35,6 @@ declare global {
       export type ContractModel = Model<IContract & Document>;
       export type MarketModel = Model<IMarket & Document>;
       export type ProjectModel = Model<IProject & Document>;
+      export type SafeModel = Model<ISafe & Document>;
     }
   }
