@@ -6,7 +6,8 @@ import {
   WalletSchema,
   MarketSchema, 
   ProjectSchema,
-  ContractShema 
+  ContractShema,
+  SafeSchema,
 } from '../validations';
 
 class Validator {
@@ -301,6 +302,21 @@ class Validator {
   async deleteContract(req: Request, _, next: NextFunction) {
     try {
       const validation = ContractShema.getContractSchema.validate({
+        ...req.body
+      });
+      if (validation.error) {
+        return next(validation.error);
+      }
+      return next();
+    } catch (e) {
+      next(e);
+    }
+  }
+
+  /// safe 
+  async createSafe(req: Request, _, next: NextFunction) {
+    try {
+      const validation = SafeSchema.createSafeSchema.validate({
         ...req.body
       });
       if (validation.error) {

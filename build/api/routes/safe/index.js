@@ -23,13 +23,17 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.SafeSchema = exports.ContractShema = exports.ProjectSchema = exports.MarketSchema = exports.WalletSchema = exports.CommentSchema = exports.FeedSchema = exports.AuthSchema = void 0;
-exports.AuthSchema = __importStar(require("./auth"));
-exports.FeedSchema = __importStar(require("./feed"));
-exports.CommentSchema = __importStar(require("./comment"));
-exports.WalletSchema = __importStar(require("./wallet"));
-exports.MarketSchema = __importStar(require("./market"));
-exports.ProjectSchema = __importStar(require("./project"));
-exports.ContractShema = __importStar(require("./contract"));
-exports.SafeSchema = __importStar(require("./safe"));
+const express_1 = require("express");
+const middlewares_1 = __importStar(require("../../middlewares"));
+const controllers_1 = require("../../controllers");
+const { listMySafe, createSafe } = controllers_1.SafeController;
+const safeRouter = (0, express_1.Router)();
+exports.default = (app) => {
+    app.use('/safe', safeRouter);
+    //get safe list
+    safeRouter.route('/list-safe').get(middlewares_1.default.isAuth, middlewares_1.default.attachCurrentUser, listMySafe);
+    //create safe
+    safeRouter.route('/create-safe').post(middlewares_1.validator.createSafe, middlewares_1.default.isAuth, middlewares_1.default.attachCurrentUser, createSafe);
+    return app;
+};
 //# sourceMappingURL=index.js.map
