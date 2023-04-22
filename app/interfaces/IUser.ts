@@ -6,6 +6,8 @@ export interface IUser {
     oneTimeSetup: boolean;
     passwordSet: boolean;
     password: string;
+    firstname: string;
+    lastname: string;
     username?: string;
     salt: string;
     role?: string;

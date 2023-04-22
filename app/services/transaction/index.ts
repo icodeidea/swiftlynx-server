@@ -1,13 +1,20 @@
 import { Service, Inject } from 'typedi';
+import request from "request";
 import { ITransactionInputDTO, ITransaction } from '../../interfaces';
 import { Document } from 'mongoose';
 import { SystemError } from '../../utils';
+import { paystack } from '../../utils/'
+import { SafeService } from '../safe';
+import { ContractService } from '../contract';
 
 @Service()
 export class TransactionService {
   constructor(
+    @Inject('userModel') private userModel: Models.UserModel,
     @Inject('walletModel') private walletModel: Models.WalletModel,
     @Inject('transactionModel') private transactionModel: Models.TransactionModel,
+    private safe: SafeService,
+    private contract: ContractService,
     @Inject('logger') private logger: { silly(arg0: string): void; error(arg0: unknown): void },
   ) {}
 
@@ -26,6 +33,7 @@ export class TransactionService {
         from: tx.from || null,
         confirmations: true,
         fee: 0,
+        metadata: tx.metadata,
         to:
           {
             amount: tx.amount,
@@ -76,4 +84,71 @@ export class TransactionService {
       throw new SystemError(e.statusCode || 500, e.message);
     }
   }
+
+  public async initialisePayment(userId: string, amount: number, entity: string, entityId: string): Promise<any> {
+    try {
+      const { initializePayment } = paystack();
+      const userRecord = await this.userModel.findOne({ '_id': userId });
+      const form: any = {};
+      form.metadata = {
+        fullName: `${userRecord?.firstname} ${userRecord?.lastname}`,
+      };
+      form.amount = amount;
+      form.amount *= 100;
+      form.email = userRecord?.email;
+
+      const {status, message, data } = await initializePayment(form);
+      
+      if (!status) {
+        throw new Error(message);
+      }
+      const authUrl = data.authorization_url;
+      return await this.createTransaction({
+        txid: data.reference,
+        amount: data.amount,
+        metadata: { ...data, entity, entityId },
+        walletId: userRecord?._id,
+        subject: userRecord?._id,
+        subjectRef: 'User',
+        type: 'credit',
+        reason: entity === 'safe' ? 'savings' : 'contract',
+        status: 'pending',
+      })
+    } catch (e) {
+      this.logger.error(e);
+      throw new SystemError(e.statusCode || 500, e.message);
+    }
+  }
+
+  public async verifyPayment(ref: any): Promise<any> {
+    try {
+      const { verifyPayment } = paystack();
+      const { status, message, data } = await verifyPayment(ref);
+
+      if (!status) {
+        throw new Error(message);
+      }
+  
+      const {
+        reference,
+        metadata,
+        amount
+      } = data;
+
+      const transactionDoc = await this.transactionModel.findOne({ txid: reference });
+
+      if(transactionDoc.metadata.entity === 'safe'){
+        return await this.safe.addfund(transactionDoc.metadata.entityId, amount)
+      }else{
+        return await this.contract.signContract(transactionDoc.metadata.entityId, transactionDoc.user, amount);
+      }
+
+      throw new Error('failed');
+    } catch (e) {
+      this.logger.error(e);
+      throw new SystemError(e.statusCode || 500, e.message);
+    }
+  }
+
+  
 }

@@ -12,6 +12,7 @@ export interface ITransaction {
     fee?: string;
     txid: string;
     from?: string;
+    metadata?: any;
     to?: {
       recipient: string;
       amount: number;
@@ -30,4 +31,5 @@ export interface ITransaction {
     from?: string;
     txid?: string;
     recipient?: string;
+    metadata?: any;
   }

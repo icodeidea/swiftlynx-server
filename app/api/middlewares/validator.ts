@@ -8,6 +8,7 @@ import {
   ProjectSchema,
   ContractShema,
   SafeSchema,
+  TransactionSchema
 } from '../validations';
 
 class Validator {
@@ -317,6 +318,20 @@ class Validator {
   async createSafe(req: Request, _, next: NextFunction) {
     try {
       const validation = SafeSchema.createSafeSchema.validate({
+        ...req.body
+      });
+      if (validation.error) {
+        return next(validation.error);
+      }
+      return next();
+    } catch (e) {
+      next(e);
+    }
+  }
+
+  async initPayment(req: Request, _, next: NextFunction) {
+    try {
+      const validation = TransactionSchema.initPaymentSchema.validate({
         ...req.body
       });
       if (validation.error) {

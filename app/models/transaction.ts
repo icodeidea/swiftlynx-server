@@ -17,6 +17,7 @@ const Transaction = new mongoose.Schema(
       default: 'Feed',
     },
     type: { type: String, required: true },
+    metadata: { type: Object },
     confirmed: { type: Boolean },
     confirmations: { type: Number },
     pending: { type: Boolean },
