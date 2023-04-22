@@ -105,7 +105,7 @@ export class TransactionService {
       const authUrl = data.authorization_url;
       return await this.createTransaction({
         txid: data.reference,
-        amount: data.amount,
+        amount: amount,
         metadata: { ...data, entity, entityId },
         walletId: userRecord?._id,
         subject: userRecord?._id,
@@ -124,6 +124,7 @@ export class TransactionService {
     try {
       const { verifyPayment } = paystack();
       const { status, message, data } = await verifyPayment(ref);
+      let verifiedEntity = null;
 
       if (!status) {
         throw new Error(message);
@@ -135,15 +136,20 @@ export class TransactionService {
         amount
       } = data;
 
-      const transactionDoc = await this.transactionModel.findOne({ txid: reference });
-
-      if(transactionDoc.metadata.entity === 'safe'){
-        return await this.safe.addfund(transactionDoc.metadata.entityId, amount)
-      }else{
-        return await this.contract.signContract(transactionDoc.metadata.entityId, transactionDoc.user, amount);
+      const transactionDoc = await this.transactionModel.findOne({ txid: reference, status: 'pending', });
+      if(!transactionDoc){
+        throw new Error('no pending transaction found');
       }
 
-      throw new Error('failed');
+      if(transactionDoc.metadata.entity === 'safe'){
+        verifiedEntity = await this.safe.addfund(transactionDoc.metadata.entityId, amount)
+      }else{
+        verifiedEntity = await this.contract.signContract(transactionDoc.metadata.entityId, transactionDoc.user, amount);
+      }
+      transactionDoc.status = 'completed';
+      transactionDoc.to.amount = amount;
+      transactionDoc.save();
+      return verifiedEntity;
     } catch (e) {
       this.logger.error(e);
       throw new SystemError(e.statusCode || 500, e.message);

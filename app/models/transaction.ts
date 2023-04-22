@@ -28,7 +28,7 @@ const Transaction = new mongoose.Schema(
     fee: { type: String },
     to:{
         recipient: { type: String, default: 'self' },
-        amount: { type: Number },
+        amount: { type: String },
       },
   },
   { timestamps: true },

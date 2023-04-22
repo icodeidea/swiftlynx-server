@@ -111,7 +111,7 @@ let TransactionService = class TransactionService {
             const authUrl = data.authorization_url;
             return await this.createTransaction({
                 txid: data.reference,
-                amount: data.amount,
+                amount: amount,
                 metadata: Object.assign(Object.assign({}, data), { entity, entityId }),
                 walletId: userRecord === null || userRecord === void 0 ? void 0 : userRecord._id,
                 subject: userRecord === null || userRecord === void 0 ? void 0 : userRecord._id,
@@ -130,18 +130,25 @@ let TransactionService = class TransactionService {
         try {
             const { verifyPayment } = (0, utils_2.paystack)();
             const { status, message, data } = await verifyPayment(ref);
+            let verifiedEntity = null;
             if (!status) {
                 throw new Error(message);
             }
             const { reference, metadata, amount } = data;
-            const transactionDoc = await this.transactionModel.findOne({ txid: reference });
+            const transactionDoc = await this.transactionModel.findOne({ txid: reference, status: 'pending', });
+            if (!transactionDoc) {
+                throw new Error('no pending transaction found');
+            }
             if (transactionDoc.metadata.entity === 'safe') {
-                return await this.safe.addfund(transactionDoc.metadata.entityId, amount);
+                verifiedEntity = await this.safe.addfund(transactionDoc.metadata.entityId, amount);
             }
             else {
-                return await this.contract.signContract(transactionDoc.metadata.entityId, transactionDoc.user, amount);
+                verifiedEntity = await this.contract.signContract(transactionDoc.metadata.entityId, transactionDoc.user, amount);
             }
-            throw new Error('failed');
+            transactionDoc.status = 'completed';
+            transactionDoc.to.amount = amount;
+            transactionDoc.save();
+            return verifiedEntity;
         }
         catch (e) {
             this.logger.error(e);

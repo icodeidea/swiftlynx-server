@@ -23,7 +23,7 @@ const request = async ({ url, body = {}, method = 'get' }) => {
   } catch (error) {
     return {
       status: false,
-      message: 'An error occured calling paystack',
+      message: 'An error occured calling paystack: '+error.message,
     };
   }
 };
@@ -42,7 +42,7 @@ const paystack = () => {
     const verifyPayment = async (ref) => {
       const { status, message, data } = await request({
         url: `transaction/verify/${encodeURIComponent(ref)}`,
-        method: 'post'
+        method: 'get'
       });
 
       return { status, message, data };
