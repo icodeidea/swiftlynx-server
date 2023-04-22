@@ -280,6 +280,18 @@ class Validator {
             next(e);
         }
     }
+    async initPayment(req, _, next) {
+        try {
+            const validation = validations_1.TransactionSchema.initPaymentSchema.validate(Object.assign({}, req.body));
+            if (validation.error) {
+                return next(validation.error);
+            }
+            return next();
+        }
+        catch (e) {
+            next(e);
+        }
+    }
 }
 const validator = new Validator();
 exports.default = validator;

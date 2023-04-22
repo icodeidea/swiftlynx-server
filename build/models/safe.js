@@ -11,7 +11,7 @@ const Safe = new mongoose_1.default.Schema({
     },
     active: {
         type: Boolean,
-        default: false
+        default: true
     },
     status: {
         type: String,
@@ -33,7 +33,7 @@ const Safe = new mongoose_1.default.Schema({
 Safe.set('toJSON', {
     transform: (document, returnedObject) => {
         // returnedObject.id = returnedObject._id.toString();
-        delete returnedObject._id;
+        // delete returnedObject._id;
         delete returnedObject.__v;
         // delete returnedObject.;
     },

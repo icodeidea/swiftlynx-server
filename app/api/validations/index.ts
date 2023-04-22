@@ -6,3 +6,4 @@ export * as MarketSchema from './market';
 export * as ProjectSchema from './project';
 export * as ContractShema from './contract';
 export * as SafeSchema from './safe';
+export * as TransactionSchema from './transaction';
