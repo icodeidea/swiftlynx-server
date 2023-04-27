@@ -13,7 +13,8 @@ TradeController.getTrades = async (req, res, next) => {
     const logger = typedi_1.Container.get('logger');
     logger.debug('Calling get trades endpoint');
     try {
-        const entityId = req.query.entityId || req.currentUser.id;
+        const entityId = req.currentUser.id;
+        console.log(entityId);
         const tradeServiceInstance = typedi_1.Container.get(services_1.TradeService);
         const data = await tradeServiceInstance.getTrades(entityId);
         return res.status(201).json({ success: true, data, message: 'data retrived' });

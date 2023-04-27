@@ -28,7 +28,7 @@ ContractController.getContract = async (req, res, next) => {
     const logger = typedi_1.Container.get('logger');
     logger.debug('Calling get contract endpoint');
     try {
-        const contractIdOrProjectId = req.params.contractIdOrProjectId;
+        const contractIdOrProjectId = req.query.contractIdOrProjectId;
         const contractServiceInstance = typedi_1.Container.get(services_1.ContractService);
         const data = await contractServiceInstance.getContract(contractIdOrProjectId);
         return res.status(201).json({ success: true, data, message: 'contract(s) retrived successfully' });
