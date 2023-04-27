@@ -73,12 +73,14 @@ export class ContractService {
   public async getContract(contractOrProjectId: string): Promise<(IContract & Document) | any> {
     try {
       this.logger.silly('getting contract record');
+      console.log('contractOrProjectId', contractOrProjectId);
 
       const contractRecord : Array<IContract> = await this.contractModel
-        .find({$or: [
-            { 'id': contractOrProjectId },
-            { 'projectId': contractOrProjectId },
-          ]});
+      .find({'projectId': contractOrProjectId});
+      //   .find({$or: [
+      //       { 'id': contractOrProjectId },
+      //       { 'projectId': contractOrProjectId },
+      //     ]});
       return contractRecord;
     } catch (e) {
       this.logger.error(e);

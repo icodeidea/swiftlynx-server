@@ -47,11 +47,12 @@ let ProjectService = class ProjectService {
     async getProject(projectId) {
         try {
             this.logger.silly('getting project record');
+            console.log('projectId', projectId);
             if (!projectId || projectId === null)
                 return await this.projectModel.find();
             const projectRecord = await this.projectModel
                 .find({ $or: [
-                    { 'id': projectId },
+                    // { '_id': projectId },
                     { 'marketId': projectId },
                     { 'userId': projectId },
                 ] });

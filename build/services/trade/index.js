@@ -46,11 +46,7 @@ let TradeService = class TradeService {
         try {
             this.logger.silly('getting my trade records');
             const tradeRecords = await this.tradeModel
-                .find({ $or: [
-                    { 'id': entityId },
-                    { 'userId': entityId }
-                    // { 'projectId': contractOrProjectId },
-                ] });
+                .find({ 'userId': entityId }).populate('contractId', 'contractName');
             return tradeRecords;
         }
         catch (e) {

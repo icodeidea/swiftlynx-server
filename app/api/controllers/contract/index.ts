@@ -27,7 +27,7 @@ export class ContractController {
     const logger: Logger = Container.get('logger');
     logger.debug('Calling get contract endpoint');
     try {
-      const contractIdOrProjectId = req.params.contractIdOrProjectId;
+      const contractIdOrProjectId = req.query.contractIdOrProjectId as string;
       const contractServiceInstance = Container.get(ContractService);
       const data = await contractServiceInstance.getContract(contractIdOrProjectId);
       return res.status(201).json({ success: true, data, message: 'contract(s) retrived successfully' });
