@@ -22,6 +22,24 @@ declare global {
       }
     }
 
+    namespace Mail {
+      export interface send {
+        to: string | Array<string>;
+        subject: string;
+        text?: string;
+        html?: string;
+        from?: string;
+        fromName?: string;
+        attachments?: any;
+      }
+      
+      export interface UpsertContact {
+        email: string;
+        [key: string]: any;
+      }
+      
+    }
+
     namespace Models {
       export type UserModel = Model<IUser & Document>;
       export type WalletModel = Model<IWallet & Document>;

@@ -3,6 +3,7 @@ import { Service, Inject } from 'typedi';
 import { IUser } from '../../interfaces/IUser';
 import config from '../../config';
 import { Document } from 'mongoose';
+import { mail } from '../../utils';
 @Service()
 export class MailerService {
   constructor(@Inject('emailClient') private emailClient) { }
@@ -25,12 +26,19 @@ export class MailerService {
       On the following page:
       <br/>
       <a href="${config.url}/auth/verify/${verified.token.value}">Verify Account</a>
+      ${verified.token.value}
       <br/>
       Best wishes,
       ${config.appName} Team.
       `,
     };
-    this.emailClient.send(data);
+    // this.emailClient.send(data);
+    mail.sendinblue.send({
+      to: data.to,
+      subject: data.subject,
+      text: data.subject,
+      html: data.html,
+    })
     return { delivered: 1, status: 'ok' };
   }
 
@@ -38,7 +46,7 @@ export class MailerService {
     const data = {
       from: 'Admin <${config.supportMail}>',
       to: email,
-      subject: '${config.appName}.com Wallet service - Resend Verification',
+      subject: `${config.appName} - Resend Verification`,
       html: `
       Hi there ${username},
       <br/>
@@ -51,11 +59,21 @@ export class MailerService {
       <br/>
       <a href="${config.url}/auth/verify/${verified.token.value}">Verify Account</a>
       <br/>
+      <br/>
+      <h3>
+        <b>${verified.token.value}<b/>
+      <h3/>
       Best wishes,
       ${config.appName} Team.
       `,
     };
-    this.emailClient.send(data);
+    // this.emailClient.send(data);
+    mail.sendinblue.send({
+      to: data.to,
+      subject: data.subject,
+      text: data.subject,
+      html: data.html,
+    })
     return { delivered: 1, status: 'ok' };
   }
 
@@ -75,12 +93,19 @@ export class MailerService {
       On the following page:
       <br/>
       <a href="${config.url}/auth/reset/${reset.token}">Reset Account Password</a>
+      <p>otp ${reset.token}</p>
       <br/>
       Best wishes,
       ${config.appName} Team.
       `,
     };
-    this.emailClient.send(data);
+    // this.emailClient.send(data);
+    mail.sendinblue.send({
+      to: data.to,
+      subject: data.subject,
+      text: data.subject,
+      html: data.html,
+    })
     return { delivered: 1, status: 'ok' };
   }
 
