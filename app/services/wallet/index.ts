@@ -1,8 +1,11 @@
 import { Service, Inject } from 'typedi';
+import { IContractUpdateStatisticsDTO, ITradeInputDTO, ITrade, IContract } from '../../interfaces';
+import { Document } from 'mongoose';
 import { EventDispatcher, EventDispatcherInterface } from '../../decorators/eventDispatcher';
-import { ITransactionInputDTO, ITransaction, IWallet, IUser } from '../../interfaces';
+import { ITransactionInputDTO, ITransaction, IWallet, IUser, IAccountDetailInputDTO, IAccountDetail, IPayout, IPayoutInputDTO } from '../../interfaces';
 import { Console } from 'winston/lib/winston/transports';
 import { TransactionService } from '../transaction';
+import { MailerService } from '../mailer';
 import { AuthService } from '../auth';
 import { SystemError } from '../../utils';
 import * as EtheriumTransactionHelper from '../../drivers/etherium/bscScan/module/transaction';
@@ -15,8 +18,11 @@ export class WalletService {
   constructor(
     @Inject('userModel') private userModel: Models.UserModel,
     @Inject('walletModel') private walletModel: Models.WalletModel,
+    @Inject('payoutModel') private payoutModel: Models.PayoutModel,
+    @Inject('accountDetailModel') private accountDetail: Models.AccountDetailModel,
     private transactor: TransactionService,
     private userAccount: AuthService,
+    private mailer: MailerService,
     @Inject('logger') private logger: { silly(arg0: string): void; error(arg0: unknown): void },
     @EventDispatcher() private eventDispatcher: EventDispatcherInterface,
   ) {}
@@ -192,6 +198,104 @@ export class WalletService {
       userIsActivated.oneTimeSetup = true;
       await userIsActivated.save();
       return userIsActivated;
+      
+    } catch (e) {
+      this.logger.error(e);
+      throw new SystemError(e.statusCode || 500, e.message);
+    }
+  }
+
+  public async getAllPayoutRequest(status: string = 'pending'): Promise<(IPayout & Document) | any> {
+    try {
+      this.logger.silly('getting all payout request');
+      const payoutRequests : Array<IPayout> = await this.payoutModel
+      .find({ status });
+      return payoutRequests;
+    } catch (e) {
+      throw new SystemError(e.statusCode || 500, e.message);
+    }
+  }
+
+  public async payoutRequest(payoutInfo: IPayoutInputDTO ): Promise<IPayout> {
+    try {
+      this.logger.silly('requesting account payout...');
+
+      let payoutDoc : IPayout & Document = await this.payoutModel
+      .findOne({
+        'user': payoutInfo.user,
+        subject: payoutInfo.subject,
+        subjectRef: payoutInfo.subjectRef,
+        accountDetailId: payoutInfo.accountDetailId
+      });
+
+      if(!payoutDoc){
+        payoutDoc = await this.payoutModel.create({
+          user: payoutInfo.user,
+          accountDetailId: payoutInfo.accountDetailId,
+          subject: payoutInfo.subject,
+          subjectRef: payoutInfo.subjectRef
+        });
+      }
+
+      // send payout request mail
+      this.mailer.PayoutRequestMail();
+
+      return payoutDoc;
+      
+    } catch (e) {
+      this.logger.error(e);
+      throw new SystemError(e.statusCode || 500, e.message);
+    }
+  }
+
+  public async getAccountDetails(user: string): Promise<(IAccountDetail & Document) | any> {
+    try {
+      this.logger.silly('getting my account details');
+      const accountDetails : Array<IAccountDetail> = await this.accountDetail
+      .find({'user': user });
+      return accountDetails;
+    } catch (e) {
+      throw new SystemError(e.statusCode || 500, e.message);
+    }
+  }
+
+  public async addAccountDetail(detail: IAccountDetailInputDTO ): Promise<IAccountDetail> {
+    try {
+      this.logger.silly('adding account detail...');
+
+      const accountDetail: IAccountDetail & Document = await this.accountDetail.create({
+        user: detail.user,
+        accountName: detail.accountName,
+        accountNumber: detail.accountNumber,
+        bankname: detail.bankname
+      });
+
+      return accountDetail;
+      
+    } catch (e) {
+      this.logger.error(e);
+      throw new SystemError(e.statusCode || 500, e.message);
+    }
+  }
+
+  public async deleteAccountDetail({ accountDetailId, user}: { accountDetailId: string, user: string }): Promise<IAccountDetail> {
+    try {
+      this.logger.silly('deleting account detail...');
+
+      const accountDetailRecord : IAccountDetail & Document = await this.accountDetail
+      .findOne({'id': accountDetailId, user});
+
+      if(!accountDetailRecord){
+        throw new Error('account not found');
+      }
+      
+      const accountDetailDeleted = await this.accountDetail.findByIdAndDelete(accountDetailId);
+      if(accountDetailDeleted) {
+        this.logger.silly('account detail deleted!');
+        return accountDetailDeleted;
+      }else{
+        throw new Error('this account detail is unable to delete at the moment, please try again later');
+      }
       
     } catch (e) {
       this.logger.error(e);

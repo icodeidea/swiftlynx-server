@@ -15,9 +15,6 @@ var __setModuleDefault = (this && this.__setModuleDefault) || (Object.create ? (
 }) : function(o, v) {
     o["default"] = v;
 });
-var __exportStar = (this && this.__exportStar) || function(m, exports) {
-    for (var p in m) if (p !== "default" && !Object.prototype.hasOwnProperty.call(exports, p)) __createBinding(exports, m, p);
-};
 var __importStar = (this && this.__importStar) || function (mod) {
     if (mod && mod.__esModule) return mod;
     var result = {};
@@ -25,14 +22,34 @@ var __importStar = (this && this.__importStar) || function (mod) {
     __setModuleDefault(result, mod);
     return result;
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.mail = exports.SystemError = void 0;
-var error_1 = require("./error");
-Object.defineProperty(exports, "SystemError", { enumerable: true, get: function () { return __importDefault(error_1).default; } });
-__exportStar(require("./helpers"), exports);
-__exportStar(require("./payment"), exports);
-exports.mail = __importStar(require("./mail"));
+exports.generateReciepient3 = exports.generateReciepient2 = exports.generateReciepient = exports.sendinblue = void 0;
+exports.sendinblue = __importStar(require("./sendinblue"));
+// export * as ses from './ses';
+const generateReciepient = (to) => {
+    let reciepients;
+    if (typeof to === 'string') {
+        reciepients = [{ email: to }];
+    }
+    else {
+        reciepients = to.map(email => ({ email }));
+    }
+    return reciepients;
+};
+exports.generateReciepient = generateReciepient;
+const generateReciepient2 = (to) => {
+    if (typeof to === 'string')
+        return to;
+    return to.join(',');
+};
+exports.generateReciepient2 = generateReciepient2;
+const generateReciepient3 = (to) => {
+    let reciepients;
+    if (typeof to === 'string') {
+        reciepients = [to];
+        return reciepients;
+    }
+    return to;
+};
+exports.generateReciepient3 = generateReciepient3;
 //# sourceMappingURL=index.js.map

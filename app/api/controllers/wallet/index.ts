@@ -46,4 +46,82 @@ export class WalletController {
       return next(e);
     }
   };
+
+  static getAllPayout = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
+    const logger: Logger = Container.get('logger');
+    logger.debug('Calling get all payouts endpoint');
+    try {
+      const walletServiceInstance = Container.get(WalletService);
+      const data = await walletServiceInstance.getAllPayoutRequest();
+      return res.status(201).json({ success: true, data, message: 'get all payout' });
+    } catch (e) {
+      logger.error('🔥 error: %o', e);
+      return next(e);
+    }
+  };
+
+  static RequestPayout = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
+    const logger: Logger = Container.get('logger');
+    logger.debug('Calling request payout endpoint');
+    try {
+      const walletServiceInstance = Container.get(WalletService);
+      const data = await walletServiceInstance.payoutRequest({
+        user: req.currentUser.id, 
+        subject: req.body.entityId, 
+        subjectRef: req.body.entity,
+        accountDetailId: req.body.accountDetailId
+      });
+      return res.status(201).json({ success: true, data, message: 'payout request successful' });
+    } catch (e) {
+      logger.error('🔥 error: %o', e);
+      return next(e);
+    }
+  };
+
+  static getPayoutAccountDetails = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
+    const logger: Logger = Container.get('logger');
+    logger.debug('Calling get payout account endpoint');
+    try {
+      const walletServiceInstance = Container.get(WalletService);
+      const data = await walletServiceInstance.getAccountDetails(req.currentUser.id);
+      return res.status(201).json({ success: true, data, message: 'all account details' });
+    } catch (e) {
+      logger.error('🔥 error: %o', e);
+      return next(e);
+    }
+  };
+
+  static AddPayoutAccountDetail = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
+    const logger: Logger = Container.get('logger');
+    logger.debug('Calling add account detail endpoint');
+    try {
+      const walletServiceInstance = Container.get(WalletService);
+      const data = await walletServiceInstance.addAccountDetail({
+        user: req.currentUser.id, 
+        accountName: req.body.accountName, 
+        accountNumber: req.body.accountNumber,
+        bankname: req.body.bankname
+      });
+      return res.status(201).json({ success: true, data, message: 'added account detail successfully' });
+    } catch (e) {
+      logger.error('🔥 error: %o', e);
+      return next(e);
+    }
+  };
+
+  static DeleteAccountDetail = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
+    const logger: Logger = Container.get('logger');
+    logger.debug('Calling delete account detail endpoint');
+    try {
+      const walletServiceInstance = Container.get(WalletService);
+      const data = await walletServiceInstance.deleteAccountDetail({
+        user: req.currentUser.id, 
+        accountDetailId: req.body.accountDetailId
+      });
+      return res.status(201).json({ success: true, data, message: 'delete account detail successful' });
+    } catch (e) {
+      logger.error('🔥 error: %o', e);
+      return next(e);
+    }
+  };
 }

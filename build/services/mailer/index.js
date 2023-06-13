@@ -19,6 +19,7 @@ exports.MailerService = void 0;
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 const typedi_1 = require("typedi");
 const config_1 = __importDefault(require("../../config"));
+const utils_1 = require("../../utils");
 let MailerService = class MailerService {
     constructor(emailClient) {
         this.emailClient = emailClient;
@@ -41,19 +42,26 @@ let MailerService = class MailerService {
       On the following page:
       <br/>
       <a href="${config_1.default.url}/auth/verify/${verified.token.value}">Verify Account</a>
+      ${verified.token.value}
       <br/>
       Best wishes,
       ${config_1.default.appName} Team.
       `,
         };
-        this.emailClient.send(data);
+        // this.emailClient.send(data);
+        utils_1.mail.sendinblue.send({
+            to: data.to,
+            subject: data.subject,
+            text: data.subject,
+            html: data.html,
+        });
         return { delivered: 1, status: 'ok' };
     }
     async ResendVerificationMail({ email, username, verified }) {
         const data = {
             from: 'Admin <${config.supportMail}>',
             to: email,
-            subject: '${config.appName}.com Wallet service - Resend Verification',
+            subject: `${config_1.default.appName} - Resend Verification`,
             html: `
       Hi there ${username},
       <br/>
@@ -66,11 +74,21 @@ let MailerService = class MailerService {
       <br/>
       <a href="${config_1.default.url}/auth/verify/${verified.token.value}">Verify Account</a>
       <br/>
+      <br/>
+      <h3>
+        <b>${verified.token.value}<b/>
+      <h3/>
       Best wishes,
       ${config_1.default.appName} Team.
       `,
         };
-        this.emailClient.send(data);
+        // this.emailClient.send(data);
+        utils_1.mail.sendinblue.send({
+            to: data.to,
+            subject: data.subject,
+            text: data.subject,
+            html: data.html,
+        });
         return { delivered: 1, status: 'ok' };
     }
     async SendPasswordResetMail({ email, reset }) {
@@ -89,12 +107,40 @@ let MailerService = class MailerService {
       On the following page:
       <br/>
       <a href="${config_1.default.url}/auth/reset/${reset.token}">Reset Account Password</a>
+      <p>otp ${reset.token}</p>
       <br/>
       Best wishes,
       ${config_1.default.appName} Team.
       `,
         };
-        this.emailClient.send(data);
+        // this.emailClient.send(data);
+        utils_1.mail.sendinblue.send({
+            to: data.to,
+            subject: data.subject,
+            text: data.subject,
+            html: data.html,
+        });
+        return { delivered: 1, status: 'ok' };
+    }
+    async PayoutRequestMail() {
+        const data = {
+            from: 'Admin <${config.supportMail}>',
+            to: 'kingsleyonyeneke@gmail.com',
+            subject: 'Payout request',
+            html: `
+      Hi Boss,
+      <br/>
+      you have a new payout request from: <a href=${config_1.default.url} target='_blank'>${config_1.default.appName}</a>
+      <br/><br/>
+      `,
+        };
+        // this.emailClient.send(data);
+        utils_1.mail.sendinblue.send({
+            to: data.to,
+            subject: data.subject,
+            text: data.subject,
+            html: data.html,
+        });
         return { delivered: 1, status: 'ok' };
     }
     StartEmailSequence(sequence, user) {

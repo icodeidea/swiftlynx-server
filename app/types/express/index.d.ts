@@ -12,7 +12,9 @@ import {
   IContract,
   IMarket,
   IProject,
-  ISafe
+  ISafe,
+  IPayout,
+  IAccountDetail
 } from '../../interfaces';
 
 declare global {
@@ -20,6 +22,24 @@ declare global {
       export interface Request {
         currentUser: IUser & Document;
       }
+    }
+
+    namespace Mail {
+      export interface send {
+        to: string | Array<string>;
+        subject: string;
+        text?: string;
+        html?: string;
+        from?: string;
+        fromName?: string;
+        attachments?: any;
+      }
+      
+      export interface UpsertContact {
+        email: string;
+        [key: string]: any;
+      }
+      
     }
 
     namespace Models {
@@ -36,5 +56,7 @@ declare global {
       export type MarketModel = Model<IMarket & Document>;
       export type ProjectModel = Model<IProject & Document>;
       export type SafeModel = Model<ISafe & Document>;
+      export type PayoutModel = Model<IPayout & Document>;
+      export type AccountDetailModel = Model<IAccountDetail & Document>;
     }
   }
