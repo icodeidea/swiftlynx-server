@@ -187,6 +187,48 @@ class Validator {
     }
   }
 
+  async requestPayout(req: Request, _, next: NextFunction) {
+    try {
+      const validation = WalletSchema.requestPayoutSchema.validate({
+        ...req.body
+      });
+      if (validation.error) {
+        return next(validation.error);
+      }
+      return next();
+    } catch (e) {
+      next(e);
+    }
+  }
+
+  async addPayoutAccountDetail(req: Request, _, next: NextFunction) {
+    try {
+      const validation = WalletSchema.addAccountDetailSchema.validate({
+        ...req.body
+      });
+      if (validation.error) {
+        return next(validation.error);
+      }
+      return next();
+    } catch (e) {
+      next(e);
+    }
+  }
+
+  async deletePayoutAccountDetail(req: Request, _, next: NextFunction) {
+    try {
+      const validation = WalletSchema.deleteAccountDetailSchema.validate({
+        ...req.body
+      });
+      if (validation.error) {
+        return next(validation.error);
+      }
+      return next();
+    } catch (e) {
+      next(e);
+    }
+  }
+
   /**
    * Market Validators
    */
@@ -342,6 +384,7 @@ class Validator {
       next(e);
     }
   }
+
   
 
 }

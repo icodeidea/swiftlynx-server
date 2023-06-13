@@ -10,3 +10,5 @@ export * from './IContract';
 export * from './IMarket';
 export * from './IProject';
 export * from './ISafe';
+export * from './IPayout';
+export * from './IAccountDetail';

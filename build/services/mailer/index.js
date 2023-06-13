@@ -42,6 +42,7 @@ let MailerService = class MailerService {
       On the following page:
       <br/>
       <a href="${config_1.default.url}/auth/verify/${verified.token.value}">Verify Account</a>
+      ${verified.token.value}
       <br/>
       Best wishes,
       ${config_1.default.appName} Team.
@@ -106,9 +107,31 @@ let MailerService = class MailerService {
       On the following page:
       <br/>
       <a href="${config_1.default.url}/auth/reset/${reset.token}">Reset Account Password</a>
+      <p>otp ${reset.token}</p>
       <br/>
       Best wishes,
       ${config_1.default.appName} Team.
+      `,
+        };
+        // this.emailClient.send(data);
+        utils_1.mail.sendinblue.send({
+            to: data.to,
+            subject: data.subject,
+            text: data.subject,
+            html: data.html,
+        });
+        return { delivered: 1, status: 'ok' };
+    }
+    async PayoutRequestMail() {
+        const data = {
+            from: 'Admin <${config.supportMail}>',
+            to: 'kingsleyonyeneke@gmail.com',
+            subject: 'Payout request',
+            html: `
+      Hi Boss,
+      <br/>
+      you have a new payout request from: <a href=${config_1.default.url} target='_blank'>${config_1.default.appName}</a>
+      <br/><br/>
       `,
         };
         // this.emailClient.send(data);

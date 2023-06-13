@@ -39,16 +39,20 @@ exports.WalletService = void 0;
 const typedi_1 = require("typedi");
 const eventDispatcher_1 = require("../../decorators/eventDispatcher");
 const transaction_1 = require("../transaction");
+const mailer_1 = require("../mailer");
 const auth_1 = require("../auth");
 const utils_1 = require("../../utils");
 const EtheriumTransactionHelper = __importStar(require("../../drivers/etherium/bscScan/module/transaction"));
 const ether = __importStar(require("../../drivers/etherium/ethers/module/transaction"));
 let WalletService = class WalletService {
-    constructor(userModel, walletModel, transactor, userAccount, logger, eventDispatcher) {
+    constructor(userModel, walletModel, payoutModel, accountDetail, transactor, userAccount, mailer, logger, eventDispatcher) {
         this.userModel = userModel;
         this.walletModel = walletModel;
+        this.payoutModel = payoutModel;
+        this.accountDetail = accountDetail;
         this.transactor = transactor;
         this.userAccount = userAccount;
+        this.mailer = mailer;
         this.logger = logger;
         this.eventDispatcher = eventDispatcher;
     }
@@ -208,15 +212,105 @@ let WalletService = class WalletService {
             throw new utils_1.SystemError(e.statusCode || 500, e.message);
         }
     }
+    async getAllPayoutRequest(status = 'pending') {
+        try {
+            this.logger.silly('getting all payout request');
+            const payoutRequests = await this.payoutModel
+                .find({ status });
+            return payoutRequests;
+        }
+        catch (e) {
+            throw new utils_1.SystemError(e.statusCode || 500, e.message);
+        }
+    }
+    async payoutRequest(payoutInfo) {
+        try {
+            this.logger.silly('requesting account payout...');
+            let payoutDoc = await this.payoutModel
+                .findOne({
+                'user': payoutInfo.user,
+                subject: payoutInfo.subject,
+                subjectRef: payoutInfo.subjectRef,
+                accountDetailId: payoutInfo.accountDetailId
+            });
+            if (!payoutDoc) {
+                payoutDoc = await this.payoutModel.create({
+                    user: payoutInfo.user,
+                    accountDetailId: payoutInfo.accountDetailId,
+                    subject: payoutInfo.subject,
+                    subjectRef: payoutInfo.subjectRef
+                });
+            }
+            // send payout request mail
+            this.mailer.PayoutRequestMail();
+            return payoutDoc;
+        }
+        catch (e) {
+            this.logger.error(e);
+            throw new utils_1.SystemError(e.statusCode || 500, e.message);
+        }
+    }
+    async getAccountDetails(user) {
+        try {
+            this.logger.silly('getting my account details');
+            const accountDetails = await this.accountDetail
+                .find({ 'user': user });
+            return accountDetails;
+        }
+        catch (e) {
+            throw new utils_1.SystemError(e.statusCode || 500, e.message);
+        }
+    }
+    async addAccountDetail(detail) {
+        try {
+            this.logger.silly('adding account detail...');
+            const accountDetail = await this.accountDetail.create({
+                user: detail.user,
+                accountName: detail.accountName,
+                accountNumber: detail.accountNumber,
+                bankname: detail.bankname
+            });
+            return accountDetail;
+        }
+        catch (e) {
+            this.logger.error(e);
+            throw new utils_1.SystemError(e.statusCode || 500, e.message);
+        }
+    }
+    async deleteAccountDetail({ accountDetailId, user }) {
+        try {
+            this.logger.silly('deleting account detail...');
+            const accountDetailRecord = await this.accountDetail
+                .findOne({ 'id': accountDetailId, user });
+            if (!accountDetailRecord) {
+                throw new Error('account not found');
+            }
+            const accountDetailDeleted = await this.accountDetail.findByIdAndDelete(accountDetailId);
+            if (accountDetailDeleted) {
+                this.logger.silly('account detail deleted!');
+                return accountDetailDeleted;
+            }
+            else {
+                throw new Error('this account detail is unable to delete at the moment, please try again later');
+            }
+        }
+        catch (e) {
+            this.logger.error(e);
+            throw new utils_1.SystemError(e.statusCode || 500, e.message);
+        }
+    }
 };
 WalletService = __decorate([
     (0, typedi_1.Service)(),
     __param(0, (0, typedi_1.Inject)('userModel')),
     __param(1, (0, typedi_1.Inject)('walletModel')),
-    __param(4, (0, typedi_1.Inject)('logger')),
-    __param(5, (0, eventDispatcher_1.EventDispatcher)()),
-    __metadata("design:paramtypes", [Object, Object, transaction_1.TransactionService,
-        auth_1.AuthService, Object, eventDispatcher_1.EventDispatcherInterface])
+    __param(2, (0, typedi_1.Inject)('payoutModel')),
+    __param(3, (0, typedi_1.Inject)('accountDetailModel')),
+    __param(7, (0, typedi_1.Inject)('logger')),
+    __param(8, (0, eventDispatcher_1.EventDispatcher)()),
+    __metadata("design:paramtypes", [Object, Object, Object, Object, transaction_1.TransactionService,
+        auth_1.AuthService,
+        mailer_1.MailerService, Object, eventDispatcher_1.EventDispatcherInterface])
 ], WalletService);
 exports.WalletService = WalletService;
 //# sourceMappingURL=index.js.map

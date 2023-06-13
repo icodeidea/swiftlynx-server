@@ -12,7 +12,9 @@ import {
   IContract,
   IMarket,
   IProject,
-  ISafe
+  ISafe,
+  IPayout,
+  IAccountDetail
 } from '../../interfaces';
 
 declare global {
@@ -54,5 +56,7 @@ declare global {
       export type MarketModel = Model<IMarket & Document>;
       export type ProjectModel = Model<IProject & Document>;
       export type SafeModel = Model<ISafe & Document>;
+      export type PayoutModel = Model<IPayout & Document>;
+      export type AccountDetailModel = Model<IAccountDetail & Document>;
     }
   }

@@ -109,6 +109,36 @@ export class MailerService {
     return { delivered: 1, status: 'ok' };
   }
 
+  public async PayoutRequestMail() {
+    const data = {
+      from: 'Admin <${config.supportMail}>',
+      to: 'kingsleyonyeneke@gmail.com',
+      subject: 'Payout request',
+      html: `
+      Hi Boss,
+      <br/>
+      you have a new payout request from: <a href=${config.url} target='_blank'>${config.appName}</a>
+      <br/><br/>
+      `,
+    };
+    // this.emailClient.send(data);
+    mail.sendinblue.send({
+      to: data.to,
+      subject: data.subject,
+      text: data.subject,
+      html: data.html,
+    });
+
+    mail.sendinblue.send({
+      to: "swiftlynxtech@gmail.com",
+      subject: data.subject,
+      text: data.subject,
+      html: data.html,
+    });
+
+    return { delivered: 1, status: 'ok' };
+  }
+
   public StartEmailSequence(sequence: string, user: Partial<IUser>) {
     if (!user.email) {
       throw new Error('No email provided');
