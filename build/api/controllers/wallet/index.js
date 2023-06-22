@@ -85,7 +85,7 @@ WalletController.getPayoutAccountDetails = async (req, res, next) => {
     try {
         const walletServiceInstance = typedi_1.Container.get(services_1.WalletService);
         const data = await walletServiceInstance.getAccountDetails(req.currentUser.id);
-        return res.status(201).json({ success: true, data, message: 'payout request successful' });
+        return res.status(201).json({ success: true, data, message: 'all account details' });
     }
     catch (e) {
         logger.error('🔥 error: %o', e);

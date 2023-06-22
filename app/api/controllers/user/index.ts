@@ -32,6 +32,19 @@ export class UserController {
       }
     };
 
+    static getUserKpi = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
+      const logger: Logger = Container.get('logger');
+      logger.debug('Calling Get User Kpi with userId: %s', req.currentUser.id);
+      try {
+        const authServiceInstance = Container.get(AuthService);
+        const result = await authServiceInstance.GetUserKpi({ userId: req.currentUser.id });
+        return res.status(200).json({ success: true, data: result, message: 'user kpi' });
+      } catch (e) {
+        logger.error('🔥 error: %o', e);
+        return next(e);
+      }
+    };
+
     static UpdatePassword = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
       const logger: Logger = Container.get('logger');
       logger.debug('Calling update Account password with userId: %s', req.currentUser.id);

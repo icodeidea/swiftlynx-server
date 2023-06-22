@@ -34,6 +34,19 @@ UserController.getAccount = async (req, res, next) => {
         return next(e);
     }
 };
+UserController.getUserKpi = async (req, res, next) => {
+    const logger = typedi_1.Container.get('logger');
+    logger.debug('Calling Get User Kpi with userId: %s', req.currentUser.id);
+    try {
+        const authServiceInstance = typedi_1.Container.get(services_1.AuthService);
+        const result = await authServiceInstance.GetUserKpi({ userId: req.currentUser.id });
+        return res.status(200).json({ success: true, data: result, message: 'user kpi' });
+    }
+    catch (e) {
+        logger.error('🔥 error: %o', e);
+        return next(e);
+    }
+};
 UserController.UpdatePassword = async (req, res, next) => {
     const logger = typedi_1.Container.get('logger');
     logger.debug('Calling update Account password with userId: %s', req.currentUser.id);
