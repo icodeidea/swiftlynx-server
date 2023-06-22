@@ -12,6 +12,9 @@ export default (app: Router): Router => {
   //update-account
   userRouter.route('/update-profile').put(validator.updateUser, middlewares.isAuth, middlewares.attachCurrentUser, UserController.updateAccount);
 
+  //user kpi
+  userRouter.route('/kpi').get(middlewares.isAuth, middlewares.attachCurrentUser, UserController.getUserKpi);
+
   //update-password
   userRouter.route('/update-password').put(validator.updatePassword, middlewares.isAuth, middlewares.attachCurrentUser, UserController.UpdatePassword);
 

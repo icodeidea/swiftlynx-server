@@ -30,9 +30,11 @@ const utils_1 = require("../../utils");
 const google_auth_library_1 = require("google-auth-library");
 const slugify_1 = __importDefault(require("slugify"));
 let AuthService = class AuthService {
-    constructor(userModel, walletModel, mailer, wallet, logger, eventDispatcher) {
+    constructor(userModel, walletModel, tradeModel, safeModel, mailer, wallet, logger, eventDispatcher) {
         this.userModel = userModel;
         this.walletModel = walletModel;
+        this.tradeModel = tradeModel;
+        this.safeModel = safeModel;
         this.mailer = mailer;
         this.wallet = wallet;
         this.logger = logger;
@@ -470,6 +472,40 @@ let AuthService = class AuthService {
             throw new utils_1.SystemError(e.statusCode || 500, e.message);
         }
     }
+    async GetUserKpi({ userId, }) {
+        this.logger.silly('Getting Account...');
+        try {
+            // this.tradeModel
+            // this.safeModel
+            // const tradeKpi = await this.tradeModel.aggregate([
+            //   { $group: {
+            //       userId: userId,
+            //       // total:       { $sum: { $add: ["$user_totaldocs", "$user_totalthings"] } },
+            //       totalTrade:   { $sum: "$amount" },
+            //   }}
+            // ])
+            // const userRecord = await this.userModel.findById(userId);
+            // const wallet = await this.walletModel.findById(userRecord.wallet);
+            // if(userRecord) {
+            //   this.logger.silly('Account Found!');
+            //   return {
+            //     user: userRecord.toJSON(),
+            //     wallet
+            //   }
+            // }else{
+            //   throw new Error('unable to find this account at the moment, please try again later');
+            // }
+            return {
+                totalAmount: 0,
+                totalTrade: 0,
+                totalSafe: 0,
+            };
+        }
+        catch (e) {
+            this.logger.error(e);
+            throw new utils_1.SystemError(e.statusCode || 500, e.message);
+        }
+    }
     async DeleteUser({ userId, }) {
         this.logger.silly('Deleting Account...');
         try {
@@ -492,9 +528,11 @@ AuthService = __decorate([
     (0, typedi_1.Service)(),
     __param(0, (0, typedi_1.Inject)('userModel')),
     __param(1, (0, typedi_1.Inject)('walletModel')),
-    __param(4, (0, typedi_1.Inject)('logger')),
-    __param(5, (0, eventDispatcher_1.EventDispatcher)()),
-    __metadata("design:paramtypes", [Object, Object, mailer_1.MailerService,
+    __param(2, (0, typedi_1.Inject)('tradeModel')),
+    __param(3, (0, typedi_1.Inject)('safeModel')),
+    __param(6, (0, typedi_1.Inject)('logger')),
+    __param(7, (0, eventDispatcher_1.EventDispatcher)()),
+    __metadata("design:paramtypes", [Object, Object, Object, Object, mailer_1.MailerService,
         wallet_1.WalletService, Object, eventDispatcher_1.EventDispatcherInterface])
 ], AuthService);
 exports.AuthService = AuthService;

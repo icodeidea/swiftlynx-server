@@ -19,6 +19,8 @@ export class AuthService {
   constructor(
     @Inject('userModel') private userModel: Models.UserModel,
     @Inject('walletModel') private walletModel: Models.WalletModel,
+    @Inject('tradeModel') private tradeModel: Models.TradeModel,
+    @Inject('safeModel') private safeModel: Models.SafeModel,
     private mailer: MailerService,
     private wallet: WalletService,
     @Inject('logger') private logger: { silly(arg0: string): void; error(arg0: unknown): void },
@@ -532,6 +534,46 @@ export class AuthService {
         }
       }else{
         throw new Error('unable to find this account at the moment, please try again later');
+      }
+    } catch(e) {
+      this.logger.error(e);
+      throw new SystemError(e.statusCode || 500, e.message);
+    }
+  }
+
+  public async GetUserKpi({
+    userId,
+  }: {
+    userId: string;
+  }): Promise<(IUser & Document) | any> {
+    this.logger.silly('Getting Account...');
+    try {
+
+      // this.tradeModel
+      // this.safeModel
+
+      // const tradeKpi = await this.tradeModel.aggregate([
+      //   { $group: {
+      //       userId: userId,
+      //       // total:       { $sum: { $add: ["$user_totaldocs", "$user_totalthings"] } },
+      //       totalTrade:   { $sum: "$amount" },
+      //   }}
+      // ])
+      // const userRecord = await this.userModel.findById(userId);
+      // const wallet = await this.walletModel.findById(userRecord.wallet);
+      // if(userRecord) {
+      //   this.logger.silly('Account Found!');
+      //   return {
+      //     user: userRecord.toJSON(),
+      //     wallet
+      //   }
+      // }else{
+      //   throw new Error('unable to find this account at the moment, please try again later');
+      // }
+      return {
+        totalAmount: 0,
+        totalTrade: 0,
+        totalSafe: 0,
       }
     } catch(e) {
       this.logger.error(e);

