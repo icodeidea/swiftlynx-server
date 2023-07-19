@@ -92,6 +92,8 @@ export class ContractService {
     try {
       this.logger.silly('sign contract');
 
+      console.log('sfjfd',amount);
+
       const contractRecord : IContract & Document = await this.contractModel
         .findOne({'id': contractId});
 
@@ -99,7 +101,7 @@ export class ContractService {
 
       if(contractRecord.minAmount && contractRecord.maxAmount){
         if(contractRecord.minAmount > amount) {throw new SystemError(400, `minimum amount should be up to ${contractRecord.minAmount}`);}
-        if(amount > contractRecord.maxAmount) {throw new SystemError(400, `amount cannot be greater thank ${contractRecord.maxAmount}`);}
+        if(amount > contractRecord.maxAmount) {throw new SystemError(400, `amount cannot be greater than ${contractRecord.maxAmount}`);}
       }
 
       const tradeRecord = await this.trade.startTrade({

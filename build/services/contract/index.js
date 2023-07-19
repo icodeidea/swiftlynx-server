@@ -89,6 +89,7 @@ let ContractService = class ContractService {
     async signContract(contractId, userId, amount) {
         try {
             this.logger.silly('sign contract');
+            console.log('sfjfd', amount);
             const contractRecord = await this.contractModel
                 .findOne({ 'id': contractId });
             if (!contractRecord)
@@ -98,7 +99,7 @@ let ContractService = class ContractService {
                     throw new utils_1.SystemError(400, `minimum amount should be up to ${contractRecord.minAmount}`);
                 }
                 if (amount > contractRecord.maxAmount) {
-                    throw new utils_1.SystemError(400, `amount cannot be greater thank ${contractRecord.maxAmount}`);
+                    throw new utils_1.SystemError(400, `amount cannot be greater than ${contractRecord.maxAmount}`);
                 }
             }
             const tradeRecord = await this.trade.startTrade({

@@ -168,7 +168,7 @@ export class AuthService {
       this.logger.silly('Password is valid!');
       this.logger.silly('Generating Access and Refresh Tokens...');
       const { accessToken, refreshToken } = this.generateTokens(userRecord);
-      await this.creditDailySignInReward( { lastLogin: userRecord.lastLogin, userId: userRecord.id } );
+      // await this.creditDailySignInReward( { lastLogin: userRecord.lastLogin, userId: userRecord.id } );
       userRecord.lastLogin = new Date();
       await userRecord.save();
       const user = userRecord;
@@ -548,32 +548,48 @@ export class AuthService {
   }): Promise<(IUser & Document) | any> {
     this.logger.silly('Getting Account...');
     try {
+      // total trade amount
+      const totalTradesAmount = await this.tradeModel.aggregate([{
+        $match : { $and : [ {userId}, {status: 'ACTIVE' }] },
+      },{
+          $group : {
+              _id : null,
+              total : {
+                  $sum : "$amount"
+              }
+          }
+      }]);
 
-      // this.tradeModel
-      // this.safeModel
+      const totalTradesInterest = await this.tradeModel.aggregate([{
+        $match : { $and : [ {userId}, {status: 'ACTIVE' }] },
+      },{
+          $group : {
+              _id : null,
+              total : {
+                  $sum : "$interest"
+              }
+          }
+      }]);
 
-      // const tradeKpi = await this.tradeModel.aggregate([
-      //   { $group: {
-      //       userId: userId,
-      //       // total:       { $sum: { $add: ["$user_totaldocs", "$user_totalthings"] } },
-      //       totalTrade:   { $sum: "$amount" },
-      //   }}
-      // ])
-      // const userRecord = await this.userModel.findById(userId);
-      // const wallet = await this.walletModel.findById(userRecord.wallet);
-      // if(userRecord) {
-      //   this.logger.silly('Account Found!');
-      //   return {
-      //     user: userRecord.toJSON(),
-      //     wallet
-      //   }
-      // }else{
-      //   throw new Error('unable to find this account at the moment, please try again later');
-      // }
+      const totalAmountInSafe = await this.safeModel.aggregate([{
+        $match : { $and : [ { user: userId }, { status: 'active' }] },
+      },{
+          $group : {
+              _id : null,
+              total : {
+                  $sum : "$amountRaised"
+              }
+          }
+      }]);
+
+      const totalTradeRoi: any = (totalTradesAmount[0].total * totalTradesInterest[0].total) / 100
+      const totalAmount = totalTradesAmount[0].total + totalAmountInSafe[0].total;
+
       return {
-        totalAmount: 0,
-        totalTrade: 0,
-        totalSafe: 0,
+        totalAmount,
+        totalTrade: totalTradesAmount[0].total,
+        totalTradeRoi, 
+        totalSafe: totalAmountInSafe[0].total,
       }
     } catch(e) {
       this.logger.error(e);
