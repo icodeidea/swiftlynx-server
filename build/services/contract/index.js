@@ -74,7 +74,23 @@ let ContractService = class ContractService {
             this.logger.silly('getting contract record');
             console.log('contractOrProjectId', contractOrProjectId);
             const contractRecord = await this.contractModel
-                .find({ 'projectId': contractOrProjectId });
+                .find({ 'projectId': contractOrProjectId, state: 'PENDING' });
+            //   .find({$or: [
+            //       { 'id': contractOrProjectId },
+            //       { 'projectId': contractOrProjectId },
+            //     ]});
+            return contractRecord;
+        }
+        catch (e) {
+            this.logger.error(e);
+            throw new utils_1.SystemError(e.statusCode || 500, e.message);
+        }
+    }
+    async getAllContract(userId) {
+        try {
+            this.logger.silly('getting all user contract record');
+            const contractRecord = await this.contractModel
+                .find({ 'userId': userId });
             //   .find({$or: [
             //       { 'id': contractOrProjectId },
             //       { 'projectId': contractOrProjectId },
@@ -89,7 +105,6 @@ let ContractService = class ContractService {
     async signContract(contractId, userId, amount) {
         try {
             this.logger.silly('sign contract');
-            console.log('sfjfd', amount);
             const contractRecord = await this.contractModel
                 .findOne({ 'id': contractId });
             if (!contractRecord)
