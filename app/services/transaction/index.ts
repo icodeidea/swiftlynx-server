@@ -85,6 +85,17 @@ export class TransactionService {
     }
   }
 
+  public async getEntityTransactions(entity: string): Promise<any> {
+    try {
+      const transactionRecord = await this.transactionModel.find({ 'subject': entity });
+      this.logger.silly('geting transaction information');
+      return transactionRecord;
+    } catch (e) {
+      this.logger.error(e);
+      throw new SystemError(e.statusCode || 500, e.message);
+    }
+  }
+
   public async initialisePayment(userId: string, amount: number, entity: string, entityId: string): Promise<any> {
     try {
       const { initializePayment } = paystack();

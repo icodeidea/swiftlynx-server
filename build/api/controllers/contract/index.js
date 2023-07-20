@@ -39,6 +39,20 @@ ContractController.getContract = async (req, res, next) => {
     }
 };
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
+ContractController.getAllContract = async (req, res, next) => {
+    const logger = typedi_1.Container.get('logger');
+    logger.debug('Calling get all contract endpoint');
+    try {
+        const contractServiceInstance = typedi_1.Container.get(services_1.ContractService);
+        const data = await contractServiceInstance.getAllContract(req.currentUser.id);
+        return res.status(201).json({ success: true, data, message: 'contract(s) retrived successfully' });
+    }
+    catch (e) {
+        logger.error('🔥 error: %o', e);
+        return next(e);
+    }
+};
+// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 ContractController.signContract = async (req, res, next) => {
     var _b;
     const logger = typedi_1.Container.get('logger');

@@ -7,7 +7,8 @@ const {
     getContract, 
     signContract ,
     updateContract,
-    deleteContract
+    deleteContract,
+    getAllContract
 } = ContractController;
 
 const contractRouter = Router();
@@ -26,6 +27,9 @@ export default (app: Router): Router => {
 
   //list contract
   contractRouter.route('/list-contract').get(getContract);
+
+  //list all contract
+  contractRouter.route('/list-all-contract').get(middlewares.isAuth, middlewares.attachCurrentUser, getAllContract);
 
   //sign contract
   contractRouter.route('/sign-contract').post(middlewares.isAuth, middlewares.attachCurrentUser, validator.signContract, signContract);

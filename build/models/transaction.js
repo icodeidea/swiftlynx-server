@@ -15,8 +15,8 @@ const Transaction = new mongoose_1.default.Schema({
     },
     subjectRef: {
         type: String,
-        enum: ['Feed', 'Comment', 'User'],
-        default: 'Feed',
+        enum: ['Safe', 'Contract', 'User'],
+        default: 'Contract',
     },
     type: { type: String, required: true },
     metadata: { type: Object },

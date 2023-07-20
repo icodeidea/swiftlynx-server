@@ -93,6 +93,17 @@ let TransactionService = class TransactionService {
             throw new utils_1.SystemError(e.statusCode || 500, e.message);
         }
     }
+    async getEntityTransactions(entity) {
+        try {
+            const transactionRecord = await this.transactionModel.find({ 'subject': entity });
+            this.logger.silly('geting transaction information');
+            return transactionRecord;
+        }
+        catch (e) {
+            this.logger.error(e);
+            throw new utils_1.SystemError(e.statusCode || 500, e.message);
+        }
+    }
     async initialisePayment(userId, amount, entity, entityId) {
         try {
             const { initializePayment } = (0, utils_2.paystack)();
