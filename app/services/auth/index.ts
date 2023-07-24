@@ -582,14 +582,14 @@ export class AuthService {
           }
       }]);
 
-      const totalTradeRoi: any = (totalTradesAmount[0].total * totalTradesInterest[0].total) / 100
-      const totalAmount = totalTradesAmount[0].total + totalAmountInSafe[0].total;
+      const totalTradeRoi: any = (totalTradesAmount[0]?.total * totalTradesInterest[0]?.total) / 100
+      const totalAmount = totalTradesAmount[0]?.total + totalAmountInSafe[0]?.total;
 
       return {
         totalAmount,
-        totalTrade: totalTradesAmount[0].total,
+        totalTrade: totalTradesAmount[0]?.total,
         totalTradeRoi, 
-        totalSafe: totalAmountInSafe[0].total,
+        totalSafe: totalAmountInSafe[0]?.total,
       }
     } catch(e) {
       this.logger.error(e);
