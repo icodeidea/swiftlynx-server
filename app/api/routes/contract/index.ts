@@ -8,7 +8,8 @@ const {
     signContract ,
     updateContract,
     deleteContract,
-    getAllContract
+    getAllContract,
+    requestPaymentConfrimation
 } = ContractController;
 
 const contractRouter = Router();
@@ -24,6 +25,8 @@ export default (app: Router): Router => {
 
   //delete contract
   contractRouter.route('/delete').delete(middlewares.isAuth, middlewares.attachCurrentUser, validator.deleteContract, deleteContract);
+
+  contractRouter.route('/request-payment-confirmation').get(middlewares.isAuth, middlewares.attachCurrentUser, requestPaymentConfrimation);
 
   //list contract
   contractRouter.route('/list-contract').get(getContract);

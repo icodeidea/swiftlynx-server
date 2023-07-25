@@ -473,6 +473,7 @@ let AuthService = class AuthService {
         }
     }
     async GetUserKpi({ userId, }) {
+        var _a, _b, _c, _d, _e, _f;
         this.logger.silly('Getting Account...');
         try {
             // total trade amount
@@ -506,13 +507,13 @@ let AuthService = class AuthService {
                         }
                     }
                 }]);
-            const totalTradeRoi = (totalTradesAmount[0].total * totalTradesInterest[0].total) / 100;
-            const totalAmount = totalTradesAmount[0].total + totalAmountInSafe[0].total;
+            const totalTradeRoi = (((_a = totalTradesAmount[0]) === null || _a === void 0 ? void 0 : _a.total) * ((_b = totalTradesInterest[0]) === null || _b === void 0 ? void 0 : _b.total)) / 100;
+            const totalAmount = ((_c = totalTradesAmount[0]) === null || _c === void 0 ? void 0 : _c.total) + ((_d = totalAmountInSafe[0]) === null || _d === void 0 ? void 0 : _d.total);
             return {
                 totalAmount,
-                totalTrade: totalTradesAmount[0].total,
+                totalTrade: (_e = totalTradesAmount[0]) === null || _e === void 0 ? void 0 : _e.total,
                 totalTradeRoi,
-                totalSafe: totalAmountInSafe[0].total,
+                totalSafe: (_f = totalAmountInSafe[0]) === null || _f === void 0 ? void 0 : _f.total,
             };
         }
         catch (e) {

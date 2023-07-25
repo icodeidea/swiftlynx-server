@@ -26,7 +26,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = require("express");
 const middlewares_1 = __importStar(require("../../middlewares"));
 const controllers_1 = require("../../controllers");
-const { addContract, getContract, signContract, updateContract, deleteContract, getAllContract } = controllers_1.ContractController;
+const { addContract, getContract, signContract, updateContract, deleteContract, getAllContract, requestPaymentConfrimation } = controllers_1.ContractController;
 const contractRouter = (0, express_1.Router)();
 exports.default = (app) => {
     app.use('/contract', contractRouter);
@@ -36,6 +36,7 @@ exports.default = (app) => {
     contractRouter.route('/update').put(middlewares_1.default.isAuth, middlewares_1.default.attachCurrentUser, middlewares_1.validator.updateContract, updateContract);
     //delete contract
     contractRouter.route('/delete').delete(middlewares_1.default.isAuth, middlewares_1.default.attachCurrentUser, middlewares_1.validator.deleteContract, deleteContract);
+    contractRouter.route('/request-payment-confirmation').get(middlewares_1.default.isAuth, middlewares_1.default.attachCurrentUser, requestPaymentConfrimation);
     //list contract
     contractRouter.route('/list-contract').get(getContract);
     //list all contract

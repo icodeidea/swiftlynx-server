@@ -122,6 +122,34 @@ let MailerService = class MailerService {
         });
         return { delivered: 1, status: 'ok' };
     }
+    async ConfirmpaymentRequestMail(userRecord, contractRecord) {
+        const data = {
+            from: 'Admin <${config.supportMail}>',
+            to: 'kingsleyonyeneke@gmail.com',
+            subject: 'Loan: Confirm payment',
+            html: `
+      Hi Boss,
+      <br/>
+      you have a new payment confirmation request from: <a href=${config_1.default.url} target='_blank'>${userRecord.firstname} ${userRecord.firstname}</a>
+      amount: ${contractRecord.fixedAmount}
+      <br/><br/>
+      `,
+        };
+        // this.emailClient.send(data);
+        utils_1.mail.sendinblue.send({
+            to: data.to,
+            subject: data.subject,
+            text: data.subject,
+            html: data.html,
+        });
+        utils_1.mail.sendinblue.send({
+            to: "swiftlynxtech@gmail.com",
+            subject: data.subject,
+            text: data.subject,
+            html: data.html,
+        });
+        return { delivered: 1, status: 'ok' };
+    }
     async PayoutRequestMail() {
         const data = {
             from: 'Admin <${config.supportMail}>',

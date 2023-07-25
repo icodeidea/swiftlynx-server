@@ -26,7 +26,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = require("express");
 const middlewares_1 = __importStar(require("../../middlewares"));
 const controllers_1 = require("../../controllers");
-const { getWalletInfo, activateWallet, WithdrawFund, getAllPayout, RequestPayout, getPayoutAccountDetails, AddPayoutAccountDetail, DeleteAccountDetail } = controllers_1.WalletController;
+const { getWalletInfo, activateWallet, WithdrawFund, getAllPayout, RequestPayout, getPayoutAccountDetails, AddPayoutAccountDetail, DeleteAccountDetail, getSwiftlynxAccountDetails } = controllers_1.WalletController;
 const walletRouter = (0, express_1.Router)();
 exports.default = (app) => {
     app.use('/wallet', walletRouter);
@@ -38,6 +38,8 @@ exports.default = (app) => {
     walletRouter.route('/withdraw-fund').post(middlewares_1.validator.withdrawFund, middlewares_1.default.isAuth, middlewares_1.default.attachCurrentUser, WithdrawFund);
     //get all payouts
     walletRouter.route('/all-payout').get(middlewares_1.default.isAuth, middlewares_1.default.attachCurrentUser, getAllPayout);
+    //get all payouts
+    walletRouter.route('/payback-accounts').get(getSwiftlynxAccountDetails);
     //request payout
     walletRouter.route('/request-payout').post(middlewares_1.validator.requestPayout, middlewares_1.default.isAuth, middlewares_1.default.attachCurrentUser, RequestPayout);
     //get all payout account detail

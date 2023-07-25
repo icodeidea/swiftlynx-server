@@ -51,6 +51,20 @@ export class ContractController {
     }
   };
 
+    // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
+    static requestPaymentConfrimation = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
+      const logger: Logger = Container.get('logger');
+      logger.debug('Calling request payment confirmation endpoint');
+      try {
+        const contractServiceInstance = Container.get(ContractService);
+        const data = await contractServiceInstance.requestPaymentConfirmation(req.currentUser.id, req?.query?.entityId as string);
+        return res.status(201).json({ success: true, data, message: 'contract(s) retrived successfully' });
+      } catch (e) {
+        logger.error('🔥 error: %o', e);
+        return next(e);
+      }
+    };
+
   // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
   static signContract = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
     const logger: Logger = Container.get('logger');

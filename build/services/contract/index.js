@@ -17,10 +17,13 @@ const typedi_1 = require("typedi");
 const utils_1 = require("../../utils");
 const project_1 = require("../project");
 const trade_1 = require("../trade");
+const mailer_1 = require("../mailer");
 let ContractService = class ContractService {
-    constructor(contractModel, logger, project, trade) {
+    constructor(contractModel, userModel, logger, mailer, project, trade) {
         this.contractModel = contractModel;
+        this.userModel = userModel;
         this.logger = logger;
+        this.mailer = mailer;
         this.project = project;
         this.trade = trade;
     }
@@ -141,6 +144,19 @@ let ContractService = class ContractService {
             throw new utils_1.SystemError(e.statusCode || 500, e.message);
         }
     }
+    async requestPaymentConfirmation(user, entityId) {
+        try {
+            this.logger.silly('requesting payment confirmation');
+            const userRecord = await this.userModel.findById(user);
+            const contractRecord = await this.contractModel
+                .findOne({ 'id': entityId, userId: user });
+            await this.mailer.ConfirmpaymentRequestMail(userRecord, contractRecord);
+            return null;
+        }
+        catch (e) {
+            throw new utils_1.SystemError(e.statusCode || 500, e.message);
+        }
+    }
     async updateContractStatistics(data) {
         try {
             this.logger.silly('updating contract statistics');
@@ -206,8 +222,10 @@ let ContractService = class ContractService {
 ContractService = __decorate([
     (0, typedi_1.Service)(),
     __param(0, (0, typedi_1.Inject)('contractModel')),
-    __param(1, (0, typedi_1.Inject)('logger')),
-    __metadata("design:paramtypes", [Object, Object, project_1.ProjectService,
+    __param(1, (0, typedi_1.Inject)('userModel')),
+    __param(2, (0, typedi_1.Inject)('logger')),
+    __metadata("design:paramtypes", [Object, Object, Object, mailer_1.MailerService,
+        project_1.ProjectService,
         trade_1.TradeService])
 ], ContractService);
 exports.ContractService = ContractService;

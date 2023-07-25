@@ -4,12 +4,15 @@ import { Document } from 'mongoose';
 import { SystemError } from '../../utils';
 import { ProjectService } from '../project';
 import { TradeService } from '../trade';
+import { MailerService } from '../mailer';
 
 @Service()
 export class ContractService {
   constructor(
     @Inject('contractModel') private contractModel: Models.ContractModel,
+    @Inject('userModel') private userModel: Models.UserModel,
     @Inject('logger') private logger: { silly(arg0: string): void; error(arg0: unknown): void },
+    private mailer: MailerService,
     private project: ProjectService,
     private trade: TradeService
   ) {}
@@ -141,6 +144,20 @@ export class ContractService {
       return tradeRecord;
     } catch (e) {
       this.logger.error(e);
+      throw new SystemError(e.statusCode || 500, e.message);
+    }
+  }
+
+  public async requestPaymentConfirmation(user: string, entityId: string): Promise<any> {
+    try {
+      this.logger.silly('requesting payment confirmation');
+      const userRecord = await this.userModel.findById(user);
+      const contractRecord : IContract & Document = await this.contractModel
+        .findOne({ 'id': entityId, userId: user });
+
+      await this.mailer.ConfirmpaymentRequestMail(userRecord, contractRecord);
+      return null;
+    } catch (e) {
       throw new SystemError(e.statusCode || 500, e.message);
     }
   }

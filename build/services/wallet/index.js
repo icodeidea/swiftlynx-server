@@ -212,6 +212,21 @@ let WalletService = class WalletService {
             throw new utils_1.SystemError(e.statusCode || 500, e.message);
         }
     }
+    async getSwiftlynxPaymentDetails() {
+        try {
+            this.logger.silly('getting my swiftlynx account details');
+            return [
+                {
+                    bankName: 'firstbank',
+                    accountName: 'swiftlynx',
+                    accountNumber: '0098357364789'
+                }
+            ];
+        }
+        catch (e) {
+            throw new utils_1.SystemError(e.statusCode || 500, e.message);
+        }
+    }
     async getAllPayoutRequest(status = 'pending') {
         try {
             this.logger.silly('getting all payout request');
