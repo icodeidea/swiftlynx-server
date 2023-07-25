@@ -205,6 +205,22 @@ export class WalletService {
     }
   }
 
+  public async getSwiftlynxPaymentDetails(): Promise<any> {
+    try {
+      this.logger.silly('getting my swiftlynx account details');
+      
+      return [
+        {
+          bankName: 'firstbank',
+          accountName: 'swiftlynx',
+          accountNumber: '0098357364789'
+        }
+      ]
+    } catch (e) {
+      throw new SystemError(e.statusCode || 500, e.message);
+    }
+  }
+
   public async getAllPayoutRequest(status: string = 'pending'): Promise<(IPayout & Document) | any> {
     try {
       this.logger.silly('getting all payout request');

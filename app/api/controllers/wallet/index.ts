@@ -78,6 +78,19 @@ export class WalletController {
     }
   };
 
+  static getSwiftlynxAccountDetails = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
+    const logger: Logger = Container.get('logger');
+    logger.debug('Calling get swiftlynx account endpoint');
+    try {
+      const walletServiceInstance = Container.get(WalletService);
+      const data = await walletServiceInstance.getSwiftlynxPaymentDetails();
+      return res.status(201).json({ success: true, data, message: 'all account details' });
+    } catch (e) {
+      logger.error('🔥 error: %o', e);
+      return next(e);
+    }
+  };
+
   static getPayoutAccountDetails = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
     const logger: Logger = Container.get('logger');
     logger.debug('Calling get payout account endpoint');

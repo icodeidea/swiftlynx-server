@@ -79,6 +79,19 @@ WalletController.RequestPayout = async (req, res, next) => {
         return next(e);
     }
 };
+WalletController.getSwiftlynxAccountDetails = async (req, res, next) => {
+    const logger = typedi_1.Container.get('logger');
+    logger.debug('Calling get swiftlynx account endpoint');
+    try {
+        const walletServiceInstance = typedi_1.Container.get(services_1.WalletService);
+        const data = await walletServiceInstance.getSwiftlynxPaymentDetails();
+        return res.status(201).json({ success: true, data, message: 'all account details' });
+    }
+    catch (e) {
+        logger.error('🔥 error: %o', e);
+        return next(e);
+    }
+};
 WalletController.getPayoutAccountDetails = async (req, res, next) => {
     const logger = typedi_1.Container.get('logger');
     logger.debug('Calling get payout account endpoint');
