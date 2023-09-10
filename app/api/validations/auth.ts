@@ -7,7 +7,7 @@ export const signupSchema = Joi.object({
   accountType: Joi.string().valid('individual', 'organisation').required(),
   email: Joi.string().email().required(),
   password: passwordComplexity(),
-  username: Joi.string().required(),
+  username: Joi.string(),
   dob: Joi.date(),
   gender: Joi.string(),
   referer: Joi.string(),

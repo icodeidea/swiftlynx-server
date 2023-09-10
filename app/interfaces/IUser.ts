@@ -36,6 +36,8 @@ export interface IUser {
   }
   
   export interface IUserInputDTO {
+    firstname: string;
+    lastname: string;
     username: string;
     email: string;
     referer?: string;

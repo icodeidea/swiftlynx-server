@@ -54,6 +54,7 @@ export class AuthService {
 
       const userRecord = await this.userModel.create({
         ...userInputDTO,
+        username: `${userInputDTO.firstname}-${userInputDTO.lastname}`,
         refId,
         salt: salt.toString('hex'),
         password: hashedPassword,
