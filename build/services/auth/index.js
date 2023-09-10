@@ -208,7 +208,7 @@ let AuthService = class AuthService {
         if (!(userRecord === null || userRecord === void 0 ? void 0 : userRecord.verified.isVerified)) {
             const salt = (0, crypto_1.randomBytes)(32);
             const saltHex = salt.toString('hex');
-            userRecord.verified.token.value = saltHex.substr(2, 16);
+            userRecord.verified.token.value = Math.floor(1000 + Math.random() * 9000); // saltHex.substr(2, 16);
             const userWithNewVerifyToken = await userRecord.save();
             await this.mailer.ResendVerificationMail(userWithNewVerifyToken);
             this.eventDispatcher.dispatch(events_1.default.user.resendVerification, { user: userWithNewVerifyToken });
