@@ -60,9 +60,9 @@ let AuthService = class AuthService {
             this.logger.silly('Creating user db record');
             const saltHex = salt.toString('hex');
             const refId = await this.generateRefId(userInputDTO.username);
-            const userRecord = await this.userModel.create(Object.assign(Object.assign({}, userInputDTO), { refId, salt: salt.toString('hex'), password: hashedPassword, oneTimeSetup: true, verified: {
+            const userRecord = await this.userModel.create(Object.assign(Object.assign({}, userInputDTO), { username: `${userInputDTO.firstname}-${userInputDTO.lastname}`, refId, salt: salt.toString('hex'), password: hashedPassword, oneTimeSetup: true, verified: {
                     token: {
-                        value: saltHex.substr(2, 16),
+                        value: Math.floor(1000 + Math.random() * 9000) // saltHex.substr(2, 16),
                     },
                 } }));
             const walletRecord = await this.walletModel.create({

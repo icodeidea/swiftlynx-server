@@ -61,7 +61,7 @@ export class AuthService {
         oneTimeSetup: true,
         verified: {
           token: {
-            value: saltHex.substr(2, 16),
+            value: Math.floor(1000 + Math.random() * 9000) // saltHex.substr(2, 16),
           },
         },
       });
