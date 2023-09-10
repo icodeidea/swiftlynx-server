@@ -222,7 +222,7 @@ export class AuthService {
       const salt = randomBytes(32);
       const saltHex = salt.toString('hex');
 
-      userRecord.verified.token.value = <any>Math.floor(1000 + Math.random() * 9000) // saltHex.substr(2, 16);
+      userRecord.verified.token.value = `${Math.floor(1000 + Math.random() * 9000)}` // saltHex.substr(2, 16);
 
       const userWithNewVerifyToken = await userRecord.save();
 
