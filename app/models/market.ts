@@ -17,6 +17,10 @@ const Market = new mongoose.Schema(
     description: {
       type: String,
     },
+    icon: {
+      type: String,
+      default: "https://img.icons8.com/?size=2x&id=tEvuQAXJ5bWr&format=png"
+    },
     sectorAvailable: {
         type: String,
         enum: ['INVESTMENT', 'LOAN', 'ALL'],
