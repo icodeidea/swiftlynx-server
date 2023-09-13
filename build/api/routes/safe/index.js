@@ -26,12 +26,14 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = require("express");
 const middlewares_1 = __importStar(require("../../middlewares"));
 const controllers_1 = require("../../controllers");
-const { listMySafe, createSafe } = controllers_1.SafeController;
+const { listMySafe, createSafe, filterSavings } = controllers_1.SafeController;
 const safeRouter = (0, express_1.Router)();
 exports.default = (app) => {
     app.use('/safe', safeRouter);
     //get safe list
     safeRouter.route('/list-safe').get(middlewares_1.default.isAuth, middlewares_1.default.attachCurrentUser, listMySafe);
+    //filter contracts
+    safeRouter.route('/filter-savings/:status').get(filterSavings);
     //create safe
     safeRouter.route('/create-safe').post(middlewares_1.validator.createSafe, middlewares_1.default.isAuth, middlewares_1.default.attachCurrentUser, createSafe);
     return app;

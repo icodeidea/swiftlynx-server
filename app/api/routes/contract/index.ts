@@ -9,6 +9,7 @@ const {
     updateContract,
     deleteContract,
     getAllContract,
+    filterAllContract,
     requestPaymentConfrimation
 } = ContractController;
 
@@ -33,6 +34,9 @@ export default (app: Router): Router => {
 
   //list all contract
   contractRouter.route('/list-all-contract').get(middlewares.isAuth, middlewares.attachCurrentUser, getAllContract);
+
+  //filter contracts
+  contractRouter.route('/filter-contracts/:state').get(filterAllContract);
 
   //sign contract
   contractRouter.route('/sign-contract').post(middlewares.isAuth, middlewares.attachCurrentUser, validator.signContract, signContract);

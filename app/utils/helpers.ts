@@ -12,3 +12,14 @@ export const isToday = (someDate) => {
       someDate.getMonth() == today.getMonth() &&
       someDate.getFullYear() == today.getFullYear()
 }
+
+export const getDateOfMonthsFromNow = (months: any) => {
+    return new Date().setMonth(new Date().getMonth() + (months));
+    // return date;
+}
+
+// export const getDateOfMonthsFromNow = (months: any) => {
+//     const currentDate = new Date();
+//     currentDate.setMonth(currentDate.getMonth() + months);
+//     return currentDate;
+// }

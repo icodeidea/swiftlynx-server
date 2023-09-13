@@ -1,5 +1,5 @@
 import { Service, Inject } from 'typedi';
-import { IContractUpdateStatisticsDTO, ITradeInputDTO, ITrade, IContract } from '../../interfaces';
+import { IContractUpdateStatisticsDTO, ITradeInputDTO, ITradeUpdateDTO, ITrade, IContract } from '../../interfaces';
 import { Document } from 'mongoose';
 import { SystemError } from '../../utils';
 
@@ -47,6 +47,32 @@ export class TradeService {
     }
   }
 
+  public async activateTrade (tradeId: string, amount: string): Promise<(ITrade & Document) | any> {
+    try {
+      await this.updateTrade({
+        tradeId,
+        amount
+      })
+      return await this.updateTradeStatus({
+        tradeId,
+        state: 'ACTIVE'
+      })
+    } catch (error) {
+      
+    }
+  }
+
+  public async filter(status: string): Promise<any> {
+    try {
+      this.logger.silly('filtering trade record');
+
+      return await this.tradeModel.find({status});
+    } catch (e) {
+      this.logger.error(e);
+      throw new SystemError(e.statusCode || 500, e.message);
+    }
+  }
+
   public async getContract(contractOrProjectId: string): Promise<(IContract & Document) | any> {
     try {
       this.logger.silly('getting contract record');
@@ -90,6 +116,50 @@ export class TradeService {
       }
       await contractRecord.save();
       return contractRecord;
+    } catch (e) {
+      this.logger.error(e);
+      throw new SystemError(e.statusCode || 500, e.message);
+    }
+  }
+
+  public async updateTrade(updateTrade: ITradeUpdateDTO): Promise<ITrade> {
+    try {
+    
+      this.logger.silly('updating trade');
+      const userId = updateTrade.userId;
+      const tradeId = updateTrade.tradeId;
+      delete updateTrade.userId;
+      delete updateTrade.projectId;
+
+      const tradeRecord = await this.tradeModel.findOne({'id': tradeId});
+      if (!tradeRecord) {
+        this.logger.silly('trade not found');
+        throw new SystemError(200, 'trade not found');
+      }
+      for (const property in updateTrade) {
+        tradeRecord[property] = updateTrade[property];
+      }
+      return await tradeRecord.save();
+    } catch (e) {
+      this.logger.error(e);
+      throw new SystemError(e.statusCode || 500, e.message);
+    }
+  }
+
+  public async updateTradeStatus({tradeId, state}:{tradeId: string, state: string}): Promise<ITrade> {
+    try {
+    
+      this.logger.silly('updating trade');
+
+      const tradeRecord = await this.tradeModel.findOne({'id': tradeId}); 
+      if (!tradeRecord) {
+        this.logger.silly('trade not found');
+        throw new SystemError(200, 'trade not found');
+      }
+      
+      tradeRecord.status = state;
+      
+      return await tradeRecord.save();
     } catch (e) {
       this.logger.error(e);
       throw new SystemError(e.statusCode || 500, e.message);

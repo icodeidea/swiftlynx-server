@@ -23,7 +23,7 @@ var __importStar = (this && this.__importStar) || function (mod) {
     return result;
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.TransactionSchema = exports.SafeSchema = exports.ContractShema = exports.ProjectSchema = exports.MarketSchema = exports.WalletSchema = exports.CommentSchema = exports.FeedSchema = exports.AuthSchema = void 0;
+exports.TradeSchema = exports.TransactionSchema = exports.SafeSchema = exports.ContractShema = exports.ProjectSchema = exports.MarketSchema = exports.WalletSchema = exports.CommentSchema = exports.FeedSchema = exports.AuthSchema = void 0;
 exports.AuthSchema = __importStar(require("./auth"));
 exports.FeedSchema = __importStar(require("./feed"));
 exports.CommentSchema = __importStar(require("./comment"));
@@ -33,4 +33,5 @@ exports.ProjectSchema = __importStar(require("./project"));
 exports.ContractShema = __importStar(require("./contract"));
 exports.SafeSchema = __importStar(require("./safe"));
 exports.TransactionSchema = __importStar(require("./transaction"));
+exports.TradeSchema = __importStar(require("./trade"));
 //# sourceMappingURL=index.js.map

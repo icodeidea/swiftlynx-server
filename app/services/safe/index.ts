@@ -49,6 +49,17 @@ export class SafeService {
     }
   }
 
+  public async filter(status: string): Promise<any> {
+    try {
+      this.logger.silly('filtering savings record');
+
+      return await this.safeModel.find({status});
+    } catch (e) {
+      this.logger.error(e);
+      throw new SystemError(e.statusCode || 500, e.message);
+    }
+  }
+
   public async addfund(safeId: string, amount: number): Promise<ISafe> {
     try {
       const safeRecord : ISafe & Document = await this.safeModel.findOne({'_id': safeId});
@@ -56,6 +67,26 @@ export class SafeService {
       safeRecord.amountRaised = safeRecord.amountRaised + amount;
       safeRecord.status = (safeRecord.amountRaised + amount ) >= safeRecord.goal ? 'completed' : safeRecord.status;
       return safeRecord.save();
+    } catch (e) {
+      this.logger.error(e);
+      throw new SystemError(e.statusCode || 500, e.message);
+    }
+  }
+
+  public async updateSafeStatus({contractId, state}:{contractId: string, state: string}): Promise<ISafe> {
+    try {
+    
+      this.logger.silly('updating safe');
+
+      const safeRecord = await this.safeModel.findOne({'id': contractId}); 
+      if (!safeRecord) {
+        this.logger.silly('safe not found');
+        throw new SystemError(200, 'safe not found');
+      }
+      
+      safeRecord.status = state;
+      
+      return await safeRecord.save();
     } catch (e) {
       this.logger.error(e);
       throw new SystemError(e.statusCode || 500, e.message);

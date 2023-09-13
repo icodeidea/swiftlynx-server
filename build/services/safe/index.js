@@ -54,12 +54,38 @@ let SafeService = class SafeService {
             throw new utils_1.SystemError(e.statusCode || 500, e.message);
         }
     }
+    async filter(status) {
+        try {
+            this.logger.silly('filtering savings record');
+            return await this.safeModel.find({ status });
+        }
+        catch (e) {
+            this.logger.error(e);
+            throw new utils_1.SystemError(e.statusCode || 500, e.message);
+        }
+    }
     async addfund(safeId, amount) {
         try {
             const safeRecord = await this.safeModel.findOne({ '_id': safeId });
             safeRecord.amountRaised = safeRecord.amountRaised + amount;
             safeRecord.status = (safeRecord.amountRaised + amount) >= safeRecord.goal ? 'completed' : safeRecord.status;
             return safeRecord.save();
+        }
+        catch (e) {
+            this.logger.error(e);
+            throw new utils_1.SystemError(e.statusCode || 500, e.message);
+        }
+    }
+    async updateSafeStatus({ contractId, state }) {
+        try {
+            this.logger.silly('updating safe');
+            const safeRecord = await this.safeModel.findOne({ 'id': contractId });
+            if (!safeRecord) {
+                this.logger.silly('safe not found');
+                throw new utils_1.SystemError(200, 'safe not found');
+            }
+            safeRecord.status = state;
+            return await safeRecord.save();
         }
         catch (e) {
             this.logger.error(e);

@@ -21,6 +21,20 @@ export class TransactionController {
     }
   };
 
+  // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
+  static filterTransactions = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
+    const logger: Logger = Container.get('logger');
+    logger.debug('Calling filter transactions endpoint');
+    try {
+      const transactionServiceInstance = Container.get(TransactionService);
+      const data = await transactionServiceInstance.filterTransactions(req.params.reason, req.params.status);
+      return res.status(201).json({ success: true, data, message: 'data retrived' });
+    } catch (e) {
+      logger.error('🔥 error: %o', e);
+      return next(e);
+    }
+  };
+
     // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
     static getEntityTransactions = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
       const logger: Logger = Container.get('logger');
@@ -63,6 +77,20 @@ export class TransactionController {
             return next(e);
           }
         };
+
+  // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
+  static getBusinessKpi = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
+    const logger: Logger = Container.get('logger');
+    logger.debug('Calling get business kpi endpoint');
+    try {
+      const transactionServiceInstance = Container.get(TransactionService);
+      const data = await transactionServiceInstance.getBusinessKpi({userId: 'adminId'});
+      return res.status(201).json({ success: true, data, message: 'data retrived' });
+    } catch (e) {
+      logger.error('🔥 error: %o', e);
+      return next(e);
+    }
+  };
 
 
 }
