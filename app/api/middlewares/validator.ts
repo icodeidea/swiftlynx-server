@@ -8,7 +8,8 @@ import {
   ProjectSchema,
   ContractShema,
   SafeSchema,
-  TransactionSchema
+  TransactionSchema,
+  TradeSchema
 } from '../validations';
 
 class Validator {
@@ -374,6 +375,21 @@ class Validator {
   async initPayment(req: Request, _, next: NextFunction) {
     try {
       const validation = TransactionSchema.initPaymentSchema.validate({
+        ...req.body
+      });
+      if (validation.error) {
+        return next(validation.error);
+      }
+      return next();
+    } catch (e) {
+      next(e);
+    }
+  }
+
+  // trade
+  async startTrade(req: Request, _, next: NextFunction) {
+    try {
+      const validation = TradeSchema.startTradeSchema.validate({
         ...req.body
       });
       if (validation.error) {

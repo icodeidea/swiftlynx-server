@@ -32,7 +32,7 @@ const Contract = new mongoose.Schema(
     },
     state: {
         type: String,
-        enum: ['ACTIVE', 'DECLINED', 'PENDING'],
+        enum: ['ACTIVE', 'DECLINED', 'PENDING', 'COMPLETED'],
         default: 'PENDING',
     },
     fixedAmount: {

@@ -23,6 +23,20 @@ TransactionController.getTransactions = async (req, res, next) => {
     }
 };
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
+TransactionController.filterTransactions = async (req, res, next) => {
+    const logger = typedi_1.Container.get('logger');
+    logger.debug('Calling filter transactions endpoint');
+    try {
+        const transactionServiceInstance = typedi_1.Container.get(services_1.TransactionService);
+        const data = await transactionServiceInstance.filterTransactions(req.params.reason, req.params.status);
+        return res.status(201).json({ success: true, data, message: 'data retrived' });
+    }
+    catch (e) {
+        logger.error('🔥 error: %o', e);
+        return next(e);
+    }
+};
+// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 TransactionController.getEntityTransactions = async (req, res, next) => {
     const logger = typedi_1.Container.get('logger');
     logger.debug('Calling get transactions endpoint');
@@ -60,6 +74,20 @@ TransactionController.paymentCallback = async (req, res, next) => {
     try {
         const transactionServiceInstance = typedi_1.Container.get(services_1.TransactionService);
         const data = await transactionServiceInstance.verifyPayment(ref);
+        return res.status(201).json({ success: true, data, message: 'data retrived' });
+    }
+    catch (e) {
+        logger.error('🔥 error: %o', e);
+        return next(e);
+    }
+};
+// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
+TransactionController.getBusinessKpi = async (req, res, next) => {
+    const logger = typedi_1.Container.get('logger');
+    logger.debug('Calling get business kpi endpoint');
+    try {
+        const transactionServiceInstance = typedi_1.Container.get(services_1.TransactionService);
+        const data = await transactionServiceInstance.getBusinessKpi({ userId: 'adminId' });
         return res.status(201).json({ success: true, data, message: 'data retrived' });
     }
     catch (e) {

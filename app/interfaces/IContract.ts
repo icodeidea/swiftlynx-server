@@ -6,6 +6,7 @@ export interface IContract {
     description: string;
     type: string
     status: string;
+    state: string;
     fixedAmount: Number;
     minAmount: Number;
     maxAmount: Number;

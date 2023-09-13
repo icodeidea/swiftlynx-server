@@ -18,13 +18,20 @@ const utils_1 = require("../../utils");
 const utils_2 = require("../../utils/");
 const safe_1 = require("../safe");
 const contract_1 = require("../contract");
+const trade_1 = require("../trade");
 let TransactionService = class TransactionService {
-    constructor(userModel, walletModel, transactionModel, safe, contract, logger) {
+    constructor(userModel, walletModel, transactionModel, 
+    //
+    contractModel, tradeModel, safeModel, safe, contract, trade, logger) {
         this.userModel = userModel;
         this.walletModel = walletModel;
         this.transactionModel = transactionModel;
+        this.contractModel = contractModel;
+        this.tradeModel = tradeModel;
+        this.safeModel = safeModel;
         this.safe = safe;
         this.contract = contract;
+        this.trade = trade;
         this.logger = logger;
     }
     async createTransaction(tx) {
@@ -93,6 +100,17 @@ let TransactionService = class TransactionService {
             throw new utils_1.SystemError(e.statusCode || 500, e.message);
         }
     }
+    async filterTransactions(reason, status) {
+        try {
+            const transactionRecord = await this.transactionModel.find({ reason, status });
+            this.logger.silly('filter transactions');
+            return transactionRecord;
+        }
+        catch (e) {
+            this.logger.error(e);
+            throw new utils_1.SystemError(e.statusCode || 500, e.message);
+        }
+    }
     async getEntityTransactions(entity) {
         try {
             const transactionRecord = await this.transactionModel.find({ 'subject': entity });
@@ -128,7 +146,7 @@ let TransactionService = class TransactionService {
                 subject: userRecord === null || userRecord === void 0 ? void 0 : userRecord._id,
                 subjectRef: 'User',
                 type: 'credit',
-                reason: entity === 'safe' ? 'savings' : 'contract',
+                reason: entity === 'safe' ? 'savings' : entity === 'trade' ? 'trade' : 'contract',
                 status: 'pending',
             });
         }
@@ -153,9 +171,12 @@ let TransactionService = class TransactionService {
             if (transactionDoc.metadata.entity === 'safe') {
                 verifiedEntity = await this.safe.addfund(transactionDoc.metadata.entityId, amount);
             }
-            else {
-                verifiedEntity = await this.contract.signContract(transactionDoc.metadata.entityId, transactionDoc.user, amount);
+            if (transactionDoc.metadata.entity === 'trade') {
+                verifiedEntity = await this.trade.activateTrade(transactionDoc.metadata.entityId, amount);
             }
+            // else{
+            //   verifiedEntity = await this.contract.signContract(transactionDoc.metadata.entityId, transactionDoc.user, amount);
+            // }
             transactionDoc.status = 'completed';
             transactionDoc.to.amount = amount;
             transactionDoc.save();
@@ -166,15 +187,163 @@ let TransactionService = class TransactionService {
             throw new utils_1.SystemError(e.statusCode || 500, e.message);
         }
     }
+    async getBusinessKpi({ userId, }) {
+        var _a, _b, _c, _d, _e, _f, _g;
+        try {
+            // get total users
+            const totalUsers = await this.userModel.count();
+            //################################
+            // get total loans
+            const totalLoans = await this.contractModel.count();
+            // get active loans
+            const totalActiveLoans = await this.contractModel.count({
+                state: 'ACTIVE'
+            });
+            // get total pending loans
+            const totalPendingLoans = await this.contractModel.count({
+                state: 'PENDING'
+            });
+            // get total completed loans
+            const totalCompletedLoans = await this.contractModel.count({
+                state: 'COMPLETED'
+            });
+            // get total declined loans
+            const totalDeclinedLoans = await this.contractModel.count({
+                state: 'DECLINED'
+            });
+            // get total loan amount
+            const totalActiveLoansAmount = await this.contractModel.aggregate([{
+                    $match: { $and: [{ status: 'PENDING' }] },
+                }, {
+                    $group: {
+                        _id: null,
+                        total: {
+                            $sum: "$fixedAmount"
+                        }
+                    }
+                }]);
+            // get total loan amount roi
+            const totalActiveLoansInterest = await this.contractModel.aggregate([{
+                    $match: { $and: [{ status: 'PENDING' }] },
+                }, {
+                    $group: {
+                        _id: null,
+                        total: {
+                            $sum: "$interest"
+                        }
+                    }
+                }]);
+            //################################
+            // get total investments
+            const totalInvestments = await this.tradeModel.count();
+            // get total pending investments
+            const totalActiveInvestments = await this.tradeModel.count({
+                status: 'ACTIVE'
+            });
+            // get total completed investments
+            const totalCompletedInvestments = await this.tradeModel.count({
+                status: 'COMPLETED'
+            });
+            // get total pending investments
+            const totalPendingInvestments = await this.tradeModel.count({
+                status: 'PENDING'
+            });
+            // get total declined investments
+            const totalDeclinedInvestments = await this.tradeModel.count({
+                status: 'DECLINED'
+            });
+            // get total investments amount
+            const totalActiveInvestmentAmount = await this.tradeModel.aggregate([{
+                    $match: { $and: [{ status: 'ACTIVE' }] },
+                }, {
+                    $group: {
+                        _id: null,
+                        total: {
+                            $sum: "$amount"
+                        }
+                    }
+                }]);
+            // get total investments amount roi
+            const totalActiveInvestmetRoi = await this.tradeModel.aggregate([{
+                    $match: { $and: [{ status: 'ACTIVE' }] },
+                }, {
+                    $group: {
+                        _id: null,
+                        total: {
+                            $sum: "$interest"
+                        }
+                    }
+                }]);
+            //################################
+            // get total savings
+            const totalSavings = await this.safeModel.count();
+            // get total active savings
+            const totalActiveSavings = await this.safeModel.count({ status: 'active' });
+            // get total completed savings
+            const totalCompletedSavings = await this.safeModel.count({ status: 'completed' });
+            // get total pending savings
+            const totalPendingSavings = await this.safeModel.count({ status: 'pending' });
+            // get total declined savings
+            const totalDeclinedSavings = await this.safeModel.count({ status: 'declined' });
+            // get total savings amount
+            const totalAmountInSavings = await this.safeModel.aggregate([{
+                    $match: { $and: [{ status: 'active' }] },
+                }, {
+                    $group: {
+                        _id: null,
+                        total: {
+                            $sum: "$amountRaised"
+                        }
+                    }
+                }]);
+            return {
+                users: {
+                    totalUsers,
+                },
+                loans: {
+                    totalLoans,
+                    totalActiveLoans,
+                    totalPendingLoans,
+                    totalCompletedLoans,
+                    totalDeclinedLoans,
+                    totalActiveLoansAmount: ((_a = totalActiveLoansAmount[0]) === null || _a === void 0 ? void 0 : _a.total) || 0,
+                    totalActiveLoansRoi: (((_b = totalActiveLoansAmount[0]) === null || _b === void 0 ? void 0 : _b.total) * ((_c = totalActiveLoansInterest[0]) === null || _c === void 0 ? void 0 : _c.total)) / 100 || 0
+                },
+                investments: {
+                    totalInvestments,
+                    totalActiveInvestments,
+                    totalCompletedInvestments,
+                    totalPendingInvestments,
+                    totalDeclinedInvestments,
+                    totalActiveInvestmentAmount: ((_d = totalActiveInvestmentAmount[0]) === null || _d === void 0 ? void 0 : _d.total) || 0,
+                    totalActiveInvestmetRoi: (((_e = totalActiveInvestmentAmount[0]) === null || _e === void 0 ? void 0 : _e.total) * ((_f = totalActiveInvestmetRoi[0]) === null || _f === void 0 ? void 0 : _f.total)) / 100 || 0
+                },
+                savings: {
+                    totalSavings,
+                    totalActiveSavings,
+                    totalCompletedSavings,
+                    totalPendingSavings,
+                    totalDeclinedSavings,
+                    totalAmountInSavings: ((_g = totalAmountInSavings[0]) === null || _g === void 0 ? void 0 : _g.total) || 0
+                }
+            };
+        }
+        catch (error) {
+        }
+    }
 };
 TransactionService = __decorate([
     (0, typedi_1.Service)(),
     __param(0, (0, typedi_1.Inject)('userModel')),
     __param(1, (0, typedi_1.Inject)('walletModel')),
     __param(2, (0, typedi_1.Inject)('transactionModel')),
-    __param(5, (0, typedi_1.Inject)('logger')),
-    __metadata("design:paramtypes", [Object, Object, Object, safe_1.SafeService,
-        contract_1.ContractService, Object])
+    __param(3, (0, typedi_1.Inject)('contractModel')),
+    __param(4, (0, typedi_1.Inject)('tradeModel')),
+    __param(5, (0, typedi_1.Inject)('safeModel')),
+    __param(9, (0, typedi_1.Inject)('logger')),
+    __metadata("design:paramtypes", [Object, Object, Object, Object, Object, Object, safe_1.SafeService,
+        contract_1.ContractService,
+        trade_1.TradeService, Object])
 ], TransactionService);
 exports.TransactionService = TransactionService;
 //# sourceMappingURL=index.js.map

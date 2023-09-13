@@ -105,6 +105,16 @@ let ContractService = class ContractService {
             throw new utils_1.SystemError(e.statusCode || 500, e.message);
         }
     }
+    async filter(state) {
+        try {
+            this.logger.silly('filtering contract record');
+            return await this.contractModel.find({ state });
+        }
+        catch (e) {
+            this.logger.error(e);
+            throw new utils_1.SystemError(e.statusCode || 500, e.message);
+        }
+    }
     async signContract(contractId, userId, amount) {
         try {
             this.logger.silly('sign contract');
@@ -189,6 +199,22 @@ let ContractService = class ContractService {
             for (const property in updateContract) {
                 contractRecord[property] = updateContract[property];
             }
+            return await contractRecord.save();
+        }
+        catch (e) {
+            this.logger.error(e);
+            throw new utils_1.SystemError(e.statusCode || 500, e.message);
+        }
+    }
+    async updateContractState({ contractId, state }) {
+        try {
+            this.logger.silly('updating contract');
+            const contractRecord = await this.contractModel.findOne({ 'id': contractId });
+            if (!contractRecord) {
+                this.logger.silly('contract not found');
+                throw new utils_1.SystemError(200, 'project not found');
+            }
+            contractRecord.state = state;
             return await contractRecord.save();
         }
         catch (e) {

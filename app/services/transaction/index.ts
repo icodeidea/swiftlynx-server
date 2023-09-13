@@ -6,6 +6,7 @@ import { SystemError } from '../../utils';
 import { paystack } from '../../utils/'
 import { SafeService } from '../safe';
 import { ContractService } from '../contract';
+import { TradeService } from '../trade';
 
 @Service()
 export class TransactionService {
@@ -13,8 +14,14 @@ export class TransactionService {
     @Inject('userModel') private userModel: Models.UserModel,
     @Inject('walletModel') private walletModel: Models.WalletModel,
     @Inject('transactionModel') private transactionModel: Models.TransactionModel,
+    //
+
+    @Inject('contractModel') private contractModel: Models.ContractModel,
+    @Inject('tradeModel') private tradeModel: Models.TradeModel,
+    @Inject('safeModel') private safeModel: Models.SafeModel,
     private safe: SafeService,
     private contract: ContractService,
+    private trade: TradeService,
     @Inject('logger') private logger: { silly(arg0: string): void; error(arg0: unknown): void },
   ) {}
 
@@ -85,6 +92,17 @@ export class TransactionService {
     }
   }
 
+  public async filterTransactions(reason: string, status: string): Promise<any> {
+    try {
+      const transactionRecord = await this.transactionModel.find({ reason, status });
+      this.logger.silly('filter transactions');
+      return transactionRecord;
+    } catch (e) {
+      this.logger.error(e);
+      throw new SystemError(e.statusCode || 500, e.message);
+    }
+  }
+
   public async getEntityTransactions(entity: string): Promise<any> {
     try {
       const transactionRecord = await this.transactionModel.find({ 'subject': entity });
@@ -122,7 +140,7 @@ export class TransactionService {
         subject: userRecord?._id,
         subjectRef: 'User',
         type: 'credit',
-        reason: entity === 'safe' ? 'savings' : 'contract',
+        reason: entity === 'safe' ? 'savings' : entity === 'trade' ? 'trade' : 'contract',
         status: 'pending',
       })
     } catch (e) {
@@ -154,9 +172,13 @@ export class TransactionService {
 
       if(transactionDoc.metadata.entity === 'safe'){
         verifiedEntity = await this.safe.addfund(transactionDoc.metadata.entityId, amount)
-      }else{
-        verifiedEntity = await this.contract.signContract(transactionDoc.metadata.entityId, transactionDoc.user, amount);
       }
+      if(transactionDoc.metadata.entity === 'trade'){
+        verifiedEntity = await this.trade.activateTrade(transactionDoc.metadata.entityId, amount)
+      }
+      // else{
+      //   verifiedEntity = await this.contract.signContract(transactionDoc.metadata.entityId, transactionDoc.user, amount);
+      // }
       transactionDoc.status = 'completed';
       transactionDoc.to.amount = amount;
       transactionDoc.save();
@@ -164,6 +186,181 @@ export class TransactionService {
     } catch (e) {
       this.logger.error(e);
       throw new SystemError(e.statusCode || 500, e.message);
+    }
+  }
+
+  public async getBusinessKpi({
+    userId,
+  }: {
+    userId: string;
+  }): Promise<any> {
+    try {
+      // get total users
+
+      const totalUsers = await this.userModel.count();
+
+      //################################
+
+      // get total loans
+      const totalLoans = await this.contractModel.count();
+
+      // get active loans
+      const totalActiveLoans = await this.contractModel.count({
+        state: 'ACTIVE'
+      });
+
+      // get total pending loans
+      const totalPendingLoans = await this.contractModel.count({
+        state: 'PENDING'
+      });
+
+      // get total completed loans
+      const totalCompletedLoans = await this.contractModel.count({
+        state: 'COMPLETED'
+      });
+
+      // get total declined loans
+      const totalDeclinedLoans = await this.contractModel.count({
+        state: 'DECLINED'
+      });
+
+      // get total loan amount
+      const totalActiveLoansAmount = await this.contractModel.aggregate([{
+        $match : { $and : [{status: 'PENDING' }] },
+      },{
+          $group : {
+              _id : null,
+              total : {
+                  $sum : "$fixedAmount"
+              }
+          }
+      }]);
+
+      // get total loan amount roi
+      const totalActiveLoansInterest = await this.contractModel.aggregate([{
+        $match : { $and : [{status: 'PENDING' }] },
+      },{
+          $group : {
+              _id : null,
+              total : {
+                  $sum : "$interest"
+              }
+          }
+      }]);
+
+      //################################
+
+      // get total investments
+      const totalInvestments = await this.tradeModel.count();
+      
+      // get total pending investments
+      const totalActiveInvestments = await this.tradeModel.count({
+        status: 'ACTIVE'
+      });
+
+      // get total completed investments
+      const totalCompletedInvestments = await this.tradeModel.count({
+        status: 'COMPLETED'
+      });
+
+      // get total pending investments
+      const totalPendingInvestments = await this.tradeModel.count({
+        status: 'PENDING'
+      });
+
+      // get total declined investments
+      const totalDeclinedInvestments = await this.tradeModel.count({
+        status: 'DECLINED'
+      });
+
+      // get total investments amount
+      const totalActiveInvestmentAmount = await this.tradeModel.aggregate([{
+        $match : { $and : [{status: 'ACTIVE' }] },
+      },{
+          $group : {
+              _id : null,
+              total : {
+                  $sum : "$amount"
+              }
+          }
+      }]);
+
+      // get total investments amount roi
+      const totalActiveInvestmetRoi = await this.tradeModel.aggregate([{
+        $match : { $and : [{status: 'ACTIVE' }] },
+      },{
+          $group : {
+              _id : null,
+              total : {
+                  $sum : "$interest"
+              }
+          }
+      }]);
+
+      //################################
+
+      // get total savings
+      const totalSavings = await this.safeModel.count();
+
+      // get total active savings
+      const totalActiveSavings = await this.safeModel.count({ status: 'active' });
+
+      // get total completed savings
+      const totalCompletedSavings = await this.safeModel.count({ status: 'completed' });
+
+      // get total pending savings
+      const totalPendingSavings = await this.safeModel.count({ status: 'pending' });
+
+      // get total declined savings
+      const totalDeclinedSavings = await this.safeModel.count({ status: 'declined' });
+
+      // get total savings amount
+      const totalAmountInSavings = await this.safeModel.aggregate([{
+        $match : { $and : [{ status: 'active' }] },
+      },{
+          $group : {
+              _id : null,
+              total : {
+                  $sum : "$amountRaised"
+              }
+          }
+      }]);
+
+      return {
+        users: {
+          totalUsers,
+        },
+        loans: {
+          totalLoans,
+          totalActiveLoans,
+          totalPendingLoans,
+          totalCompletedLoans,
+          totalDeclinedLoans,
+          totalActiveLoansAmount: totalActiveLoansAmount[0]?.total || 0,
+          totalActiveLoansRoi: (totalActiveLoansAmount[0]?.total * totalActiveLoansInterest[0]?.total) / 100 || 0
+        },
+        investments: {
+          totalInvestments,
+          totalActiveInvestments,
+          totalCompletedInvestments,
+          totalPendingInvestments,
+          totalDeclinedInvestments,
+          totalActiveInvestmentAmount: totalActiveInvestmentAmount[0]?.total || 0,
+          totalActiveInvestmetRoi: (totalActiveInvestmentAmount[0]?.total * totalActiveInvestmetRoi[0]?.total) / 100 || 0
+        },
+        savings: {
+          totalSavings,
+          totalActiveSavings,
+          totalCompletedSavings,
+          totalPendingSavings,
+          totalDeclinedSavings,
+          totalAmountInSavings: totalAmountInSavings[0]?.total || 0
+        }
+      }
+
+
+    } catch (error) {
+      
     }
   }
 

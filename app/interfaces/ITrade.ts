@@ -5,22 +5,36 @@ export interface ITrade {
   contractId: string;
   type: string;
   status: string;
-  amount: Number;
-  interest: Number;
-  startDate: Date;
-  endDate: Date;
+  amount: any;
+  interest: any;
+  startDate: any;
+  endDate: any;
   slug: string;
   delete: Boolean;
 }
 
 export interface ITradeInputDTO {
   userId: string;
-  projectId: string;
-  contractId: string;
+  projectId: any;
+  contractId: any;
+  tradeId?: string
   type: string;
   status: string;
-  amount: Number;
-  interest: Number;
-  startDate: string;
-  endDate: string;
+  amount: any;
+  interest: any;
+  startDate: any;
+  endDate: any;
+}
+
+export interface ITradeUpdateDTO {
+  userId?: string;
+  projectId?: string;
+  contractId?: string;
+  tradeId?: string
+  type?: string;
+  status?: string;
+  amount?: any;
+  interest?: any;
+  startDate?: string;
+  endDate?: string;
 }

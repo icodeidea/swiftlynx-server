@@ -22,6 +22,20 @@ SafeController.listMySafe = async (req, res, next) => {
         return next(e);
     }
 };
+// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
+SafeController.filterSavings = async (req, res, next) => {
+    const logger = typedi_1.Container.get('logger');
+    logger.debug('Calling filter savings endpoint');
+    try {
+        const safeServiceInstance = typedi_1.Container.get(services_1.SafeService);
+        const data = await safeServiceInstance.filter(req.params.status);
+        return res.status(201).json({ success: true, data, message: 'data retrived' });
+    }
+    catch (e) {
+        logger.error('🔥 error: %o', e);
+        return next(e);
+    }
+};
 SafeController.createSafe = async (req, res, next) => {
     const logger = typedi_1.Container.get('logger');
     logger.debug('Calling create safe endpoint');
