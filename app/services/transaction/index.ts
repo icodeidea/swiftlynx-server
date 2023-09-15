@@ -326,6 +326,21 @@ export class TransactionService {
           }
       }]);
 
+      // get total pending transactions amount
+      const totalPendingTransactionAmount = await this.transactionModel.aggregate([{
+        $match : { $and : [{status: 'pending' }] },
+      },{
+          $group : {
+              _id : null,
+              total : {
+                  $sum : "$to.amount"
+              }
+          }
+      }]);
+
+      // get total pending transactions
+      const totalPendingTransaction = await this.transactionModel.count({ status: 'pending' });
+
       return {
         users: {
           totalUsers,
@@ -355,10 +370,12 @@ export class TransactionService {
           totalPendingSavings,
           totalDeclinedSavings,
           totalAmountInSavings: totalAmountInSavings[0]?.total || 0
+        },
+        transactions: {
+          totalPendingTransactionAmount: totalPendingTransactionAmount[0].total || 0,
+          totalPendingTransaction
         }
       }
-
-
     } catch (error) {
       
     }
