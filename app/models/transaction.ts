@@ -13,7 +13,7 @@ const Transaction = new mongoose.Schema(
     },
     subjectRef: {
       type: String,
-      enum: ['Safe', 'Contract', 'User'],
+      enum: ['Safe', 'Contract', 'User', 'Trade'],
       default: 'Contract',
     },
     type: { type: String, required: true },

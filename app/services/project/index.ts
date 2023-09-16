@@ -40,14 +40,14 @@ export class ProjectService {
       this.logger.silly('getting project record');
       console.log('projectId',projectId);
 
-      if(!projectId || projectId === null) return await this.projectModel.find();
+      if(!projectId || projectId === null) return await this.projectModel.find().populate('marketId');
 
       const projectRecord: Array<IProject> = await this.projectModel
         .find({$or: [
             // { '_id': projectId },
             { 'marketId': projectId },
             { 'userId': projectId },
-          ]});
+          ]}).populate('marketId');
       
       return projectRecord;
     } catch (e) {

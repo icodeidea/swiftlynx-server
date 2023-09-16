@@ -12,7 +12,7 @@ exports.signupSchema = joi_1.default.object({
     accountType: joi_1.default.string().valid('individual', 'organisation').required(),
     email: joi_1.default.string().email().required(),
     password: (0, joi_password_complexity_1.default)(),
-    username: joi_1.default.string(),
+    // username: Joi.string(),
     dob: joi_1.default.date(),
     gender: joi_1.default.string(),
     referer: joi_1.default.string(),

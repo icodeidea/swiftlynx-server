@@ -102,7 +102,7 @@ let TransactionService = class TransactionService {
     }
     async filterTransactions(reason, status) {
         try {
-            const transactionRecord = await this.transactionModel.find({ reason, status });
+            const transactionRecord = await this.transactionModel.find({ reason, status }).populate('subject', ['firstname', 'lastname', 'email']);
             this.logger.silly('filter transactions');
             return transactionRecord;
         }
