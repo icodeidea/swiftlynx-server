@@ -21,6 +21,7 @@ export class AuthService {
     @Inject('walletModel') private walletModel: Models.WalletModel,
     @Inject('tradeModel') private tradeModel: Models.TradeModel,
     @Inject('safeModel') private safeModel: Models.SafeModel,
+    @Inject('contractModel') private contractModel: Models.ContractModel,
     private mailer: MailerService,
     private wallet: WalletService,
     @Inject('logger') private logger: { silly(arg0: string): void; error(arg0: unknown): void },
@@ -77,7 +78,7 @@ export class AuthService {
       this.logger.silly('Welcome Email will be sent at this point...');
       await this.mailer.SendWelcomeEmail(userRecord);
       this.eventDispatcher.dispatch(events.user.signUp, { user: userRecord });
-      await this.millestoneCommision({userId : userRecord.id, dollar: 0.11, reason: 'signup reward'});
+      // await this.millestoneCommision({userId : userRecord.id, dollar: 0.11, reason: 'signup reward'});
 
       return 'Account Created, Verification email has been sent';
     } catch (e) {
@@ -189,9 +190,9 @@ export class AuthService {
     if (!userRecord?.verified.isVerified) {
       userRecord.verified.isVerified = true;
       userRecord.verified.token.value = null;
-      if(userRecord.referer){
-        await this.creditReferer(userRecord.referer);
-      }
+      // if(userRecord.referer){
+      //   await this.creditReferer(userRecord.referer);
+      // }
       await userRecord.save();
       return 'Your email has now been verified. Thank you for using our service';
     } else if (userRecord?.verified.isVerified) {
@@ -583,6 +584,18 @@ export class AuthService {
           }
       }]);
 
+      // get total loan amount
+      const totalActiveLoansAmount = await this.contractModel.aggregate([{
+        $match : { $and : [ { user: userId }, {status: 'PENDING' } ] },
+      },{
+          $group : {
+              _id : null,
+              total : {
+                  $sum : "$fixedAmount"
+              }
+          }
+      }]);
+
       const totalTradeRoi: any = (totalTradesAmount[0]?.total * totalTradesInterest[0]?.total) / 100
       const totalAmount = totalTradesAmount[0]?.total + totalAmountInSafe[0]?.total;
 
@@ -591,6 +604,7 @@ export class AuthService {
         totalTrade: totalTradesAmount[0]?.total,
         totalTradeRoi, 
         totalSafe: totalAmountInSafe[0]?.total,
+        totalDebt: totalActiveLoansAmount[0]?.total
       }
     } catch(e) {
       this.logger.error(e);

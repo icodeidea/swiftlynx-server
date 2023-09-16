@@ -94,7 +94,7 @@ export class TransactionService {
 
   public async filterTransactions(reason: string, status: string): Promise<any> {
     try {
-      const transactionRecord = await this.transactionModel.find({ reason, status });
+      const transactionRecord = await this.transactionModel.find({ reason, status }).populate('subject', ['firstname', 'lastname', 'email']);
       this.logger.silly('filter transactions');
       return transactionRecord;
     } catch (e) {

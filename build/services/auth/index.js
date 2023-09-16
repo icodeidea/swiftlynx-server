@@ -30,11 +30,12 @@ const utils_1 = require("../../utils");
 const google_auth_library_1 = require("google-auth-library");
 const slugify_1 = __importDefault(require("slugify"));
 let AuthService = class AuthService {
-    constructor(userModel, walletModel, tradeModel, safeModel, mailer, wallet, logger, eventDispatcher) {
+    constructor(userModel, walletModel, tradeModel, safeModel, contractModel, mailer, wallet, logger, eventDispatcher) {
         this.userModel = userModel;
         this.walletModel = walletModel;
         this.tradeModel = tradeModel;
         this.safeModel = safeModel;
+        this.contractModel = contractModel;
         this.mailer = mailer;
         this.wallet = wallet;
         this.logger = logger;
@@ -77,7 +78,7 @@ let AuthService = class AuthService {
             this.logger.silly('Welcome Email will be sent at this point...');
             await this.mailer.SendWelcomeEmail(userRecord);
             this.eventDispatcher.dispatch(events_1.default.user.signUp, { user: userRecord });
-            await this.millestoneCommision({ userId: userRecord.id, dollar: 0.11, reason: 'signup reward' });
+            // await this.millestoneCommision({userId : userRecord.id, dollar: 0.11, reason: 'signup reward'});
             return 'Account Created, Verification email has been sent';
         }
         catch (e) {
@@ -176,9 +177,9 @@ let AuthService = class AuthService {
         if (!(userRecord === null || userRecord === void 0 ? void 0 : userRecord.verified.isVerified)) {
             userRecord.verified.isVerified = true;
             userRecord.verified.token.value = null;
-            if (userRecord.referer) {
-                await this.creditReferer(userRecord.referer);
-            }
+            // if(userRecord.referer){
+            //   await this.creditReferer(userRecord.referer);
+            // }
             await userRecord.save();
             return 'Your email has now been verified. Thank you for using our service';
         }
@@ -473,7 +474,7 @@ let AuthService = class AuthService {
         }
     }
     async GetUserKpi({ userId, }) {
-        var _a, _b, _c, _d, _e, _f;
+        var _a, _b, _c, _d, _e, _f, _g;
         this.logger.silly('Getting Account...');
         try {
             // total trade amount
@@ -507,6 +508,17 @@ let AuthService = class AuthService {
                         }
                     }
                 }]);
+            // get total loan amount
+            const totalActiveLoansAmount = await this.contractModel.aggregate([{
+                    $match: { $and: [{ user: userId }, { status: 'PENDING' }] },
+                }, {
+                    $group: {
+                        _id: null,
+                        total: {
+                            $sum: "$fixedAmount"
+                        }
+                    }
+                }]);
             const totalTradeRoi = (((_a = totalTradesAmount[0]) === null || _a === void 0 ? void 0 : _a.total) * ((_b = totalTradesInterest[0]) === null || _b === void 0 ? void 0 : _b.total)) / 100;
             const totalAmount = ((_c = totalTradesAmount[0]) === null || _c === void 0 ? void 0 : _c.total) + ((_d = totalAmountInSafe[0]) === null || _d === void 0 ? void 0 : _d.total);
             return {
@@ -514,6 +526,7 @@ let AuthService = class AuthService {
                 totalTrade: (_e = totalTradesAmount[0]) === null || _e === void 0 ? void 0 : _e.total,
                 totalTradeRoi,
                 totalSafe: (_f = totalAmountInSafe[0]) === null || _f === void 0 ? void 0 : _f.total,
+                totalDebt: (_g = totalActiveLoansAmount[0]) === null || _g === void 0 ? void 0 : _g.total
             };
         }
         catch (e) {
@@ -545,9 +558,10 @@ AuthService = __decorate([
     __param(1, (0, typedi_1.Inject)('walletModel')),
     __param(2, (0, typedi_1.Inject)('tradeModel')),
     __param(3, (0, typedi_1.Inject)('safeModel')),
-    __param(6, (0, typedi_1.Inject)('logger')),
-    __param(7, (0, eventDispatcher_1.EventDispatcher)()),
-    __metadata("design:paramtypes", [Object, Object, Object, Object, mailer_1.MailerService,
+    __param(4, (0, typedi_1.Inject)('contractModel')),
+    __param(7, (0, typedi_1.Inject)('logger')),
+    __param(8, (0, eventDispatcher_1.EventDispatcher)()),
+    __metadata("design:paramtypes", [Object, Object, Object, Object, Object, mailer_1.MailerService,
         wallet_1.WalletService, Object, eventDispatcher_1.EventDispatcherInterface])
 ], AuthService);
 exports.AuthService = AuthService;

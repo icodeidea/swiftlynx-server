@@ -85,7 +85,6 @@ const User = new mongoose_1.default.Schema({
 }, { timestamps: true });
 User.set('toJSON', {
     transform: (document, returnedObject) => {
-        console.log();
         if (returnedObject.hasOwnProperty('toString')) {
             returnedObject.id = returnedObject._id.toString();
             returnedObject.role = returnedObject.admin.toString();
