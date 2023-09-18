@@ -6,5 +6,6 @@ export const initPaymentSchema = Joi.object({
     entity: Joi.string().required().valid(        
         'contract',
         'safe',
+        'trade'
     ),
 });

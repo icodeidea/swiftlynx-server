@@ -62,7 +62,7 @@ export class SafeService {
 
   public async addfund(safeId: string, amount: number): Promise<ISafe> {
     try {
-      const safeRecord : ISafe & Document = await this.safeModel.findOne({'_id': safeId});
+      const safeRecord : ISafe & Document = await this.safeModel.findById(safeId);
 
       safeRecord.amountRaised = safeRecord.amountRaised + amount;
       safeRecord.status = (safeRecord.amountRaised + amount ) >= safeRecord.goal ? 'completed' : safeRecord.status;

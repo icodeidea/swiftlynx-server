@@ -159,9 +159,18 @@ let TransactionService = class TransactionService {
         try {
             const { verifyPayment } = (0, utils_2.paystack)();
             const { status, message, data } = await verifyPayment(ref);
+            // console.log('paystack ref', ref);
+            // console.log('paystack status', status);
+            // console.log('paystack message', message);
+            // console.log('paystack data', data);
             let verifiedEntity = null;
             if (!status) {
                 throw new Error(message);
+            }
+            if (data) {
+                if (data !== "success") {
+                    throw new Error(data.gateway_response);
+                }
             }
             const { reference, metadata, amount } = data;
             const transactionDoc = await this.transactionModel.findOne({ txid: reference, status: 'pending', });
