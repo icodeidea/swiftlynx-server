@@ -66,7 +66,7 @@ let SafeService = class SafeService {
     }
     async addfund(safeId, amount) {
         try {
-            const safeRecord = await this.safeModel.findOne({ '_id': safeId });
+            const safeRecord = await this.safeModel.findById(safeId);
             safeRecord.amountRaised = safeRecord.amountRaised + amount;
             safeRecord.status = (safeRecord.amountRaised + amount) >= safeRecord.goal ? 'completed' : safeRecord.status;
             return safeRecord.save();
