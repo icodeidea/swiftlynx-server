@@ -18,14 +18,15 @@ exports.addContractSchema = joi_1.default.object({
 });
 exports.updateContractSchema = joi_1.default.object({
     contractId: joi_1.default.string().required().max(100),
-    contractName: joi_1.default.string().required().max(100),
-    description: joi_1.default.string().required().max(300),
-    fixedAmount: joi_1.default.number().min(1000),
-    minAmount: joi_1.default.number().min(1000),
+    contractName: joi_1.default.string(),
+    state: joi_1.default.string(),
+    description: joi_1.default.string(),
+    fixedAmount: joi_1.default.number(),
+    minAmount: joi_1.default.number(),
     maxAmount: joi_1.default.number(),
-    type: joi_1.default.string().valid("SWIFT_LOAN", "PEER_TO_PEER_LOAN").required().max(100),
-    interest: joi_1.default.number().required(),
-    maturityTime: joi_1.default.string().required(),
+    type: joi_1.default.string().valid("SWIFT_LOAN", "PEER_TO_PEER_LOAN").max(100),
+    interest: joi_1.default.number(),
+    maturityTime: joi_1.default.string(),
 });
 exports.getContractSchema = joi_1.default.object({
     contractId: joi_1.default.string().required().max(1000),

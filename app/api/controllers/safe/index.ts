@@ -48,6 +48,20 @@ export class SafeController {
     }
   };
 
+  static updateSafeState = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
+    const logger: Logger = Container.get('logger');
+    logger.debug('Calling Update Safe with userId');
+    try {
+      // req.body.userId = req.currentUser.id;
+      const safeServiceInstance = Container.get(SafeService);
+      const data = await safeServiceInstance.updateSafeStatus({ safeId: req.body.safeId, state: req.body.state });
+      return res.status(201).json({ success: true, data, message: 'safe updated successfully' });
+    } catch (e) {
+      logger.error('🔥 error: %o', e);
+      return next(e);
+    }
+  };
+
 //   static WithdrawFund = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
 //     const logger: Logger = Container.get('logger');
 //     logger.debug('Calling withdraw fund endpoint');

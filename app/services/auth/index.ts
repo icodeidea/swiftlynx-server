@@ -543,6 +543,33 @@ export class AuthService {
     }
   }
 
+  public async FilterUsers({
+    key,
+    value
+  }: {
+    key: any;
+    value: any;
+  }): Promise<(IUser & Document) | any> {
+    this.logger.silly('Getting Accounts...');
+    const params = key && value ? {[key]: value} : {};
+    try {
+      return await this.userModel.find(params).populate("wallet");
+      // const wallet = await this.walletModel.findById(userRecord.wallet);
+      // if(userRecord) {
+      //   this.logger.silly('Account Found!');
+      //   return {
+      //     user: userRecord.toJSON(),
+      //     wallet
+      //   }
+      // }else{
+      //   throw new Error('unable to find this account at the moment, please try again later');
+      // }
+    } catch(e) {
+      this.logger.error(e);
+      throw new SystemError(e.statusCode || 500, e.message);
+    }
+  }
+
   public async GetUserKpi({
     userId,
   }: {

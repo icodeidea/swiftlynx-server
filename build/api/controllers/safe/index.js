@@ -49,4 +49,18 @@ SafeController.createSafe = async (req, res, next) => {
         return next(e);
     }
 };
+SafeController.updateSafeState = async (req, res, next) => {
+    const logger = typedi_1.Container.get('logger');
+    logger.debug('Calling Update Safe with userId');
+    try {
+        // req.body.userId = req.currentUser.id;
+        const safeServiceInstance = typedi_1.Container.get(services_1.SafeService);
+        const data = await safeServiceInstance.updateSafeStatus({ safeId: req.body.safeId, state: req.body.state });
+        return res.status(201).json({ success: true, data, message: 'safe updated successfully' });
+    }
+    catch (e) {
+        logger.error('🔥 error: %o', e);
+        return next(e);
+    }
+};
 //# sourceMappingURL=index.js.map

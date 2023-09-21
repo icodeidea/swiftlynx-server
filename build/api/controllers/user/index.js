@@ -34,6 +34,20 @@ UserController.getAccount = async (req, res, next) => {
         return next(e);
     }
 };
+UserController.filterAccounts = async (req, res, next) => {
+    var _b, _c;
+    const logger = typedi_1.Container.get('logger');
+    logger.debug('Calling Get Account with userId');
+    try {
+        const authServiceInstance = typedi_1.Container.get(services_1.AuthService);
+        const result = await authServiceInstance.FilterUsers({ key: (_b = req === null || req === void 0 ? void 0 : req.query) === null || _b === void 0 ? void 0 : _b.key, value: (_c = req === null || req === void 0 ? void 0 : req.query) === null || _c === void 0 ? void 0 : _c.value });
+        return res.status(200).json({ success: true, data: result, message: 'users found' });
+    }
+    catch (e) {
+        logger.error('🔥 error: %o', e);
+        return next(e);
+    }
+};
 UserController.getUserKpi = async (req, res, next) => {
     const logger = typedi_1.Container.get('logger');
     logger.debug('Calling Get User Kpi with userId: %s', req.currentUser.id);

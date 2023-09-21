@@ -68,4 +68,18 @@ TradeController.filterTrades = async (req, res, next) => {
         return next(e);
     }
 };
+TradeController.updateTradeState = async (req, res, next) => {
+    const logger = typedi_1.Container.get('logger');
+    logger.debug('Calling Update Trade with userId');
+    try {
+        // req.body.userId = req.currentUser.id;
+        const tradeServiceInstance = typedi_1.Container.get(services_1.TradeService);
+        const data = await tradeServiceInstance.updateTradeStatus({ tradeId: req.body.tradeId, state: req.body.state });
+        return res.status(201).json({ success: true, data, message: 'trade updated successfully' });
+    }
+    catch (e) {
+        logger.error('🔥 error: %o', e);
+        return next(e);
+    }
+};
 //# sourceMappingURL=index.js.map

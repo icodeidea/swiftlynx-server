@@ -34,6 +34,8 @@ exports.default = (app) => {
     userRouter.route('/update-profile').put(middlewares_1.validator.updateUser, middlewares_1.default.isAuth, middlewares_1.default.attachCurrentUser, controllers_1.UserController.updateAccount);
     //user kpi
     userRouter.route('/kpi').get(middlewares_1.default.isAuth, middlewares_1.default.attachCurrentUser, controllers_1.UserController.getUserKpi);
+    //filter accounts
+    userRouter.route('/filter-accounts').get(controllers_1.UserController.filterAccounts);
     //update-password
     userRouter.route('/update-password').put(middlewares_1.validator.updatePassword, middlewares_1.default.isAuth, middlewares_1.default.attachCurrentUser, controllers_1.UserController.UpdatePassword);
     //delete-account

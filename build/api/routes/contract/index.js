@@ -26,7 +26,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = require("express");
 const middlewares_1 = __importStar(require("../../middlewares"));
 const controllers_1 = require("../../controllers");
-const { addContract, getContract, signContract, updateContract, deleteContract, getAllContract, filterAllContract, requestPaymentConfrimation } = controllers_1.ContractController;
+const { addContract, getContract, signContract, updateContract, updateContractState, deleteContract, getAllContract, filterAllContract, requestPaymentConfrimation } = controllers_1.ContractController;
 const contractRouter = (0, express_1.Router)();
 exports.default = (app) => {
     app.use('/contract', contractRouter);
@@ -34,6 +34,8 @@ exports.default = (app) => {
     contractRouter.route('/add-contract').post(middlewares_1.default.isAuth, middlewares_1.default.attachCurrentUser, middlewares_1.validator.addContract, addContract);
     //update contract
     contractRouter.route('/update').put(middlewares_1.default.isAuth, middlewares_1.default.attachCurrentUser, middlewares_1.validator.updateContract, updateContract);
+    //update contract state
+    contractRouter.route('/update-state').put(middlewares_1.validator.updateContract, updateContractState);
     //delete contract
     contractRouter.route('/delete').delete(middlewares_1.default.isAuth, middlewares_1.default.attachCurrentUser, middlewares_1.validator.deleteContract, deleteContract);
     contractRouter.route('/request-payment-confirmation').get(middlewares_1.default.isAuth, middlewares_1.default.attachCurrentUser, requestPaymentConfrimation);

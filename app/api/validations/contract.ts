@@ -14,14 +14,15 @@ export const addContractSchema = Joi.object({
 
 export const updateContractSchema = Joi.object({
   contractId: Joi.string().required().max(100),
-  contractName: Joi.string().required().max(100),
-  description: Joi.string().required().max(300),
-  fixedAmount: Joi.number().min(1000),
-  minAmount: Joi.number().min(1000),
+  contractName: Joi.string(),
+  state: Joi.string(),
+  description: Joi.string(),
+  fixedAmount: Joi.number(),
+  minAmount: Joi.number(),
   maxAmount: Joi.number(),
-  type: Joi.string().valid("SWIFT_LOAN", "PEER_TO_PEER_LOAN").required().max(100),
-  interest: Joi.number().required(),
-  maturityTime: Joi.string().required(),
+  type: Joi.string().valid("SWIFT_LOAN", "PEER_TO_PEER_LOAN").max(100),
+  interest: Joi.number(),
+  maturityTime: Joi.string(),
 });
 
 export const getContractSchema = Joi.object({

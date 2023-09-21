@@ -2,7 +2,7 @@ import { Router } from 'express'
 import middlewares, { validator } from '../../middlewares';
 import { SafeController } from '../../controllers'
 
-const { listMySafe, createSafe, filterSavings } = SafeController;
+const { listMySafe, createSafe, filterSavings, updateSafeState } = SafeController;
 
 const safeRouter = Router();
 
@@ -17,6 +17,9 @@ export default (app: Router): Router => {
 
   //create safe
   safeRouter.route('/create-safe').post(validator.createSafe, middlewares.isAuth, middlewares.attachCurrentUser, createSafe);
+
+  //update safe state
+  safeRouter.route('/update-state').put(validator.updateSafe, updateSafeState);
 
   return app;
 };

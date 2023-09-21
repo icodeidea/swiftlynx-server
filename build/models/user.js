@@ -87,16 +87,16 @@ User.set('toJSON', {
     transform: (document, returnedObject) => {
         if (returnedObject.hasOwnProperty('toString')) {
             returnedObject.id = returnedObject._id.toString();
-            returnedObject.role = returnedObject.admin.toString();
+            // returnedObject.role = returnedObject.admin.toString();
         }
         else {
             returnedObject.id = returnedObject._id;
-            returnedObject.role = returnedObject.admin;
+            // returnedObject.role = returnedObject.admin;
         }
         delete returnedObject._id;
         delete returnedObject.__v;
         delete returnedObject.password;
-        delete returnedObject.admin;
+        // delete returnedObject.admin;
         delete returnedObject.salt;
     },
 });

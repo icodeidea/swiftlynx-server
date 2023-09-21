@@ -473,6 +473,27 @@ let AuthService = class AuthService {
             throw new utils_1.SystemError(e.statusCode || 500, e.message);
         }
     }
+    async FilterUsers({ key, value }) {
+        this.logger.silly('Getting Accounts...');
+        const params = key && value ? { [key]: value } : {};
+        try {
+            return await this.userModel.find(params).populate("wallet");
+            // const wallet = await this.walletModel.findById(userRecord.wallet);
+            // if(userRecord) {
+            //   this.logger.silly('Account Found!');
+            //   return {
+            //     user: userRecord.toJSON(),
+            //     wallet
+            //   }
+            // }else{
+            //   throw new Error('unable to find this account at the moment, please try again later');
+            // }
+        }
+        catch (e) {
+            this.logger.error(e);
+            throw new utils_1.SystemError(e.statusCode || 500, e.message);
+        }
+    }
     async GetUserKpi({ userId, }) {
         var _a, _b, _c, _d, _e, _f, _g;
         this.logger.silly('Getting Account...');

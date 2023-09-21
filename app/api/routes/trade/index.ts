@@ -2,7 +2,7 @@ import { Router } from 'express'
 import middlewares, { validator } from '../../middlewares';
 import { TradeController } from '../../controllers'
 
-const { getTrades, filterTrades, startTrade } = TradeController;
+const { getTrades, filterTrades, startTrade, updateTradeState } = TradeController;
 
 const tradeRouter = Router();
 
@@ -17,6 +17,9 @@ export default (app: Router): Router => {
 
   //filter trades
   tradeRouter.route('/filter-trades/:status').get(filterTrades);
+
+  //update trade state
+  tradeRouter.route('/update-state').put(validator.updateTrade, updateTradeState);
 
   return app;
 };

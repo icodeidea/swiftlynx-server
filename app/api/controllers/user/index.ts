@@ -32,6 +32,19 @@ export class UserController {
       }
     };
 
+    static filterAccounts = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
+      const logger: Logger = Container.get('logger');
+      logger.debug('Calling Get Account with userId');
+      try {
+        const authServiceInstance = Container.get(AuthService);
+        const result = await authServiceInstance.FilterUsers({ key: req?.query?.key, value: req?.query?.value });
+        return res.status(200).json({ success: true, data: result, message: 'users found' });
+      } catch (e) {
+        logger.error('🔥 error: %o', e);
+        return next(e);
+      }
+    };
+
     static getUserKpi = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
       const logger: Logger = Container.get('logger');
       logger.debug('Calling Get User Kpi with userId: %s', req.currentUser.id);
