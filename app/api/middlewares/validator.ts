@@ -372,6 +372,20 @@ class Validator {
     }
   }
 
+  async updateSafe(req: Request, _, next: NextFunction) {
+    try {
+      const validation = SafeSchema.updateSafeSchema.validate({
+        ...req.body
+      });
+      if (validation.error) {
+        return next(validation.error);
+      }
+      return next();
+    } catch (e) {
+      next(e);
+    }
+  }
+
   async initPayment(req: Request, _, next: NextFunction) {
     try {
       const validation = TransactionSchema.initPaymentSchema.validate({
@@ -401,7 +415,19 @@ class Validator {
     }
   }
 
-  
+  async updateTrade(req: Request, _, next: NextFunction) {
+    try {
+      const validation = TradeSchema.updateTradeSchema.validate({
+        ...req.body
+      });
+      if (validation.error) {
+        return next(validation.error);
+      }
+      return next();
+    } catch (e) {
+      next(e);
+    }
+  }
 
 }
 

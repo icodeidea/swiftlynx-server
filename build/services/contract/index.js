@@ -108,7 +108,7 @@ let ContractService = class ContractService {
     async filter(state) {
         try {
             this.logger.silly('filtering contract record');
-            return await this.contractModel.find({ state });
+            return await this.contractModel.find({ state }).populate('userId', ['firstname', 'lastname', 'email']).populate('projectId', ['projectName', 'projectDescription']);
         }
         catch (e) {
             this.logger.error(e);
@@ -209,13 +209,16 @@ let ContractService = class ContractService {
     async updateContractState({ contractId, state }) {
         try {
             this.logger.silly('updating contract');
-            const contractRecord = await this.contractModel.findOne({ 'id': contractId });
+            console.log('contractId', contractId);
+            const contractRecord = await this.contractModel.findById(contractId);
             if (!contractRecord) {
                 this.logger.silly('contract not found');
                 throw new utils_1.SystemError(200, 'project not found');
             }
             contractRecord.state = state;
-            return await contractRecord.save();
+            const updatedContract = await contractRecord.save();
+            console.log('updatedContract', updatedContract);
+            return updatedContract;
         }
         catch (e) {
             this.logger.error(e);

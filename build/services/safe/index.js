@@ -57,7 +57,7 @@ let SafeService = class SafeService {
     async filter(status) {
         try {
             this.logger.silly('filtering savings record');
-            return await this.safeModel.find({ status });
+            return await this.safeModel.find({ status }).populate('user', ['firstname', 'lastname', 'email']);
         }
         catch (e) {
             this.logger.error(e);
@@ -66,7 +66,9 @@ let SafeService = class SafeService {
     }
     async addfund(safeId, amount) {
         try {
+            console.log('safeId', safeId);
             const safeRecord = await this.safeModel.findById(safeId);
+            console.log('safeRecord', safeRecord);
             safeRecord.amountRaised = safeRecord.amountRaised + amount;
             safeRecord.status = (safeRecord.amountRaised + amount) >= safeRecord.goal ? 'completed' : safeRecord.status;
             return safeRecord.save();
@@ -76,10 +78,10 @@ let SafeService = class SafeService {
             throw new utils_1.SystemError(e.statusCode || 500, e.message);
         }
     }
-    async updateSafeStatus({ contractId, state }) {
+    async updateSafeStatus({ safeId, state }) {
         try {
             this.logger.silly('updating safe');
-            const safeRecord = await this.safeModel.findOne({ 'id': contractId });
+            const safeRecord = await this.safeModel.findById(safeId);
             if (!safeRecord) {
                 this.logger.silly('safe not found');
                 throw new utils_1.SystemError(200, 'safe not found');

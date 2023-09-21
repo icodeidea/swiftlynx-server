@@ -113,7 +113,7 @@ let TransactionService = class TransactionService {
     }
     async getEntityTransactions(entity) {
         try {
-            const transactionRecord = await this.transactionModel.find({ 'subject': entity });
+            const transactionRecord = await this.transactionModel.find({ 'metadata.entityId': entity });
             this.logger.silly('geting transaction information');
             return transactionRecord;
         }
@@ -159,21 +159,22 @@ let TransactionService = class TransactionService {
         try {
             const { verifyPayment } = (0, utils_2.paystack)();
             const { status, message, data } = await verifyPayment(ref);
-            // console.log('paystack ref', ref);
-            // console.log('paystack status', status);
-            // console.log('paystack message', message);
-            // console.log('paystack data', data);
+            console.log('paystack ref', ref);
+            console.log('paystack status', status);
+            console.log('paystack message', message);
+            console.log('paystack data', data);
             let verifiedEntity = null;
             if (!status) {
                 throw new Error(message);
             }
             if (data) {
-                if (data !== "success") {
+                if (data.status !== "success") {
                     throw new Error(data.gateway_response);
                 }
             }
             const { reference, metadata, amount } = data;
             const transactionDoc = await this.transactionModel.findOne({ txid: reference, status: 'pending', });
+            console.log('transactionDoc', transactionDoc);
             if (!transactionDoc) {
                 throw new Error('no pending transaction found');
             }

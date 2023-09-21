@@ -69,5 +69,19 @@ export class TradeController {
     }
   };
 
+  static updateTradeState = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
+    const logger: Logger = Container.get('logger');
+    logger.debug('Calling Update Trade with userId');
+    try {
+      // req.body.userId = req.currentUser.id;
+      const tradeServiceInstance = Container.get(TradeService);
+      const data = await tradeServiceInstance.updateTradeStatus({ tradeId: req.body.tradeId, state: req.body.state });
+      return res.status(201).json({ success: true, data, message: 'trade updated successfully' });
+    } catch (e) {
+      logger.error('🔥 error: %o', e);
+      return next(e);
+    }
+  };
+
 
 }

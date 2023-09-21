@@ -7,6 +7,7 @@ const {
     getContract, 
     signContract ,
     updateContract,
+    updateContractState,
     deleteContract,
     getAllContract,
     filterAllContract,
@@ -23,6 +24,9 @@ export default (app: Router): Router => {
 
   //update contract
   contractRouter.route('/update').put(middlewares.isAuth, middlewares.attachCurrentUser, validator.updateContract, updateContract);
+
+  //update contract state
+  contractRouter.route('/update-state').put(validator.updateContract, updateContractState);
 
   //delete contract
   contractRouter.route('/delete').delete(middlewares.isAuth, middlewares.attachCurrentUser, validator.deleteContract, deleteContract);

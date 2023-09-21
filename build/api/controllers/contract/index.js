@@ -111,6 +111,20 @@ ContractController.updateContract = async (req, res, next) => {
         return next(e);
     }
 };
+ContractController.updateContractState = async (req, res, next) => {
+    const logger = typedi_1.Container.get('logger');
+    logger.debug('Calling Update Contract with userId');
+    try {
+        // req.body.userId = req.currentUser.id;
+        const contractServiceInstance = typedi_1.Container.get(services_1.ContractService);
+        const data = await contractServiceInstance.updateContractState({ contractId: req.body.contractId, state: req.body.state });
+        return res.status(201).json({ success: true, data, message: 'contract updated successfully' });
+    }
+    catch (e) {
+        logger.error('🔥 error: %o', e);
+        return next(e);
+    }
+};
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 ContractController.deleteContract = async (req, res, next) => {
     var _b;

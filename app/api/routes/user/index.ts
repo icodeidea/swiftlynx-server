@@ -15,6 +15,9 @@ export default (app: Router): Router => {
   //user kpi
   userRouter.route('/kpi').get(middlewares.isAuth, middlewares.attachCurrentUser, UserController.getUserKpi);
 
+  //filter accounts
+  userRouter.route('/filter-accounts').get(UserController.filterAccounts);
+
   //update-password
   userRouter.route('/update-password').put(validator.updatePassword, middlewares.isAuth, middlewares.attachCurrentUser, UserController.UpdatePassword);
 

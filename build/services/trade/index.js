@@ -70,7 +70,7 @@ let TradeService = class TradeService {
     async filter(status) {
         try {
             this.logger.silly('filtering trade record');
-            return await this.tradeModel.find({ status });
+            return await this.tradeModel.find({ status }).populate('userId', ['firstname', 'lastname', 'email']);
         }
         catch (e) {
             this.logger.error(e);
@@ -148,7 +148,7 @@ let TradeService = class TradeService {
     async updateTradeStatus({ tradeId, state }) {
         try {
             this.logger.silly('updating trade');
-            const tradeRecord = await this.tradeModel.findOne({ 'id': tradeId });
+            const tradeRecord = await this.tradeModel.findById(tradeId);
             if (!tradeRecord) {
                 this.logger.silly('trade not found');
                 throw new utils_1.SystemError(200, 'trade not found');

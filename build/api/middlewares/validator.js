@@ -316,6 +316,18 @@ class Validator {
             next(e);
         }
     }
+    async updateSafe(req, _, next) {
+        try {
+            const validation = validations_1.SafeSchema.updateSafeSchema.validate(Object.assign({}, req.body));
+            if (validation.error) {
+                return next(validation.error);
+            }
+            return next();
+        }
+        catch (e) {
+            next(e);
+        }
+    }
     async initPayment(req, _, next) {
         try {
             const validation = validations_1.TransactionSchema.initPaymentSchema.validate(Object.assign({}, req.body));
@@ -332,6 +344,18 @@ class Validator {
     async startTrade(req, _, next) {
         try {
             const validation = validations_1.TradeSchema.startTradeSchema.validate(Object.assign({}, req.body));
+            if (validation.error) {
+                return next(validation.error);
+            }
+            return next();
+        }
+        catch (e) {
+            next(e);
+        }
+    }
+    async updateTrade(req, _, next) {
+        try {
+            const validation = validations_1.TradeSchema.updateTradeSchema.validate(Object.assign({}, req.body));
             if (validation.error) {
                 return next(validation.error);
             }

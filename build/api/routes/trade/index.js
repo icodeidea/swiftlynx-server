@@ -26,7 +26,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const express_1 = require("express");
 const middlewares_1 = __importStar(require("../../middlewares"));
 const controllers_1 = require("../../controllers");
-const { getTrades, filterTrades, startTrade } = controllers_1.TradeController;
+const { getTrades, filterTrades, startTrade, updateTradeState } = controllers_1.TradeController;
 const tradeRouter = (0, express_1.Router)();
 exports.default = (app) => {
     app.use('/trade', tradeRouter);
@@ -36,6 +36,8 @@ exports.default = (app) => {
     tradeRouter.route('/list-trade').get(middlewares_1.default.isAuth, middlewares_1.default.attachCurrentUser, getTrades);
     //filter trades
     tradeRouter.route('/filter-trades/:status').get(filterTrades);
+    //update trade state
+    tradeRouter.route('/update-state').put(middlewares_1.validator.updateTrade, updateTradeState);
     return app;
 };
 //# sourceMappingURL=index.js.map
