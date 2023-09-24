@@ -53,7 +53,7 @@ export class SafeService {
     try {
       this.logger.silly('filtering savings record');
 
-      return await this.safeModel.find({status}).populate('user', ['firstname', 'lastname', 'email']);
+      return await this.safeModel.find({status}).populate('user', ['firstname', 'lastname', 'email', 'picture']);
     } catch (e) {
       this.logger.error(e);
       throw new SystemError(e.statusCode || 500, e.message);

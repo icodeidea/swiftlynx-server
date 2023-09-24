@@ -52,8 +52,22 @@ export class WalletController {
     logger.debug('Calling get all payouts endpoint');
     try {
       const walletServiceInstance = Container.get(WalletService);
-      const data = await walletServiceInstance.getAllPayoutRequest();
+      const data = await walletServiceInstance.getAllPayoutRequest(req.query?.status as string);
       return res.status(201).json({ success: true, data, message: 'get all payout' });
+    } catch (e) {
+      logger.error('🔥 error: %o', e);
+      return next(e);
+    }
+  };
+
+  static updatePayoutStatus = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
+    const logger: Logger = Container.get('logger');
+    logger.debug('Calling Update Payout with userId');
+    try {
+      // req.body.userId = req.currentUser.id;
+      const walletServiceInstance = Container.get(WalletService);
+      const data = await walletServiceInstance.updatePayoutStatus({ payoutId: req.body.payoutId, state: req.body.state });
+      return res.status(201).json({ success: true, data, message: 'payout updated successfully' });
     } catch (e) {
       logger.error('🔥 error: %o', e);
       return next(e);

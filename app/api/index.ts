@@ -11,6 +11,7 @@ import project from './routes/project';
 import contract from './routes/contract';
 import trade from './routes/trade';
 import safe from './routes/safe';
+import fit from './routes/fit';
 // guaranteed to get dependencies
 export default (): Router => {
   const app = Router();
@@ -25,5 +26,6 @@ export default (): Router => {
   contract(app);
   trade(app);
   safe(app);
+  fit(app);
   return app;
 };

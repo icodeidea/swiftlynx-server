@@ -19,6 +19,19 @@ export class UserController {
         }
     };
 
+    static updateRole = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
+      const logger: Logger = Container.get('logger');
+      logger.debug('Calling Update Role with userId: %s', req.body.userId);
+      try {
+        const authServiceInstance = Container.get(AuthService);
+        const result = await authServiceInstance.UpdateRecord({ updateRecord: {role: req.body.role}, userId: req.body.userId });
+        return res.status(200).json({ success: true, data: result, message: 'user updated successfully' });
+      } catch (e) {
+        logger.error('🔥 error: %o', e);
+        return next(e);
+      }
+  };
+
     static getAccount = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
       const logger: Logger = Container.get('logger');
       logger.debug('Calling Get Account with userId: %s', req.currentUser.id);

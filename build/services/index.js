@@ -27,4 +27,5 @@ __exportStar(require("./project"), exports);
 __exportStar(require("./contract"), exports);
 __exportStar(require("./trade"), exports);
 __exportStar(require("./safe"), exports);
+__exportStar(require("./fit"), exports);
 //# sourceMappingURL=index.js.map

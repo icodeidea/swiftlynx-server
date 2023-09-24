@@ -97,6 +97,11 @@ exports.default = async ({ expressApp }) => {
         // eslint-disable-next-line @typescript-eslint/no-var-requires
         model: require('../models/accountDetail').default,
     };
+    const fitModel = {
+        name: 'fitModel',
+        // eslint-disable-next-line @typescript-eslint/no-var-requires
+        model: require('../models/fit').default,
+    };
     // It returns the agenda instance because it's needed in the subsequent loaders
     const { agenda } = await (0, dependencyInjector_1.default)({
         mongoConnection,
@@ -115,7 +120,8 @@ exports.default = async ({ expressApp }) => {
             projectModel,
             safeModel,
             payoutModel,
-            accountDetailModel
+            accountDetailModel,
+            fitModel
         ],
     });
     logger_1.default.info('✌️ Dependency Injector loaded');

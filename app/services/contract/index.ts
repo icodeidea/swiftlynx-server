@@ -112,7 +112,7 @@ export class ContractService {
     try {
       this.logger.silly('filtering contract record');
 
-      return await this.contractModel.find({state}).populate('userId', ['firstname', 'lastname', 'email']).populate('projectId', ['projectName', 'projectDescription']);
+      return await this.contractModel.find({state}).populate('userId', ['firstname', 'lastname', 'email', 'picture']).populate('projectId', ['projectName', 'projectDescription']);
     } catch (e) {
       this.logger.error(e);
       throw new SystemError(e.statusCode || 500, e.message);

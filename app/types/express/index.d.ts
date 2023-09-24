@@ -14,7 +14,8 @@ import {
   IProject,
   ISafe,
   IPayout,
-  IAccountDetail
+  IAccountDetail,
+  IFit
 } from '../../interfaces';
 
 declare global {
@@ -58,5 +59,6 @@ declare global {
       export type SafeModel = Model<ISafe & Document>;
       export type PayoutModel = Model<IPayout & Document>;
       export type AccountDetailModel = Model<IAccountDetail & Document>;
+      export type FitModel = Model<IFit & Document>;
     }
   }
