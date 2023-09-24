@@ -32,6 +32,8 @@ exports.default = (app) => {
     userRouter.route('/').get(middlewares_1.default.isAuth, middlewares_1.default.attachCurrentUser, controllers_1.UserController.getAccount);
     //update-account
     userRouter.route('/update-profile').put(middlewares_1.validator.updateUser, middlewares_1.default.isAuth, middlewares_1.default.attachCurrentUser, controllers_1.UserController.updateAccount);
+    //update-account-role
+    userRouter.route('/update-role').put(controllers_1.UserController.updateRole);
     //user kpi
     userRouter.route('/kpi').get(middlewares_1.default.isAuth, middlewares_1.default.attachCurrentUser, controllers_1.UserController.getUserKpi);
     //filter accounts

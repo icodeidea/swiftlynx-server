@@ -48,5 +48,6 @@ export interface IUser {
   export interface IUserUpdateDTO {
     username?: string;
     country?: string;
+    role?: string;
   }
   

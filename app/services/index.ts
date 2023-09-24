@@ -11,3 +11,4 @@ export * from './project';
 export * from './contract';
 export * from './trade';
 export * from './safe';
+export * from './fit'

@@ -21,6 +21,19 @@ UserController.updateAccount = async (req, res, next) => {
         return next(e);
     }
 };
+UserController.updateRole = async (req, res, next) => {
+    const logger = typedi_1.Container.get('logger');
+    logger.debug('Calling Update Role with userId: %s', req.body.userId);
+    try {
+        const authServiceInstance = typedi_1.Container.get(services_1.AuthService);
+        const result = await authServiceInstance.UpdateRecord({ updateRecord: { role: req.body.role }, userId: req.body.userId });
+        return res.status(200).json({ success: true, data: result, message: 'user updated successfully' });
+    }
+    catch (e) {
+        logger.error('🔥 error: %o', e);
+        return next(e);
+    }
+};
 UserController.getAccount = async (req, res, next) => {
     const logger = typedi_1.Container.get('logger');
     logger.debug('Calling Get Account with userId: %s', req.currentUser.id);

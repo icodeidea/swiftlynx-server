@@ -225,9 +225,30 @@ export class WalletService {
     try {
       this.logger.silly('getting all payout request');
       const payoutRequests : Array<IPayout> = await this.payoutModel
-      .find({ status });
+      .find({ status }).populate('user', ['firstname', 'lastname', 'email', 'picture'])
+      .populate('subject').populate('accountDetailId');
       return payoutRequests;
     } catch (e) {
+      throw new SystemError(e.statusCode || 500, e.message);
+    }
+  }
+
+  public async updatePayoutStatus({payoutId, state}:{payoutId: string, state: string}): Promise<IPayout> {
+    try {
+    
+      this.logger.silly('updating payout');
+
+      const payoutRecord = await this.payoutModel.findById(payoutId); 
+      if (!payoutRecord) {
+        this.logger.silly('payout not found');
+        throw new SystemError(200, 'payout not found');
+      }
+      
+      payoutRecord.status = state.toLowerCase();
+      
+      return await payoutRecord.save();
+    } catch (e) {
+      this.logger.error(e);
       throw new SystemError(e.statusCode || 500, e.message);
     }
   }

@@ -49,12 +49,27 @@ WalletController.WithdrawFund = async (req, res, next) => {
     }
 };
 WalletController.getAllPayout = async (req, res, next) => {
+    var _b;
     const logger = typedi_1.Container.get('logger');
     logger.debug('Calling get all payouts endpoint');
     try {
         const walletServiceInstance = typedi_1.Container.get(services_1.WalletService);
-        const data = await walletServiceInstance.getAllPayoutRequest();
+        const data = await walletServiceInstance.getAllPayoutRequest((_b = req.query) === null || _b === void 0 ? void 0 : _b.status);
         return res.status(201).json({ success: true, data, message: 'get all payout' });
+    }
+    catch (e) {
+        logger.error('🔥 error: %o', e);
+        return next(e);
+    }
+};
+WalletController.updatePayoutStatus = async (req, res, next) => {
+    const logger = typedi_1.Container.get('logger');
+    logger.debug('Calling Update Payout with userId');
+    try {
+        // req.body.userId = req.currentUser.id;
+        const walletServiceInstance = typedi_1.Container.get(services_1.WalletService);
+        const data = await walletServiceInstance.updatePayoutStatus({ payoutId: req.body.payoutId, state: req.body.state });
+        return res.status(201).json({ success: true, data, message: 'payout updated successfully' });
     }
     catch (e) {
         logger.error('🔥 error: %o', e);

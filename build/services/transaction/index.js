@@ -102,7 +102,7 @@ let TransactionService = class TransactionService {
     }
     async filterTransactions(reason, status) {
         try {
-            const transactionRecord = await this.transactionModel.find({ reason, status }).populate('subject', ['firstname', 'lastname', 'email']);
+            const transactionRecord = await this.transactionModel.find({ reason, status }).populate('subject', ['firstname', 'lastname', 'email', 'picture']);
             this.logger.silly('filter transactions');
             return transactionRecord;
         }
@@ -125,7 +125,7 @@ let TransactionService = class TransactionService {
     async initialisePayment(userId, amount, entity, entityId) {
         try {
             const { initializePayment } = (0, utils_2.paystack)();
-            const userRecord = await this.userModel.findOne({ '_id': userId });
+            const userRecord = await this.userModel.findById(userId);
             const form = {};
             form.metadata = {
                 fullName: `${userRecord === null || userRecord === void 0 ? void 0 : userRecord.firstname} ${userRecord === null || userRecord === void 0 ? void 0 : userRecord.lastname}`,

@@ -94,7 +94,7 @@ export class TransactionService {
 
   public async filterTransactions(reason: string, status: string): Promise<any> {
     try {
-      const transactionRecord = await this.transactionModel.find({ reason, status }).populate('subject', ['firstname', 'lastname', 'email']);
+      const transactionRecord = await this.transactionModel.find({ reason, status }).populate('subject', ['firstname', 'lastname', 'email', 'picture']);
       this.logger.silly('filter transactions');
       return transactionRecord;
     } catch (e) {
@@ -117,7 +117,7 @@ export class TransactionService {
   public async initialisePayment(userId: string, amount: number, entity: string, entityId: string): Promise<any> {
     try {
       const { initializePayment } = paystack();
-      const userRecord = await this.userModel.findOne({ '_id': userId });
+      const userRecord = await this.userModel.findById(userId);
       const form: any = {};
       form.metadata = {
         fullName: `${userRecord?.firstname} ${userRecord?.lastname}`,

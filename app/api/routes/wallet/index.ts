@@ -6,7 +6,8 @@ const {
   getWalletInfo, 
   activateWallet, 
   WithdrawFund, 
-  getAllPayout, 
+  getAllPayout,
+  updatePayoutStatus, 
   RequestPayout,
   getPayoutAccountDetails,
   AddPayoutAccountDetail,
@@ -29,10 +30,13 @@ export default (app: Router): Router => {
   walletRouter.route('/withdraw-fund').post(validator.withdrawFund, middlewares.isAuth, middlewares.attachCurrentUser, WithdrawFund);
 
   //get all payouts
-  walletRouter.route('/all-payout').get(middlewares.isAuth, middlewares.attachCurrentUser, getAllPayout);
+  walletRouter.route('/all-payout').get(getAllPayout);
 
-    //get all payouts
-    walletRouter.route('/payback-accounts').get(getSwiftlynxAccountDetails);
+  //update wallet state
+  walletRouter.route('/update-payout-state').put(updatePayoutStatus);
+
+  //get all payouts
+  walletRouter.route('/payback-accounts').get(getSwiftlynxAccountDetails);
 
   //request payout
   walletRouter.route('/request-payout').post(validator.requestPayout, middlewares.isAuth, middlewares.attachCurrentUser, RequestPayout);

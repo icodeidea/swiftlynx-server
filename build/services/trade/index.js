@@ -70,7 +70,7 @@ let TradeService = class TradeService {
     async filter(status) {
         try {
             this.logger.silly('filtering trade record');
-            return await this.tradeModel.find({ status }).populate('userId', ['firstname', 'lastname', 'email']);
+            return await this.tradeModel.find({ status }).populate('userId', ['firstname', 'lastname', 'email', 'picture']);
         }
         catch (e) {
             this.logger.error(e);

@@ -544,10 +544,10 @@ let AuthService = class AuthService {
             const totalAmount = ((_c = totalTradesAmount[0]) === null || _c === void 0 ? void 0 : _c.total) + ((_d = totalAmountInSafe[0]) === null || _d === void 0 ? void 0 : _d.total);
             return {
                 totalAmount,
-                totalTrade: (_e = totalTradesAmount[0]) === null || _e === void 0 ? void 0 : _e.total,
+                totalTrade: ((_e = totalTradesAmount[0]) === null || _e === void 0 ? void 0 : _e.total) || 0,
                 totalTradeRoi,
-                totalSafe: (_f = totalAmountInSafe[0]) === null || _f === void 0 ? void 0 : _f.total,
-                totalDebt: (_g = totalActiveLoansAmount[0]) === null || _g === void 0 ? void 0 : _g.total
+                totalSafe: ((_f = totalAmountInSafe[0]) === null || _f === void 0 ? void 0 : _f.total) || 0,
+                totalDebt: ((_g = totalActiveLoansAmount[0]) === null || _g === void 0 ? void 0 : _g.total) || 0
             };
         }
         catch (e) {

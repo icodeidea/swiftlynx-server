@@ -627,11 +627,11 @@ export class AuthService {
       const totalAmount = totalTradesAmount[0]?.total + totalAmountInSafe[0]?.total;
 
       return {
-        totalAmount,
-        totalTrade: totalTradesAmount[0]?.total,
-        totalTradeRoi, 
-        totalSafe: totalAmountInSafe[0]?.total,
-        totalDebt: totalActiveLoansAmount[0]?.total
+        totalAmount: totalAmount || 0,
+        totalTrade: totalTradesAmount[0]?.total || 0,
+        totalTradeRoi: totalTradeRoi || 0, 
+        totalSafe: totalAmountInSafe[0]?.total || 0,
+        totalDebt: totalActiveLoansAmount[0]?.total || 0
       }
     } catch(e) {
       this.logger.error(e);
