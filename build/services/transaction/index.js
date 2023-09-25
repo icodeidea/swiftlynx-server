@@ -179,16 +179,16 @@ let TransactionService = class TransactionService {
                 throw new Error('no pending transaction found');
             }
             if (transactionDoc.metadata.entity === 'safe') {
-                verifiedEntity = await this.safe.addfund(transactionDoc.metadata.entityId, amount);
+                verifiedEntity = await this.safe.addfund(transactionDoc.metadata.entityId, transactionDoc.to.amount);
             }
             if (transactionDoc.metadata.entity === 'trade') {
-                verifiedEntity = await this.trade.activateTrade(transactionDoc.metadata.entityId, amount);
+                verifiedEntity = await this.trade.activateTrade(transactionDoc.metadata.entityId, transactionDoc.to.amount);
             }
             // else{
             //   verifiedEntity = await this.contract.signContract(transactionDoc.metadata.entityId, transactionDoc.user, amount);
             // }
             transactionDoc.status = 'completed';
-            transactionDoc.to.amount = amount;
+            // transactionDoc.to.amount = amount;
             transactionDoc.save();
             return verifiedEntity;
         }
