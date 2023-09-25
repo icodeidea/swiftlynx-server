@@ -543,9 +543,9 @@ let AuthService = class AuthService {
             const totalTradeRoi = (((_a = totalTradesAmount[0]) === null || _a === void 0 ? void 0 : _a.total) * ((_b = totalTradesInterest[0]) === null || _b === void 0 ? void 0 : _b.total)) / 100;
             const totalAmount = ((_c = totalTradesAmount[0]) === null || _c === void 0 ? void 0 : _c.total) + ((_d = totalAmountInSafe[0]) === null || _d === void 0 ? void 0 : _d.total);
             return {
-                totalAmount,
+                totalAmount: totalAmount || 0,
                 totalTrade: ((_e = totalTradesAmount[0]) === null || _e === void 0 ? void 0 : _e.total) || 0,
-                totalTradeRoi,
+                totalTradeRoi: totalTradeRoi || 0,
                 totalSafe: ((_f = totalAmountInSafe[0]) === null || _f === void 0 ? void 0 : _f.total) || 0,
                 totalDebt: ((_g = totalActiveLoansAmount[0]) === null || _g === void 0 ? void 0 : _g.total) || 0
             };

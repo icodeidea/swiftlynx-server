@@ -77,7 +77,7 @@ let ContractService = class ContractService {
             this.logger.silly('getting contract record');
             console.log('contractOrProjectId', contractOrProjectId);
             const contractRecord = await this.contractModel
-                .find({ 'projectId': contractOrProjectId, state: 'PENDING' });
+                .find({ 'projectId': contractOrProjectId });
             //   .find({$or: [
             //       { 'id': contractOrProjectId },
             //       { 'projectId': contractOrProjectId },

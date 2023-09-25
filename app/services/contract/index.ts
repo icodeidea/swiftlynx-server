@@ -79,7 +79,7 @@ export class ContractService {
       console.log('contractOrProjectId', contractOrProjectId);
 
       const contractRecord : Array<IContract> = await this.contractModel
-      .find({'projectId': contractOrProjectId, state: 'PENDING'});
+      .find({'projectId': contractOrProjectId});
       //   .find({$or: [
       //       { 'id': contractOrProjectId },
       //       { 'projectId': contractOrProjectId },
