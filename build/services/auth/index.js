@@ -531,7 +531,7 @@ let AuthService = class AuthService {
                 }]);
             // get total loan amount
             const totalActiveLoansAmount = await this.contractModel.aggregate([{
-                    $match: { $and: [{ user: userId }, { status: 'PENDING' }] },
+                    $match: { $and: [{ user: userId }, { state: 'PENDING' }] },
                 }, {
                     $group: {
                         _id: null,
