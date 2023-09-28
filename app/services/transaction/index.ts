@@ -346,7 +346,7 @@ export class TransactionService {
           $group : {
               _id : null,
               total : {
-                  "$sum" : "$to.amount"
+                  $sum : "$to.$amount"
               }
           }
       }]);
