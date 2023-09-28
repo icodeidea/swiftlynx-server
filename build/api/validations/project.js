@@ -7,15 +7,15 @@ exports.deleteProjectSchema = exports.updateProjectSchema = exports.startProject
 const joi_1 = __importDefault(require("joi"));
 exports.startProjectSchema = joi_1.default.object({
     projectName: joi_1.default.string().required().max(100),
-    projectDescription: joi_1.default.string().required().max(100),
+    projectDescription: joi_1.default.string().required().min(100).max(5000),
     marketId: joi_1.default.string().required().max(1000),
     projectCategory: joi_1.default.string(),
-    projectType: joi_1.default.string().valid("STARTUP", "OFFICIAL").required().max(100),
+    projectType: joi_1.default.string().valid("STARTUP", "OFFICIAL").max(100),
 });
 exports.updateProjectSchema = joi_1.default.object({
     projectId: joi_1.default.string().required(),
     projectName: joi_1.default.string().max(100),
-    projectDescription: joi_1.default.string().max(100),
+    projectDescription: joi_1.default.string().min(100).max(5000),
     marketId: joi_1.default.string().max(1000),
     projectCategory: joi_1.default.string(),
     projectType: joi_1.default.string().valid("STARTUP", "OFFICIAL").max(100),

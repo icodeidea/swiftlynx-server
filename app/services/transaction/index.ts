@@ -237,7 +237,7 @@ export class TransactionService {
 
       // get total loan amount
       const totalActiveLoansAmount = await this.contractModel.aggregate([{
-        $match : { $and : [{status: 'PENDING' }] },
+        $match : { $and : [{state: 'PENDING' }] },
       },{
           $group : {
               _id : null,
@@ -249,7 +249,7 @@ export class TransactionService {
 
       // get total loan amount roi
       const totalActiveLoansInterest = await this.contractModel.aggregate([{
-        $match : { $and : [{status: 'PENDING' }] },
+        $match : { $and : [{state: 'PENDING' }] },
       },{
           $group : {
               _id : null,
@@ -340,14 +340,18 @@ export class TransactionService {
       // get total pending transactions amount
       const totalPendingTransactionAmount = await this.transactionModel.aggregate([{
         $match : { $and : [{status: 'pending' }] },
-      },{
+      },
+      // {$unwind: '$to'},
+      {
           $group : {
               _id : null,
               total : {
-                  $sum : "$to.amount"
+                  $sum : "$to.$amount"
               }
           }
       }]);
+
+      console.log(totalPendingTransactionAmount);
 
       // get total pending transactions
       const totalPendingTransaction = await this.transactionModel.count({ status: 'pending' });

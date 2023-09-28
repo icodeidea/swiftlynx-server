@@ -30,7 +30,7 @@ const Transaction = new mongoose_1.default.Schema({
     fee: { type: String },
     to: {
         recipient: { type: String, default: 'self' },
-        amount: { type: String },
+        amount: { type: Number, default: 0.0 },
     },
 }, { timestamps: true });
 Transaction.set('toJSON', {
