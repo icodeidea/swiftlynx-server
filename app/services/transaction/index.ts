@@ -83,7 +83,7 @@ export class TransactionService {
 
   public async getTransactions(wallet_id: string): Promise<any> {
     try {
-      const transactionRecord = await this.transactionModel.find({ user: wallet_id });
+      const transactionRecord = await this.transactionModel.find({ user: wallet_id }).sort({createdAt: -1});
       this.logger.silly('geting transaction information');
       return transactionRecord;
     } catch (e) {
@@ -92,9 +92,13 @@ export class TransactionService {
     }
   }
 
-  public async filterTransactions(reason: string, status: string): Promise<any> {
+  public async filterTransactions(reason: string, status: string, user?: any): Promise<any> {
     try {
-      const transactionRecord = await this.transactionModel.find({ reason, status }).populate('subject', ['firstname', 'lastname', 'email', 'picture']);
+
+      let params: any = {reason, status}
+      if (user) params = {...params, subject: user}
+
+      const transactionRecord = await this.transactionModel.find(params).populate('subject', ['firstname', 'lastname', 'email', 'picture']).sort({createdAt: -1});
       this.logger.silly('filter transactions');
       return transactionRecord;
     } catch (e) {
@@ -105,7 +109,7 @@ export class TransactionService {
 
   public async getEntityTransactions(entity: string): Promise<any> {
     try {
-      const transactionRecord = await this.transactionModel.find({ 'metadata.entityId': entity });
+      const transactionRecord = await this.transactionModel.find({ 'metadata.entityId': entity }).sort({createdAt: -1});
       this.logger.silly('geting transaction information');
       return transactionRecord;
     } catch (e) {
@@ -346,7 +350,7 @@ export class TransactionService {
           $group : {
               _id : null,
               total : {
-                  $sum : "$to.$amount"
+                  $sum : "$to.amount"
               }
           }
       }]);

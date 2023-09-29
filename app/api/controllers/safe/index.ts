@@ -27,7 +27,7 @@ export class SafeController {
     logger.debug('Calling filter savings endpoint');
     try {
       const safeServiceInstance = Container.get(SafeService);
-      const data = await safeServiceInstance.filter(req.params.status)
+      const data = await safeServiceInstance.filter(req.params.status, req?.query?.user)
       return res.status(201).json({ success: true, data, message: 'data retrived' });
     } catch (e) {
       logger.error('🔥 error: %o', e);

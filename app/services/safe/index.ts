@@ -1,5 +1,5 @@
 import { Service, Inject } from 'typedi';
-import { Document } from 'mongoose';
+import { Document, Types } from 'mongoose';
 import { EventDispatcher, EventDispatcherInterface } from '../../decorators/eventDispatcher';
 import { ITransactionInputDTO, ISafeInputDTO, ISafe, ITransaction, IWallet, IUser } from '../../interfaces';
 import { Console } from 'winston/lib/winston/transports';
@@ -40,20 +40,30 @@ export class SafeService {
     try {
       this.logger.silly('getting savings record');
 
-      if(!safeId || safeId === null) return await this.safeModel.find({user: userId});
+      if(!safeId || safeId === null) return await this.safeModel.find({user: userId}).sort({createdAt: -1});
 
-      if(safeId) return await this.safeModel.find({_id: safeId});
+      if(safeId) return await this.safeModel.find({_id: safeId}).sort({createdAt: -1});
     } catch (e) {
       this.logger.error(e);
       throw new SystemError(e.statusCode || 500, e.message);
     }
   }
 
-  public async filter(status: string): Promise<any> {
+  public async filter(status: string, user?: any): Promise<any> {
     try {
       this.logger.silly('filtering savings record');
 
-      return await this.safeModel.find({status}).populate('user', ['firstname', 'lastname', 'email', 'picture']);
+      if(Types.ObjectId.isValid(status)){
+        const singleSafe = await this.safeModel.findById(status).populate('user', ['firstname', 'lastname', 'email', 'picture']);
+        if(singleSafe){
+          return [].push(singleSafe)
+        }
+      }
+
+      let params: any = {status}
+      if (user) params = {...params, user}
+
+      return await this.safeModel.find(params).populate('user', ['firstname', 'lastname', 'email', 'picture']).sort({createdAt: -1});
     } catch (e) {
       this.logger.error(e);
       throw new SystemError(e.statusCode || 500, e.message);

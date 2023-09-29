@@ -14,6 +14,7 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.TradeService = void 0;
 const typedi_1 = require("typedi");
+const mongoose_1 = require("mongoose");
 const utils_1 = require("../../utils");
 let TradeService = class TradeService {
     constructor(tradeModel, contractModel, logger) {
@@ -46,7 +47,7 @@ let TradeService = class TradeService {
         try {
             this.logger.silly('getting my trade records');
             const tradeRecords = await this.tradeModel
-                .find({ 'userId': entityId }).populate('contractId', 'contractName');
+                .find({ 'userId': entityId }).populate('contractId', 'contractName').sort({ createdAt: -1 });
             return tradeRecords;
         }
         catch (e) {
@@ -67,10 +68,19 @@ let TradeService = class TradeService {
         catch (error) {
         }
     }
-    async filter(status) {
+    async filter(status, user) {
         try {
             this.logger.silly('filtering trade record');
-            return await this.tradeModel.find({ status }).populate('userId', ['firstname', 'lastname', 'email', 'picture']);
+            if (mongoose_1.Types.ObjectId.isValid(status)) {
+                const singleTrade = await this.tradeModel.findById(status).populate('userId', ['firstname', 'lastname', 'email', 'picture']);
+                if (singleTrade) {
+                    return [].push(singleTrade);
+                }
+            }
+            let params = { status };
+            if (user)
+                params = Object.assign(Object.assign({}, params), { userId: user });
+            return await this.tradeModel.find(params).populate('userId', ['firstname', 'lastname', 'email', 'picture']).sort({ createdAt: -1 });
         }
         catch (e) {
             this.logger.error(e);
@@ -84,7 +94,7 @@ let TradeService = class TradeService {
                 .find({ $or: [
                     { 'id': contractOrProjectId },
                     { 'projectId': contractOrProjectId },
-                ] });
+                ] }).sort({ createdAt: -1 });
             return contractRecord;
         }
         catch (e) {

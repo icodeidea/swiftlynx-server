@@ -1,6 +1,6 @@
 import { Service, Inject } from 'typedi';
 import { IContractUpdateStatisticsDTO, ITradeInputDTO, ITradeUpdateDTO, ITrade, IContract } from '../../interfaces';
-import { Document } from 'mongoose';
+import { Document, Types } from 'mongoose';
 import { SystemError } from '../../utils';
 
 @Service()
@@ -40,7 +40,7 @@ export class TradeService {
     try {
       this.logger.silly('getting my trade records');
       const tradeRecords : Array<ITrade> = await this.tradeModel
-      .find({'userId': entityId }).populate('contractId', 'contractName');
+      .find({'userId': entityId }).populate('contractId', 'contractName').sort({createdAt: -1});
     return tradeRecords;
     } catch (e) {
       throw new SystemError(e.statusCode || 500, e.message);
@@ -62,11 +62,21 @@ export class TradeService {
     }
   }
 
-  public async filter(status: string): Promise<any> {
+  public async filter(status: string, user?: any): Promise<any> {
     try {
       this.logger.silly('filtering trade record');
 
-      return await this.tradeModel.find({status}).populate('userId', ['firstname', 'lastname', 'email', 'picture']);
+      if(Types.ObjectId.isValid(status)){
+        const singleTrade = await this.tradeModel.findById(status).populate('userId', ['firstname', 'lastname', 'email', 'picture']);
+        if(singleTrade){
+          return [].push(singleTrade)
+        }
+      }
+
+      let params: any = {status}
+      if (user) params = {...params, userId: user}
+
+      return await this.tradeModel.find(params).populate('userId', ['firstname', 'lastname', 'email', 'picture']).sort({createdAt: -1});
     } catch (e) {
       this.logger.error(e);
       throw new SystemError(e.statusCode || 500, e.message);
@@ -81,7 +91,7 @@ export class TradeService {
         .find({$or: [
             { 'id': contractOrProjectId },
             { 'projectId': contractOrProjectId },
-          ]});
+          ]}).sort({createdAt: -1});
       return contractRecord;
     } catch (e) {
       this.logger.error(e);

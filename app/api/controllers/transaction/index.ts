@@ -27,7 +27,7 @@ export class TransactionController {
     logger.debug('Calling filter transactions endpoint');
     try {
       const transactionServiceInstance = Container.get(TransactionService);
-      const data = await transactionServiceInstance.filterTransactions(req.params.reason, req.params.status);
+      const data = await transactionServiceInstance.filterTransactions(req.params.reason, req.params.status, req?.query?.user);
       return res.status(201).json({ success: true, data, message: 'data retrived' });
     } catch (e) {
       logger.error('🔥 error: %o', e);

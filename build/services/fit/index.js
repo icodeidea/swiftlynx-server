@@ -37,7 +37,7 @@ let FitService = class FitService {
             let params = { status };
             if (branch)
                 params = Object.assign(Object.assign({}, params), { branch });
-            return await this.fitModel.find(Object.assign({}, params));
+            return await this.fitModel.find(Object.assign({}, params)).sort({ createdAt: -1 });
         }
         catch (e) {
             this.logger.error(e);

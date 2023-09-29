@@ -14,6 +14,7 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.SafeService = void 0;
 const typedi_1 = require("typedi");
+const mongoose_1 = require("mongoose");
 const eventDispatcher_1 = require("../../decorators/eventDispatcher");
 const transaction_1 = require("../transaction");
 const auth_1 = require("../auth");
@@ -45,19 +46,28 @@ let SafeService = class SafeService {
         try {
             this.logger.silly('getting savings record');
             if (!safeId || safeId === null)
-                return await this.safeModel.find({ user: userId });
+                return await this.safeModel.find({ user: userId }).sort({ createdAt: -1 });
             if (safeId)
-                return await this.safeModel.find({ _id: safeId });
+                return await this.safeModel.find({ _id: safeId }).sort({ createdAt: -1 });
         }
         catch (e) {
             this.logger.error(e);
             throw new utils_1.SystemError(e.statusCode || 500, e.message);
         }
     }
-    async filter(status) {
+    async filter(status, user) {
         try {
             this.logger.silly('filtering savings record');
-            return await this.safeModel.find({ status }).populate('user', ['firstname', 'lastname', 'email', 'picture']);
+            if (mongoose_1.Types.ObjectId.isValid(status)) {
+                const singleSafe = await this.safeModel.findById(status).populate('user', ['firstname', 'lastname', 'email', 'picture']);
+                if (singleSafe) {
+                    return [].push(singleSafe);
+                }
+            }
+            let params = { status };
+            if (user)
+                params = Object.assign(Object.assign({}, params), { user });
+            return await this.safeModel.find(params).populate('user', ['firstname', 'lastname', 'email', 'picture']).sort({ createdAt: -1 });
         }
         catch (e) {
             this.logger.error(e);

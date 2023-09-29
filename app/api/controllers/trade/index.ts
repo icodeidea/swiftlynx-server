@@ -61,7 +61,7 @@ export class TradeController {
     logger.debug('Calling filter trades endpoint');
     try {
       const tradeServiceInstance = Container.get(TradeService);
-      const data = await tradeServiceInstance.filter(req.params.status)
+      const data = await tradeServiceInstance.filter(req.params.status, req?.query?.user)
       return res.status(201).json({ success: true, data, message: 'data retrived' });
     } catch (e) {
       logger.error('🔥 error: %o', e);

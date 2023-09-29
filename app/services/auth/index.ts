@@ -553,7 +553,7 @@ export class AuthService {
     this.logger.silly('Getting Accounts...');
     const params = key && value ? {[key]: value} : {};
     try {
-      return await this.userModel.find(params).populate("wallet");
+      return await this.userModel.find(params).populate("wallet").sort({createdAt: -1});
       // const wallet = await this.walletModel.findById(userRecord.wallet);
       // if(userRecord) {
       //   this.logger.silly('Account Found!');
