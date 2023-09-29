@@ -14,6 +14,7 @@ var __param = (this && this.__param) || function (paramIndex, decorator) {
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.ContractService = void 0;
 const typedi_1 = require("typedi");
+const mongoose_1 = require("mongoose");
 const utils_1 = require("../../utils");
 const project_1 = require("../project");
 const trade_1 = require("../trade");
@@ -77,7 +78,7 @@ let ContractService = class ContractService {
             this.logger.silly('getting contract record');
             console.log('contractOrProjectId', contractOrProjectId);
             const contractRecord = await this.contractModel
-                .find({ 'projectId': contractOrProjectId });
+                .find({ 'projectId': contractOrProjectId }).sort({ createdAt: -1 });
             //   .find({$or: [
             //       { 'id': contractOrProjectId },
             //       { 'projectId': contractOrProjectId },
@@ -93,7 +94,7 @@ let ContractService = class ContractService {
         try {
             this.logger.silly('getting all user contract record');
             const contractRecord = await this.contractModel
-                .find({ 'userId': userId });
+                .find({ 'userId': userId }).sort({ createdAt: -1 });
             //   .find({$or: [
             //       { 'id': contractOrProjectId },
             //       { 'projectId': contractOrProjectId },
@@ -105,10 +106,20 @@ let ContractService = class ContractService {
             throw new utils_1.SystemError(e.statusCode || 500, e.message);
         }
     }
-    async filter(state) {
+    async filter(state, user) {
         try {
             this.logger.silly('filtering contract record');
-            return await this.contractModel.find({ state }).populate('userId', ['firstname', 'lastname', 'email', 'picture']).populate('projectId', ['projectName', 'projectDescription']);
+            if (mongoose_1.Types.ObjectId.isValid(state)) {
+                const singleContract = await this.contractModel.findById(state).populate('userId', ['firstname', 'lastname', 'email', 'picture']).populate('projectId', ['projectName', 'projectDescription']);
+                if (singleContract) {
+                    return [].push(singleContract);
+                }
+            }
+            let params = { state };
+            if (user)
+                params = Object.assign(Object.assign({}, params), { userId: user });
+            console.log(params);
+            return await this.contractModel.find(params).populate('userId', ['firstname', 'lastname', 'email', 'picture']).populate('projectId', ['projectName', 'projectDescription']).sort({ createdAt: -1 });
         }
         catch (e) {
             this.logger.error(e);

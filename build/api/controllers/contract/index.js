@@ -54,11 +54,12 @@ ContractController.getAllContract = async (req, res, next) => {
 };
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 ContractController.filterAllContract = async (req, res, next) => {
+    var _b;
     const logger = typedi_1.Container.get('logger');
     logger.debug('Calling filter all contract endpoint');
     try {
         const contractServiceInstance = typedi_1.Container.get(services_1.ContractService);
-        const data = await contractServiceInstance.filter(req.params.state);
+        const data = await contractServiceInstance.filter(req.params.state, (_b = req === null || req === void 0 ? void 0 : req.query) === null || _b === void 0 ? void 0 : _b.user);
         return res.status(201).json({ success: true, data, message: 'contract(s) retrived successfully' });
     }
     catch (e) {

@@ -24,11 +24,12 @@ TransactionController.getTransactions = async (req, res, next) => {
 };
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 TransactionController.filterTransactions = async (req, res, next) => {
+    var _b;
     const logger = typedi_1.Container.get('logger');
     logger.debug('Calling filter transactions endpoint');
     try {
         const transactionServiceInstance = typedi_1.Container.get(services_1.TransactionService);
-        const data = await transactionServiceInstance.filterTransactions(req.params.reason, req.params.status);
+        const data = await transactionServiceInstance.filterTransactions(req.params.reason, req.params.status, (_b = req === null || req === void 0 ? void 0 : req.query) === null || _b === void 0 ? void 0 : _b.user);
         return res.status(201).json({ success: true, data, message: 'data retrived' });
     }
     catch (e) {

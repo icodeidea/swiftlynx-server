@@ -56,11 +56,12 @@ TradeController.startTrade = async (req, res, next) => {
 };
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 TradeController.filterTrades = async (req, res, next) => {
+    var _b;
     const logger = typedi_1.Container.get('logger');
     logger.debug('Calling filter trades endpoint');
     try {
         const tradeServiceInstance = typedi_1.Container.get(services_1.TradeService);
-        const data = await tradeServiceInstance.filter(req.params.status);
+        const data = await tradeServiceInstance.filter(req.params.status, (_b = req === null || req === void 0 ? void 0 : req.query) === null || _b === void 0 ? void 0 : _b.user);
         return res.status(201).json({ success: true, data, message: 'data retrived' });
     }
     catch (e) {

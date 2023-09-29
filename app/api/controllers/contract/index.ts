@@ -57,7 +57,7 @@ export class ContractController {
     logger.debug('Calling filter all contract endpoint');
     try {
       const contractServiceInstance = Container.get(ContractService);
-      const data = await contractServiceInstance.filter(req.params.state)
+      const data = await contractServiceInstance.filter(req.params.state, req?.query?.user)
       return res.status(201).json({ success: true, data, message: 'contract(s) retrived successfully' });
     } catch (e) {
       logger.error('🔥 error: %o', e);

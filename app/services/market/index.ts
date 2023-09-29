@@ -30,7 +30,7 @@ export class MarketService {
     try {
       this.logger.silly('getting market record');
 
-      if(!MarketId || MarketId === null) return await this.marketModel.find();
+      if(!MarketId || MarketId === null) return await this.marketModel.find().sort({createdAt: -1});
 
       const marketRecord : IMarket & Document = await this.marketModel
         .findOne({$or: [

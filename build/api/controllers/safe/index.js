@@ -24,11 +24,12 @@ SafeController.listMySafe = async (req, res, next) => {
 };
 // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
 SafeController.filterSavings = async (req, res, next) => {
+    var _b;
     const logger = typedi_1.Container.get('logger');
     logger.debug('Calling filter savings endpoint');
     try {
         const safeServiceInstance = typedi_1.Container.get(services_1.SafeService);
-        const data = await safeServiceInstance.filter(req.params.status);
+        const data = await safeServiceInstance.filter(req.params.status, (_b = req === null || req === void 0 ? void 0 : req.query) === null || _b === void 0 ? void 0 : _b.user);
         return res.status(201).json({ success: true, data, message: 'data retrived' });
     }
     catch (e) {

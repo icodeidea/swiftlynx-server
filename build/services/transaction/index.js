@@ -91,7 +91,7 @@ let TransactionService = class TransactionService {
     }
     async getTransactions(wallet_id) {
         try {
-            const transactionRecord = await this.transactionModel.find({ user: wallet_id });
+            const transactionRecord = await this.transactionModel.find({ user: wallet_id }).sort({ createdAt: -1 });
             this.logger.silly('geting transaction information');
             return transactionRecord;
         }
@@ -100,9 +100,12 @@ let TransactionService = class TransactionService {
             throw new utils_1.SystemError(e.statusCode || 500, e.message);
         }
     }
-    async filterTransactions(reason, status) {
+    async filterTransactions(reason, status, user) {
         try {
-            const transactionRecord = await this.transactionModel.find({ reason, status }).populate('subject', ['firstname', 'lastname', 'email', 'picture']);
+            let params = { reason, status };
+            if (user)
+                params = Object.assign(Object.assign({}, params), { subject: user });
+            const transactionRecord = await this.transactionModel.find(params).populate('subject', ['firstname', 'lastname', 'email', 'picture']).sort({ createdAt: -1 });
             this.logger.silly('filter transactions');
             return transactionRecord;
         }
@@ -113,7 +116,7 @@ let TransactionService = class TransactionService {
     }
     async getEntityTransactions(entity) {
         try {
-            const transactionRecord = await this.transactionModel.find({ 'metadata.entityId': entity });
+            const transactionRecord = await this.transactionModel.find({ 'metadata.entityId': entity }).sort({ createdAt: -1 });
             this.logger.silly('geting transaction information');
             return transactionRecord;
         }
@@ -315,7 +318,7 @@ let TransactionService = class TransactionService {
                     $group: {
                         _id: null,
                         total: {
-                            $sum: "$to.$amount"
+                            $sum: "$to.amount"
                         }
                     }
                 }]);

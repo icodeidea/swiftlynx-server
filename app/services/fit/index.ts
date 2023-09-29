@@ -33,7 +33,7 @@ export class FitService {
       let params: any = {status};
       if(branch) params = { ...params, branch}
 
-      return await this.fitModel.find({...params});
+      return await this.fitModel.find({...params}).sort({createdAt: -1});
     } catch (e) {
       this.logger.error(e);
       throw new SystemError(e.statusCode || 500, e.message);
