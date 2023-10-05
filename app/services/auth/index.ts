@@ -624,7 +624,7 @@ export class AuthService {
       }]);
 
       const totalTradeRoi: any = (totalTradesAmount[0]?.total * totalTradesInterest[0]?.total) / 100
-      const totalAmount = totalTradesAmount[0]?.total + totalAmountInSafe[0]?.total;
+      const totalAmount = totalTradesAmount[0]?.total || 0 + totalAmountInSafe[0]?.total || 0;
 
       return {
         totalAmount: totalAmount || 0,
