@@ -24,6 +24,7 @@ export interface ITradeInputDTO {
   interest: any;
   startDate: any;
   endDate: any;
+  duration: any;
 }
 
 export interface ITradeUpdateDTO {

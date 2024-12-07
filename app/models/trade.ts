@@ -34,6 +34,11 @@ const Trade = new mongoose.Schema(
         type: Number,
         required: true,
     },
+    duration: {
+        type: String,
+        default:'6',
+        required: true,
+    },
     startDate: {
         type: Date,
         default: Date.now(),

@@ -31,9 +31,10 @@ TradeController.startTrade = async (req, res, next) => {
     logger.debug('Calling start trade endpoint');
     try {
         const interest = {
-            '6': 10,
-            '12': 15
+            '6': 12,
+            '12': 24
         };
+        const dateRange = (0, utils_1.getDateRange)(parseInt(req.body.month));
         const tradeInput = {
             userId: req.currentUser.id,
             projectId: req.currentUser.id,
@@ -42,8 +43,9 @@ TradeController.startTrade = async (req, res, next) => {
             status: 'PENDING',
             amount: req.body.amount,
             interest: interest[req.body.month],
-            startDate: new Date(),
-            endDate: (0, utils_1.getDateOfMonthsFromNow)(req.body.month),
+            startDate: dateRange.startDate,
+            endDate: dateRange.endDate,
+            duration: req.body.month
         };
         const tradeServiceInstance = typedi_1.Container.get(services_1.TradeService);
         const data = await tradeServiceInstance.startTrade(tradeInput);

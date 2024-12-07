@@ -11,15 +11,22 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 var __param = (this && this.__param) || function (paramIndex, decorator) {
     return function (target, key) { decorator(target, key, paramIndex); }
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.TradeService = void 0;
 const typedi_1 = require("typedi");
 const mongoose_1 = require("mongoose");
+const mongoose_2 = __importDefault(require("mongoose"));
+const transaction_1 = require("../transaction");
 const utils_1 = require("../../utils");
 let TradeService = class TradeService {
-    constructor(tradeModel, contractModel, logger) {
+    constructor(tradeModel, contractModel, transactionModel, transactor, logger) {
         this.tradeModel = tradeModel;
         this.contractModel = contractModel;
+        this.transactionModel = transactionModel;
+        this.transactor = transactor;
         this.logger = logger;
     }
     async startTrade(contract) {
@@ -35,6 +42,20 @@ let TradeService = class TradeService {
                 interest: contract.interest,
                 startDate: contract.startDate,
                 endDate: contract.endDate,
+                duration: contract.duration,
+            });
+            //instantiate transaction record keeping
+            this.transactor.createTransaction({
+                walletId: contract.userId,
+                amount: contract.amount,
+                type: 'trade',
+                status: 'pending',
+                fee: 0,
+                subject: (startedTrade === null || startedTrade === void 0 ? void 0 : startedTrade.id) || (startedTrade === null || startedTrade === void 0 ? void 0 : startedTrade._id),
+                subjectRef: 'Trade',
+                reason: "supply liquididy",
+                recipient: "swiftlynx",
+                metadata: {}
             });
             return startedTrade;
         }
@@ -43,12 +64,62 @@ let TradeService = class TradeService {
             throw new utils_1.SystemError(e.statusCode || 500, e.message);
         }
     }
+    async getTradeSummary(userId, status = 'ACTIVE') {
+        try {
+            const result = await this.tradeModel.aggregate([
+                {
+                    $match: {
+                        userId: new mongoose_2.default.Types.ObjectId(userId),
+                        status: status,
+                        deleted: false,
+                    },
+                },
+                {
+                    $group: {
+                        _id: null,
+                        totalAmount: { $sum: '$amount' },
+                        totalInterest: { $sum: { $multiply: ['$amount', { $divide: ['$interest', 100] }] } },
+                        tradeCount: { $sum: 1 },
+                    },
+                },
+                {
+                    $project: {
+                        _id: 0,
+                        totalAmount: 1,
+                        totalInterest: 1,
+                        totalAmountWithInterest: { $add: ['$totalAmount', '$totalInterest'] },
+                        tradeCount: 1,
+                    },
+                },
+            ]);
+            if (result.length > 0) {
+                return result[0];
+            }
+            else {
+                return {
+                    totalAmount: 0,
+                    totalInterest: 0,
+                    totalAmountWithInterest: 0,
+                    tradeCount: 0,
+                };
+            }
+        }
+        catch (error) {
+            console.error('Error fetching trade summary:', error);
+            throw error;
+        }
+    }
     async getTrades(entityId) {
         try {
             this.logger.silly('getting my trade records');
             const tradeRecords = await this.tradeModel
                 .find({ 'userId': entityId }).populate('contractId', 'contractName').sort({ createdAt: -1 });
-            return tradeRecords;
+            // get trade summary
+            const tradeSum = await this.getTradeSummary(entityId);
+            return {
+                tradeSum,
+                trades: tradeRecords
+            };
         }
         catch (e) {
             throw new utils_1.SystemError(e.statusCode || 500, e.message);
@@ -80,7 +151,13 @@ let TradeService = class TradeService {
             let params = { status };
             if (user)
                 params = Object.assign(Object.assign({}, params), { userId: user });
-            return await this.tradeModel.find(params).populate('userId', ['firstname', 'lastname', 'email', 'picture']).sort({ createdAt: -1 });
+            const tradeRecords = await this.tradeModel.find(params).populate('userId', ['firstname', 'lastname', 'email', 'picture']).sort({ createdAt: -1 });
+            // get trade summary
+            const tradeSum = await this.getTradeSummary(params === null || params === void 0 ? void 0 : params.userId, params === null || params === void 0 ? void 0 : params.status);
+            return {
+                tradeSum,
+                trades: tradeRecords
+            };
         }
         catch (e) {
             this.logger.error(e);
@@ -176,8 +253,9 @@ TradeService = __decorate([
     (0, typedi_1.Service)(),
     __param(0, (0, typedi_1.Inject)('tradeModel')),
     __param(1, (0, typedi_1.Inject)('contractModel')),
-    __param(2, (0, typedi_1.Inject)('logger')),
-    __metadata("design:paramtypes", [Object, Object, Object])
+    __param(2, (0, typedi_1.Inject)('transactionModel')),
+    __param(4, (0, typedi_1.Inject)('logger')),
+    __metadata("design:paramtypes", [Object, Object, Object, transaction_1.TransactionService, Object])
 ], TradeService);
 exports.TradeService = TradeService;
 //# sourceMappingURL=index.js.map

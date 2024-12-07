@@ -37,12 +37,12 @@ exports.default = (app) => {
     //Google Auth
     authRouter.route('/google-auth').post(middlewares_1.validator.OAuth, controllers_1.AuthController.googleAuth);
     //verifyMail
-    authRouter.route('/verify/:token').get(controllers_1.AuthController.verifyEmail);
+    authRouter.route('/verify/:token/:email/:type').get(controllers_1.AuthController.verifyEmail);
     authRouter.route('/reset').post(middlewares_1.validator.validateEmail, controllers_1.AuthController.requestPasswordReset);
     authRouter.route('/reset/:token').post(middlewares_1.validator.validatePassword, controllers_1.AuthController.updatePassword);
     authRouter.route('/reset-password').post(middlewares_1.validator.resetPassword, middlewares_1.default.isAuth, middlewares_1.default.attachCurrentUser, controllers_1.AuthController.authedUpdatePassword);
     // resend verification mail replacement
-    authRouter.route('/resend-verify-mail').post(middlewares_1.validator.validateEmail, controllers_1.AuthController.resendVerificationMail);
+    authRouter.route('/resend-verify-mail/:type').post(middlewares_1.validator.validateEmail, controllers_1.AuthController.resendVerificationMail);
     // resendVerificationMail : depricated, didnt comment it out to avoid system break down
     authRouter
         .route('/resend-verify')

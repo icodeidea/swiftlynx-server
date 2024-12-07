@@ -1,4 +1,5 @@
 import { Service, Inject } from 'typedi';
+import mongoose from 'mongoose';
 import request from "request";
 import { ITransactionInputDTO, ITransaction } from '../../interfaces';
 import { Document } from 'mongoose';
@@ -34,17 +35,17 @@ export class TransactionService {
         subject: tx.subject,
         subjectRef: tx.subjectRef,
         type: tx.type,
-        txid: tx.txid || Math.floor(100000 + Math.random() * 900000),
+        txid: tx?.txid || Math.floor(100000 + Math.random() * 900000),
         reason: tx.reason,
         status: tx.status,
-        from: tx.from || null,
+        from: tx?.from || null,
         confirmations: true,
         fee: 0,
-        metadata: tx.metadata,
+        metadata: tx?.metadata,
         to:
           {
             amount: tx.amount,
-            recipient: tx.recipient || null
+            recipient: tx?.recipient || null
           },
       });
       const data = userTransaction;
@@ -81,11 +82,94 @@ export class TransactionService {
     }
   }
 
+  public async getTransactionSums(userId: string): Promise<any> {
+    try {
+      // First let's see what kind of documents we're working with
+      const sampleDocs = await this.transactionModel.find({ 
+        user: new mongoose.Types.ObjectId(userId),
+        type: { $in: ["credit", "debit"] }
+      }).limit(2);
+      console.log("Sample docs:", JSON.stringify(sampleDocs, null, 2));
+  
+      const result = await this.transactionModel.aggregate([
+        // Match documents for the specific user
+        {
+          $match: {
+            user: new mongoose.Types.ObjectId(userId),
+            type: { $in: ["credit", "debit"] }
+          }
+        },
+        // Add a stage to ensure amount is treated as a number
+        {
+          $addFields: {
+            numericAmount: {
+              $convert: {
+                input: "$to.amount",
+                to: "double",
+                onError: 0,
+                onNull: 0
+              }
+            }
+          }
+        },
+        // Group by transaction type and calculate sums
+        {
+          $group: {
+            _id: "$type",
+            totalAmount: { $sum: "$numericAmount" },
+            count: { $sum: 1 },
+            // Debug: Let's see the individual amounts
+            amounts: { $push: "$numericAmount" }
+          }
+        },
+        // Reshape the output
+        {
+          $project: {
+            _id: 0,
+            type: "$_id",
+            totalAmount: { $round: ["$totalAmount", 2] },  // Round to 2 decimal places
+            count: 1,
+            amounts: 1  // For debugging
+          }
+        }
+      ]);
+  
+      // Convert array to object with default values
+      const summary = {
+        credit: {
+          totalAmount: 0,
+          count: 0
+        },
+        debit: {
+          totalAmount: 0,
+          count: 0
+        }
+      };
+  
+      // Populate the summary object
+      result.forEach(item => {
+        summary[item.type] = {
+          totalAmount: Number(item.totalAmount) || 0,  // Ensure we have a number
+          count: item.count
+        };
+      });
+  
+      return summary;
+    } catch (e) {
+      this.logger.error(e);
+      throw new SystemError(e.statusCode || 500, e.message);
+    }
+  }
+
   public async getTransactions(wallet_id: string): Promise<any> {
     try {
+      const tnxSum = await this.getTransactionSums(wallet_id);
       const transactionRecord = await this.transactionModel.find({ user: wallet_id }).sort({createdAt: -1});
       this.logger.silly('geting transaction information');
-      return transactionRecord;
+      return {
+        tnxSum,
+        tnx: transactionRecord,
+      };
     } catch (e) {
       this.logger.error(e);
       throw new SystemError(e.statusCode || 500, e.message);

@@ -1,6 +1,8 @@
 import { Service, Inject } from 'typedi';
 import { IContractUpdateStatisticsDTO, ITradeInputDTO, ITradeUpdateDTO, ITrade, IContract } from '../../interfaces';
 import { Document, Types } from 'mongoose';
+import mongoose from 'mongoose';
+import { TransactionService } from '../transaction';
 import { SystemError } from '../../utils';
 
 @Service()
@@ -8,6 +10,8 @@ export class TradeService {
   constructor(
     @Inject('tradeModel') private tradeModel: Models.TradeModel,
     @Inject('contractModel') private contractModel: Models.ContractModel,
+    @Inject('transactionModel') private transactionModel: Models.TransactionModel,
+    private transactor: TransactionService,
     @Inject('logger') private logger: { silly(arg0: string): void; error(arg0: unknown): void },
   ) {}
 
@@ -26,6 +30,21 @@ export class TradeService {
         interest: contract.interest,
         startDate: contract.startDate,
         endDate: contract.endDate,
+        duration: contract.duration,
+      });
+
+      //instantiate transaction record keeping
+      this.transactor.createTransaction({
+        walletId: contract.userId,
+        amount: contract.amount,
+        type: 'trade',
+        status: 'pending',
+        fee: 0,
+        subject: startedTrade?.id || startedTrade?._id,
+        subjectRef: 'Trade',
+        reason: "supply liquididy",
+        recipient: "swiftlynx",
+        metadata: {}
       });
 
       return startedTrade;
@@ -36,12 +55,63 @@ export class TradeService {
     }
   }
 
+  public async getTradeSummary(userId: string, status: string = 'ACTIVE') : Promise<(ITrade & Document) | any>  {
+    try {
+      const result = await this.tradeModel.aggregate([
+        {
+          $match: {
+            userId: new mongoose.Types.ObjectId(userId),
+            status: status,
+            deleted: false,
+          },
+        },
+        {
+          $group: {
+            _id: null,
+            totalAmount: { $sum: '$amount' },
+            totalInterest: { $sum: { $multiply: ['$amount', { $divide: ['$interest', 100] }] } },
+            tradeCount: { $sum: 1 },
+          },
+        },
+        {
+          $project: {
+            _id: 0,
+            totalAmount: 1,
+            totalInterest: 1,
+            totalAmountWithInterest: { $add: ['$totalAmount', '$totalInterest'] },
+            tradeCount: 1,
+          },
+        },
+      ]);
+  
+      if (result.length > 0) {
+        return result[0];
+      } else {
+        return {
+          totalAmount: 0,
+          totalInterest: 0,
+          totalAmountWithInterest: 0,
+          tradeCount: 0,
+        };
+      }
+    } catch (error) {
+      console.error('Error fetching trade summary:', error);
+      throw error;
+    }
+  }
+
   public async getTrades(entityId: string): Promise<(ITrade & Document) | any> {
     try {
       this.logger.silly('getting my trade records');
       const tradeRecords : Array<ITrade> = await this.tradeModel
       .find({'userId': entityId }).populate('contractId', 'contractName').sort({createdAt: -1});
-    return tradeRecords;
+
+      // get trade summary
+      const tradeSum = await this.getTradeSummary(entityId);
+      return {
+        tradeSum,
+        trades: tradeRecords
+      };
     } catch (e) {
       throw new SystemError(e.statusCode || 500, e.message);
     }
@@ -76,7 +146,14 @@ export class TradeService {
       let params: any = {status}
       if (user) params = {...params, userId: user}
 
-      return await this.tradeModel.find(params).populate('userId', ['firstname', 'lastname', 'email', 'picture']).sort({createdAt: -1});
+      const tradeRecords = await this.tradeModel.find(params).populate('userId', ['firstname', 'lastname', 'email', 'picture']).sort({createdAt: -1});
+
+      // get trade summary
+      const tradeSum = await this.getTradeSummary(params?.userId, params?.status);
+      return {
+        tradeSum,
+        trades: tradeRecords
+      };
     } catch (e) {
       this.logger.error(e);
       throw new SystemError(e.statusCode || 500, e.message);

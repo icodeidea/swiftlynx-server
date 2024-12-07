@@ -7,7 +7,7 @@ import { Console } from 'winston/lib/winston/transports';
 import { TransactionService } from '../transaction';
 import { MailerService } from '../mailer';
 import { AuthService } from '../auth';
-import { SystemError } from '../../utils';
+import { SystemError, isTimeDue } from '../../utils';
 import * as EtheriumTransactionHelper from '../../drivers/etherium/bscScan/module/transaction';
 import * as ether from '../../drivers/etherium/ethers/module/transaction';
 import * as web3 from '../../drivers/etherium/web3/module/transaction';
@@ -20,6 +20,8 @@ export class WalletService {
     @Inject('walletModel') private walletModel: Models.WalletModel,
     @Inject('payoutModel') private payoutModel: Models.PayoutModel,
     @Inject('accountDetailModel') private accountDetail: Models.AccountDetailModel,
+    @Inject('tradeModel') private tradeModel: Models.TradeModel,
+    @Inject('safeModel') private safeModel: Models.SafeModel,
     private transactor: TransactionService,
     private userAccount: AuthService,
     private mailer: MailerService,
@@ -274,8 +276,56 @@ export class WalletService {
         });
       }
 
+      let mail_data = {
+        firstname: null,
+        lastname: null,
+        user_email: null,
+        desc: null,
+        startDate: null,
+        endDate: null,
+        isDue: null,
+        status: null,
+        amount: null
+      };
+
+      // get the user info
+      const userInfo = await this.userModel.findById(payoutInfo.user)
+      mail_data.firstname = userInfo?.firstname
+      mail_data.lastname = userInfo?.lastname
+      mail_data.user_email = userInfo?.email
+
+      // safe
+      if(payoutInfo.subjectRef === 'safe'){
+        mail_data.desc = "requesting payout for safe"
+        const safe = await this.safeModel.findById(payoutInfo.subject)
+        mail_data.isDue = safe?.amountRaised >= safe?.goal
+        // mail_data.startDate = safe?.createdAt
+        mail_data.startDate = "none"
+        mail_data.endDate = "none"
+        mail_data.amount = safe?.amountRaised
+        mail_data.status = safe?.status?.toLowerCase()
+      }
+
+      //trade
+      if(payoutInfo.subjectRef === 'Trade'){
+        mail_data.desc = "requesting payout for trade"
+        const trade = await this.tradeModel.findById(payoutInfo.subject)
+        const isDue = isTimeDue(trade?.startDate, trade?.endDate)
+        mail_data.isDue = isDue
+        mail_data.startDate = trade?.startDate
+        mail_data.endDate = trade?.endDate
+        mail_data.amount = trade.amount 
+        mail_data.status = trade?.status?.toLowerCase()
+      }
+
+      this.mailer.PayoutRequestMail(mail_data);
+
       // send payout request mail
-      this.mailer.PayoutRequestMail();
+      if(mail_data.status?.toLowerCase() === "active"){
+        this.mailer.PayoutRequestMail(mail_data);
+      }else{
+        throw new SystemError(200, `you can't request payout for ${mail_data.status} ${payoutInfo.subjectRef}`);
+      }
 
       return payoutDoc;
       
@@ -299,6 +349,18 @@ export class WalletService {
   public async addAccountDetail(detail: IAccountDetailInputDTO ): Promise<IAccountDetail> {
     try {
       this.logger.silly('adding account detail...');
+
+      const accountDetailRecord : IAccountDetail & Document = await this.accountDetail
+      .findOne({
+        user: detail.user,
+        accountName: detail.accountName,
+        accountNumber: detail.accountNumber,
+        bankname: detail.bankname
+      });
+
+      if(accountDetailRecord){
+        return accountDetailRecord;
+      }
 
       const accountDetail: IAccountDetail & Document = await this.accountDetail.create({
         user: detail.user,

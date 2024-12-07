@@ -4,7 +4,7 @@ import { Logger } from 'winston';
 
 import { TradeService } from '../../../services';
 import { ITrade } from '../../../interfaces/ITrade';
-import { getDateOfMonthsFromNow } from "../../../utils"
+import { getDateOfMonthsFromNow, getDateRange } from "../../../utils"
 
 export class TradeController {
 
@@ -31,9 +31,11 @@ export class TradeController {
     try {
 
       const interest = {
-        '6': 10,
-        '12': 15
+        '6': 12,
+        '12': 24
       };
+
+      const dateRange = getDateRange(parseInt(req.body.month))
 
       const tradeInput = {
         userId: req.currentUser.id,
@@ -43,8 +45,9 @@ export class TradeController {
         status: 'PENDING',
         amount: req.body.amount,
         interest: interest[req.body.month],
-        startDate: new Date(),
-        endDate: getDateOfMonthsFromNow(req.body.month),
+        startDate: dateRange.startDate,
+        endDate: dateRange.endDate,
+        duration: req.body.month
       };
       const tradeServiceInstance = Container.get(TradeService);
       const data = await tradeServiceInstance.startTrade(tradeInput);

@@ -14,7 +14,7 @@ exports.default = {
     "version": "1.0.0",
     appName: 'Swiftlynx',
     environment: process.env.NODE_ENV,
-    supportMail: 'admin@mad9aija.com',
+    supportMail: 'contact@swiftlynxtechnologies.com',
     /**
      * Server Listening Port
      */
@@ -85,6 +85,15 @@ exports.default = {
             "Authorization",
         ],
         allowedMethods: "GET,HEAD,PUT,POST,DELETE"
+    },
+    recipients: [
+        'kingsleyonyeneke@gmail.com',
+        'swiftlynxtech@gmail.com'
+    ],
+    socialLinks: {
+        facebook: "https://facebook.com/",
+        twitter: "https://twitter.com/",
+        linkedin: "https://linkedin.com/",
     }
 };
 //# sourceMappingURL=index.js.map

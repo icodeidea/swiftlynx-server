@@ -62,10 +62,11 @@ export class AuthService {
         oneTimeSetup: true,
         verified: {
           token: {
-            value: Math.floor(1000 + Math.random() * 9000) // saltHex.substr(2, 16),
+            value: Math.floor(100000 + Math.random() * 900000), // Generates a six-digit number
           },
         },
       });
+      
       const walletRecord = await this.walletModel.create({
         user: userRecord.id,
       });
@@ -160,6 +161,7 @@ export class AuthService {
       throw new SystemError(200, 'Please Continue With Google and update password from setting');
     }
     if (userRecord.verified.isVerified === false) {
+      this.ResendVerificationMail(userRecord.email);
       throw new SystemError(200, 'Account not verified, check your email to verify your account');
     }
 
@@ -182,22 +184,49 @@ export class AuthService {
     }
   }
 
-  public async VerifyMail({ token }: { token: string }): Promise<string> {
-    const userRecord = await this.userModel.findOne({ 'verified.token.value': token });
-    if (!userRecord) {
-      throw new SystemError(200, 'User not registered or the token has expired please, request a new one!');
+  public async VerifyMail({email, token, type }: { email: string, token: string, type: string }): Promise<{ user: IUser; accessToken: string; refreshToken: string; wallet?: {} } | string>  {
+    let userRecord: any = {}
+    if (type === "reset"){
+      console.log("email", email)
+      console.log("token", token)
+      console.log("type", type)
+      userRecord = await this.userModel.findOne({email, 'reset.token': token });
+      if (!userRecord) {
+        throw new SystemError(200, 'User not registered or the token has expired please, request a new one!');
+      }
+      userRecord.reset.token = null;
+    } else {
+      userRecord = await this.userModel.findOne({email, 'verified.token.value': token });
+      if (!userRecord) {
+        throw new SystemError(200, 'User not registered or the token has expired please, request a new one!');
+      }
+
+      if (!userRecord?.verified.isVerified) {
+        userRecord.verified.isVerified = true;
+        userRecord.verified.token.value = null;
+        // if(userRecord.referer){
+        //   await this.creditReferer(userRecord.referer);
+        // } 
+
+        // return 'Your email has now been verified. Thank you for using our service';
+      } else if (userRecord?.verified.isVerified) {
+        throw new SystemError(200, 'Your email has already been verified');
+      }
     }
-    if (!userRecord?.verified.isVerified) {
-      userRecord.verified.isVerified = true;
-      userRecord.verified.token.value = null;
-      // if(userRecord.referer){
-      //   await this.creditReferer(userRecord.referer);
-      // }
-      await userRecord.save();
-      return 'Your email has now been verified. Thank you for using our service';
-    } else if (userRecord?.verified.isVerified) {
-      return 'Your email has already been verified';
-    }
+
+    await userRecord.save();
+
+    this.logger.silly('Password is valid!');
+    this.logger.silly('Generating Access and Refresh Tokens...');
+    const { accessToken, refreshToken } = this.generateTokens(userRecord);
+    // await this.creditDailySignInReward( { lastLogin: userRecord.lastLogin, userId: userRecord.id } );
+    userRecord.lastLogin = new Date();
+    await userRecord.save();
+    const user = userRecord;
+    console.log(user);
+    const wallet = await this.walletModel.findById(user.wallet);
+    return { user, accessToken, refreshToken, wallet };
+
   }
 
   public async ResendVerification({ userId }: { userId: string }): Promise<(IUser & Document) | string> {
@@ -214,25 +243,34 @@ export class AuthService {
     }
   }
 
-  public async ResendVerificationMail(email: string): Promise<(IUser & Document) | string> {
+  public async ResendVerificationMail(email: string, type: string = "reset"): Promise<(IUser & Document) | string> {
     const userRecord = await this.userModel.findOne({ email });
     if (!userRecord) {
       throw new Error('Email not yet registered on this platform, make sure you entered the correct mail');
     }
-    if (!userRecord?.verified.isVerified) {
-      const salt = randomBytes(32);
-      const saltHex = salt.toString('hex');
-
-      userRecord.verified.token.value = `${Math.floor(1000 + Math.random() * 9000)}` // saltHex.substr(2, 16);
-
-      const userWithNewVerifyToken = await userRecord.save();
-
-      await this.mailer.ResendVerificationMail(userWithNewVerifyToken);
-      this.eventDispatcher.dispatch(events.user.resendVerification, { user: userWithNewVerifyToken });
+    if(type === "reset"){
+      const resetToken = `${Math.floor(100000 + Math.random() * 900000)}`;
+      userRecord.reset.token = resetToken;
+      await userRecord.save();
+      await this.mailer.SendPasswordResetMail(userRecord);
+      // this.eventDispatcher.dispatch(events.user.resendVerification, { user: userRecord });
       return 'check your mail, another verification link has been sent';
-      //return userWithNewVerifyToken.verified.token.value;
-    } else if (userRecord?.verified.isVerified) {
-      throw new SystemError(200, 'Your email has already been verified');
+    } else {
+      if (!userRecord?.verified.isVerified) {
+        const salt = randomBytes(32);
+        const saltHex = salt.toString('hex');
+
+        userRecord.verified.token.value = `${Math.floor(100000 + Math.random() * 900000)}` // Generates a six-digit number
+
+        const userWithNewVerifyToken = await userRecord.save();
+
+        await this.mailer.ResendVerificationMail(userWithNewVerifyToken);
+        this.eventDispatcher.dispatch(events.user.resendVerification, { user: userWithNewVerifyToken });
+        return 'check your mail, another verification link has been sent';
+        //return userWithNewVerifyToken.verified.token.value;
+      } else if (userRecord?.verified.isVerified) {
+        throw new SystemError(200, 'Your email has already been verified');
+      }
     }
   }
 
@@ -310,8 +348,13 @@ export class AuthService {
 
   }
 
-  public async VerifyResetPasswordMail({ token }: { token: string }): Promise<string> {
-    const userRecord = await this.userModel.findOne({ 'reset.token': token });
+  public async VerifyResetPasswordMail({email, token }: {email: string, token: string }): Promise<string> {
+    const userRecord = await this.userModel.findOne({email, 'reset.token': token });
+    userRecord.reset.token = null;
+      // if(userRecord.referer){
+      //   await this.creditReferer(userRecord.referer);
+      // } 
+      await userRecord.save();
     if (!userRecord) {
       throw new SystemError(200, 'User not registered or the token has expired please, request a new one!');
     }
@@ -324,7 +367,7 @@ export class AuthService {
       this.logger.silly('user not found');
       return 'We have sent a password reset to the mail if it exists within our platform';
     }
-    const resetToken = await nanoid(15);
+    const resetToken = `${Math.floor(100000 + Math.random() * 900000)}`;
     userRecord.reset.token = resetToken;
     await userRecord.save();
     await this.mailer.SendPasswordResetMail(userRecord);

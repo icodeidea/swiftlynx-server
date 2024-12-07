@@ -18,7 +18,7 @@ export default (app: Router): Router => {
   authRouter.route('/google-auth').post(validator.OAuth, AuthController.googleAuth);
 
   //verifyMail
-  authRouter.route('/verify/:token').get(AuthController.verifyEmail);
+  authRouter.route('/verify/:token/:email/:type').get(AuthController.verifyEmail);
 
   authRouter.route('/reset').post(validator.validateEmail, AuthController.requestPasswordReset);
 
@@ -27,7 +27,7 @@ export default (app: Router): Router => {
   authRouter.route('/reset-password').post(validator.resetPassword, middlewares.isAuth, middlewares.attachCurrentUser, AuthController.authedUpdatePassword);
 
   // resend verification mail replacement
-  authRouter.route('/resend-verify-mail').post(validator.validateEmail, AuthController.resendVerificationMail);
+  authRouter.route('/resend-verify-mail/:type').post(validator.validateEmail, AuthController.resendVerificationMail);
 
   // resendVerificationMail : depricated, didnt comment it out to avoid system break down
   authRouter

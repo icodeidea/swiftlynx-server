@@ -88,8 +88,12 @@ export class AuthController {
       console.log(req);
       const authServiceInstance = Container.get(AuthService);
 
-      const result = await authServiceInstance.VerifyMail({ token: req.params.token });
-      return res.status(200).json({ success: true, data: {}, message: result });
+      const result = await authServiceInstance.VerifyMail({ 
+        token: req.params.token, 
+        email: req.params.email,
+        type: req.params.type
+      });
+      return res.status(200).json({ success: true, data: result, message: "Your email has now been verified. Thank you for using our service" });
     } catch (e) {
       logger.error('🔥 error %o', e);
       return next(e);
@@ -113,10 +117,11 @@ export class AuthController {
   static resendVerificationMail = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
     const logger: Logger = Container.get('logger');
     logger.debug('verifying: %s', req.body.email);
+    logger.debug('resending: %s', req.params.type);
     try {
       const authServiceInstance = Container.get(AuthService);
 
-      const result = await authServiceInstance.ResendVerificationMail(req.body.email);
+      const result = await authServiceInstance.ResendVerificationMail(req.body.email, req.params.type);
       return res.status(201).json({ success: true, data: {}, message: result });
     } catch (e) {
       logger.error('🔥 error %o', e);

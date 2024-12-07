@@ -11,9 +11,13 @@ var __metadata = (this && this.__metadata) || function (k, v) {
 var __param = (this && this.__param) || function (paramIndex, decorator) {
     return function (target, key) { decorator(target, key, paramIndex); }
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.TransactionService = void 0;
 const typedi_1 = require("typedi");
+const mongoose_1 = __importDefault(require("mongoose"));
 const utils_1 = require("../../utils");
 const utils_2 = require("../../utils/");
 const safe_1 = require("../safe");
@@ -43,16 +47,16 @@ let TransactionService = class TransactionService {
                 subject: tx.subject,
                 subjectRef: tx.subjectRef,
                 type: tx.type,
-                txid: tx.txid || Math.floor(100000 + Math.random() * 900000),
+                txid: (tx === null || tx === void 0 ? void 0 : tx.txid) || Math.floor(100000 + Math.random() * 900000),
                 reason: tx.reason,
                 status: tx.status,
-                from: tx.from || null,
+                from: (tx === null || tx === void 0 ? void 0 : tx.from) || null,
                 confirmations: true,
                 fee: 0,
-                metadata: tx.metadata,
+                metadata: tx === null || tx === void 0 ? void 0 : tx.metadata,
                 to: {
                     amount: tx.amount,
-                    recipient: tx.recipient || null
+                    recipient: (tx === null || tx === void 0 ? void 0 : tx.recipient) || null
                 },
             });
             const data = userTransaction;
@@ -89,11 +93,90 @@ let TransactionService = class TransactionService {
             throw new utils_1.SystemError(e.statusCode || 500, e.message);
         }
     }
+    async getTransactionSums(userId) {
+        try {
+            // First let's see what kind of documents we're working with
+            const sampleDocs = await this.transactionModel.find({
+                user: new mongoose_1.default.Types.ObjectId(userId),
+                type: { $in: ["credit", "debit"] }
+            }).limit(2);
+            console.log("Sample docs:", JSON.stringify(sampleDocs, null, 2));
+            const result = await this.transactionModel.aggregate([
+                // Match documents for the specific user
+                {
+                    $match: {
+                        user: new mongoose_1.default.Types.ObjectId(userId),
+                        type: { $in: ["credit", "debit"] }
+                    }
+                },
+                // Add a stage to ensure amount is treated as a number
+                {
+                    $addFields: {
+                        numericAmount: {
+                            $convert: {
+                                input: "$to.amount",
+                                to: "double",
+                                onError: 0,
+                                onNull: 0
+                            }
+                        }
+                    }
+                },
+                // Group by transaction type and calculate sums
+                {
+                    $group: {
+                        _id: "$type",
+                        totalAmount: { $sum: "$numericAmount" },
+                        count: { $sum: 1 },
+                        // Debug: Let's see the individual amounts
+                        amounts: { $push: "$numericAmount" }
+                    }
+                },
+                // Reshape the output
+                {
+                    $project: {
+                        _id: 0,
+                        type: "$_id",
+                        totalAmount: { $round: ["$totalAmount", 2] },
+                        count: 1,
+                        amounts: 1 // For debugging
+                    }
+                }
+            ]);
+            // Convert array to object with default values
+            const summary = {
+                credit: {
+                    totalAmount: 0,
+                    count: 0
+                },
+                debit: {
+                    totalAmount: 0,
+                    count: 0
+                }
+            };
+            // Populate the summary object
+            result.forEach(item => {
+                summary[item.type] = {
+                    totalAmount: Number(item.totalAmount) || 0,
+                    count: item.count
+                };
+            });
+            return summary;
+        }
+        catch (e) {
+            this.logger.error(e);
+            throw new utils_1.SystemError(e.statusCode || 500, e.message);
+        }
+    }
     async getTransactions(wallet_id) {
         try {
+            const tnxSum = await this.getTransactionSums(wallet_id);
             const transactionRecord = await this.transactionModel.find({ user: wallet_id }).sort({ createdAt: -1 });
             this.logger.silly('geting transaction information');
-            return transactionRecord;
+            return {
+                tnxSum,
+                tnx: transactionRecord,
+            };
         }
         catch (e) {
             this.logger.error(e);

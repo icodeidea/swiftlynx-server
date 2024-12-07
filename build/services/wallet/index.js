@@ -45,11 +45,13 @@ const utils_1 = require("../../utils");
 const EtheriumTransactionHelper = __importStar(require("../../drivers/etherium/bscScan/module/transaction"));
 const ether = __importStar(require("../../drivers/etherium/ethers/module/transaction"));
 let WalletService = class WalletService {
-    constructor(userModel, walletModel, payoutModel, accountDetail, transactor, userAccount, mailer, logger, eventDispatcher) {
+    constructor(userModel, walletModel, payoutModel, accountDetail, tradeModel, safeModel, transactor, userAccount, mailer, logger, eventDispatcher) {
         this.userModel = userModel;
         this.walletModel = walletModel;
         this.payoutModel = payoutModel;
         this.accountDetail = accountDetail;
+        this.tradeModel = tradeModel;
+        this.safeModel = safeModel;
         this.transactor = transactor;
         this.userAccount = userAccount;
         this.mailer = mailer;
@@ -256,6 +258,7 @@ let WalletService = class WalletService {
         }
     }
     async payoutRequest(payoutInfo) {
+        var _a, _b, _c;
         try {
             this.logger.silly('requesting account payout...');
             let payoutDoc = await this.payoutModel
@@ -273,8 +276,52 @@ let WalletService = class WalletService {
                     subjectRef: payoutInfo.subjectRef
                 });
             }
+            let mail_data = {
+                firstname: null,
+                lastname: null,
+                user_email: null,
+                desc: null,
+                startDate: null,
+                endDate: null,
+                isDue: null,
+                status: null,
+                amount: null
+            };
+            // get the user info
+            const userInfo = await this.userModel.findById(payoutInfo.user);
+            mail_data.firstname = userInfo === null || userInfo === void 0 ? void 0 : userInfo.firstname;
+            mail_data.lastname = userInfo === null || userInfo === void 0 ? void 0 : userInfo.lastname;
+            mail_data.user_email = userInfo === null || userInfo === void 0 ? void 0 : userInfo.email;
+            // safe
+            if (payoutInfo.subjectRef === 'safe') {
+                mail_data.desc = "requesting payout for safe";
+                const safe = await this.safeModel.findById(payoutInfo.subject);
+                mail_data.isDue = (safe === null || safe === void 0 ? void 0 : safe.amountRaised) >= (safe === null || safe === void 0 ? void 0 : safe.goal);
+                // mail_data.startDate = safe?.createdAt
+                mail_data.startDate = "none";
+                mail_data.endDate = "none";
+                mail_data.amount = safe === null || safe === void 0 ? void 0 : safe.amountRaised;
+                mail_data.status = (_a = safe === null || safe === void 0 ? void 0 : safe.status) === null || _a === void 0 ? void 0 : _a.toLowerCase();
+            }
+            //trade
+            if (payoutInfo.subjectRef === 'Trade') {
+                mail_data.desc = "requesting payout for trade";
+                const trade = await this.tradeModel.findById(payoutInfo.subject);
+                const isDue = (0, utils_1.isTimeDue)(trade === null || trade === void 0 ? void 0 : trade.startDate, trade === null || trade === void 0 ? void 0 : trade.endDate);
+                mail_data.isDue = isDue;
+                mail_data.startDate = trade === null || trade === void 0 ? void 0 : trade.startDate;
+                mail_data.endDate = trade === null || trade === void 0 ? void 0 : trade.endDate;
+                mail_data.amount = trade.amount;
+                mail_data.status = (_b = trade === null || trade === void 0 ? void 0 : trade.status) === null || _b === void 0 ? void 0 : _b.toLowerCase();
+            }
+            this.mailer.PayoutRequestMail(mail_data);
             // send payout request mail
-            this.mailer.PayoutRequestMail();
+            if (((_c = mail_data.status) === null || _c === void 0 ? void 0 : _c.toLowerCase()) === "active") {
+                this.mailer.PayoutRequestMail(mail_data);
+            }
+            else {
+                throw new utils_1.SystemError(200, `you can't request payout for ${mail_data.status} ${payoutInfo.subjectRef}`);
+            }
             return payoutDoc;
         }
         catch (e) {
@@ -296,6 +343,16 @@ let WalletService = class WalletService {
     async addAccountDetail(detail) {
         try {
             this.logger.silly('adding account detail...');
+            const accountDetailRecord = await this.accountDetail
+                .findOne({
+                user: detail.user,
+                accountName: detail.accountName,
+                accountNumber: detail.accountNumber,
+                bankname: detail.bankname
+            });
+            if (accountDetailRecord) {
+                return accountDetailRecord;
+            }
             const accountDetail = await this.accountDetail.create({
                 user: detail.user,
                 accountName: detail.accountName,
@@ -338,9 +395,11 @@ WalletService = __decorate([
     __param(1, (0, typedi_1.Inject)('walletModel')),
     __param(2, (0, typedi_1.Inject)('payoutModel')),
     __param(3, (0, typedi_1.Inject)('accountDetailModel')),
-    __param(7, (0, typedi_1.Inject)('logger')),
-    __param(8, (0, eventDispatcher_1.EventDispatcher)()),
-    __metadata("design:paramtypes", [Object, Object, Object, Object, transaction_1.TransactionService,
+    __param(4, (0, typedi_1.Inject)('tradeModel')),
+    __param(5, (0, typedi_1.Inject)('safeModel')),
+    __param(9, (0, typedi_1.Inject)('logger')),
+    __param(10, (0, eventDispatcher_1.EventDispatcher)()),
+    __metadata("design:paramtypes", [Object, Object, Object, Object, Object, Object, transaction_1.TransactionService,
         auth_1.AuthService,
         mailer_1.MailerService, Object, eventDispatcher_1.EventDispatcherInterface])
 ], WalletService);

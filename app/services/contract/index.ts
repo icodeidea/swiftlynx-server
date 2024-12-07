@@ -153,7 +153,8 @@ export class ContractService {
         status: 'ACTIVE',
         interest: contractRecord.interest,
         startDate: `${Date.now()}`,
-        endDate: contractRecord.maturityTime
+        endDate: contractRecord.maturityTime,
+        duration: '6',
       })
 
       this.project.updateProjectStatistics({
