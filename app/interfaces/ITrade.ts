@@ -9,6 +9,7 @@ export interface ITrade {
   interest: any;
   startDate: any;
   endDate: any;
+  duration: string;
   slug: string;
   delete: Boolean;
 }
@@ -38,4 +39,5 @@ export interface ITradeUpdateDTO {
   interest?: any;
   startDate?: string;
   endDate?: string;
+  duration?: string;
 }

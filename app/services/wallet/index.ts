@@ -350,6 +350,7 @@ export class WalletService {
     try {
       this.logger.silly('adding account detail...');
 
+
       const accountDetailRecord : IAccountDetail & Document = await this.accountDetail
       .findOne({
         user: detail.user,
@@ -360,6 +361,21 @@ export class WalletService {
 
       if(accountDetailRecord){
         return accountDetailRecord;
+      }
+
+      // temporary update
+      const accountDetailRecordToUpdate : IAccountDetail & Document = await this.accountDetail
+      .findOne({
+        user: detail.user,
+      });
+
+      if(accountDetailRecordToUpdate){
+        accountDetailRecordToUpdate.accountName = detail.accountName;
+        accountDetailRecordToUpdate.accountNumber = detail.accountNumber;
+        accountDetailRecordToUpdate.bankname = detail.bankname
+
+        return await accountDetailRecordToUpdate.save();
+
       }
 
       const accountDetail: IAccountDetail & Document = await this.accountDetail.create({

@@ -6,7 +6,7 @@ class Validator {
         try {
             const validation = validations_1.AuthSchema.signupSchema.validate(Object.assign({}, req.body));
             if (validation.error) {
-                return next(validation.error);
+                return next(validation.error.message);
             }
             return next();
         }

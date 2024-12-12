@@ -105,6 +105,46 @@ export class ProjectService {
     }
   }
 
+  public async getFeaturedProjects(): Promise<any> {
+    try {
+      this.logger.silly('getting my featured projects');
+      
+      return [
+        {
+          image: 'https://res.cloudinary.com/diituo7sj/image/upload/v1733965394/swiftlynx-Banner4_qvf9wc.png',
+          title: 'wealth',
+          description: '',
+          link: '',
+          location: 'in-app'
+        },
+        {
+          image: 'https://res.cloudinary.com/diituo7sj/image/upload/v1733965394/swiftlynx-Banner2_v3tvgm.png',
+          title: 'christmas',
+          description: '',
+          link: '',
+          location: 'in-app'
+        },
+        {
+          image: 'https://res.cloudinary.com/diituo7sj/image/upload/v1733965394/swiftlynx-Banner1_ycu6av.png',
+          title: 'salah',
+          description: '',
+          link: '',
+          location: 'web-view'
+        },
+        {
+          image: 'https://res.cloudinary.com/diituo7sj/image/upload/v1733965394/swiftlynx-Banner3_w2yahj.png',
+          title: 'new year',
+          description: '',
+          link: '',
+          location: 'in-app'
+        },
+
+      ]
+    } catch (e) {
+      throw new SystemError(e.statusCode || 500, e.message);
+    }
+  }
+
   public async deleteProject({
     userId,
     projectId

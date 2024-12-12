@@ -353,6 +353,17 @@ let WalletService = class WalletService {
             if (accountDetailRecord) {
                 return accountDetailRecord;
             }
+            // temporary update
+            const accountDetailRecordToUpdate = await this.accountDetail
+                .findOne({
+                user: detail.user,
+            });
+            if (accountDetailRecordToUpdate) {
+                accountDetailRecordToUpdate.accountName = detail.accountName;
+                accountDetailRecordToUpdate.accountNumber = detail.accountNumber;
+                accountDetailRecordToUpdate.bankname = detail.bankname;
+                return await accountDetailRecordToUpdate.save();
+            }
             const accountDetail = await this.accountDetail.create({
                 user: detail.user,
                 accountName: detail.accountName,

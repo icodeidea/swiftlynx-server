@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.isTimeDue = exports.getDateRange = exports.getDateOfMonthsFromNow = exports.isToday = exports.prefixQueryParams = void 0;
+exports.isTimestampExpired = exports.isTimeDue = exports.getDateRange = exports.getDateOfMonthsFromNow = exports.isToday = exports.prefixQueryParams = void 0;
 const prefixQueryParams = async (baseUrl, paramObj) => {
     for (const param in paramObj) {
         baseUrl += `&${param}=${paramObj[param]}`;
@@ -53,6 +53,26 @@ function isTimeDue(startDate, endDate) {
     return now > end;
 }
 exports.isTimeDue = isTimeDue;
+function isTimestampExpired(expirationTimeStr) {
+    try {
+        // First try to parse as a number (milliseconds)
+        let expirationTime = Number(expirationTimeStr);
+        // If not a valid number, try parsing as a date string
+        if (isNaN(expirationTime)) {
+            expirationTime = Date.parse(expirationTimeStr);
+        }
+        // Check if the parsed time is valid
+        if (isNaN(expirationTime)) {
+            throw new Error('Invalid timestamp format');
+        }
+        return Date.now() > expirationTime;
+    }
+    catch (error) {
+        console.error('Error parsing timestamp:', error);
+        return false; // or handle the error as needed
+    }
+}
+exports.isTimestampExpired = isTimestampExpired;
 // export const getDateOfMonthsFromNow = (months: any) => {
 //     const currentDate = new Date();
 //     currentDate.setMonth(currentDate.getMonth() + months);

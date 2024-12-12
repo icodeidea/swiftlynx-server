@@ -80,7 +80,7 @@ UserController.UpdatePassword = async (req, res, next) => {
     try {
         const authServiceInstance = typedi_1.Container.get(services_1.AuthService);
         const result = await authServiceInstance.AuthedUpdatePassword(req.currentUser.id, req.body.password, req.body.newPassword);
-        return res.status(200).json({ success: true, data: result, message: 'user password updated' });
+        return res.status(200).json({ success: true, data: {}, message: result });
     }
     catch (e) {
         logger.error('🔥 error: %o', e);

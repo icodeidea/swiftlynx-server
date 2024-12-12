@@ -4,6 +4,7 @@ import { Document, Types } from 'mongoose';
 import mongoose from 'mongoose';
 import { TransactionService } from '../transaction';
 import { SystemError } from '../../utils';
+import { getDateOfMonthsFromNow, getDateRange } from "../../utils"
 
 @Service()
 export class TradeService {
@@ -11,7 +12,7 @@ export class TradeService {
     @Inject('tradeModel') private tradeModel: Models.TradeModel,
     @Inject('contractModel') private contractModel: Models.ContractModel,
     @Inject('transactionModel') private transactionModel: Models.TransactionModel,
-    private transactor: TransactionService,
+    // private transactor: TransactionService,
     @Inject('logger') private logger: { silly(arg0: string): void; error(arg0: unknown): void },
   ) {}
 
@@ -33,19 +34,33 @@ export class TradeService {
         duration: contract.duration,
       });
 
-      //instantiate transaction record keeping
-      this.transactor.createTransaction({
-        walletId: contract.userId,
-        amount: contract.amount,
-        type: 'trade',
-        status: 'pending',
-        fee: 0,
-        subject: startedTrade?.id || startedTrade?._id,
-        subjectRef: 'Trade',
-        reason: "supply liquididy",
-        recipient: "swiftlynx",
-        metadata: {}
-      });
+      console.log("startedTrade", startedTrade)
+      if(startedTrade){
+
+        //instantiate transaction record keeping
+        this.logger.silly('creating transaction.');
+        this.transactionModel.create({
+          user: contract.userId,
+          subject: startedTrade?._id || startedTrade?.id,
+          subjectRef: 'Trade',
+          type: 'credit',
+          txid: Math.floor(100000 + Math.random() * 900000),
+          reason: "Supply Liquidity",
+          status: 'pending',
+          from: null,
+          confirmations: true,
+          fee: 0,
+          metadata: {
+            entity: "trade",
+            entityId: startedTrade?.id || startedTrade?._id,
+          },
+          to:
+            {
+              amount: contract.amount,
+              recipient: "swiftlynx" || null
+            },
+        });
+      }
 
       return startedTrade;
 
@@ -245,6 +260,11 @@ export class TradeService {
       }
       
       tradeRecord.status = state;
+      if(state === "ACTIVE"){
+        const dateRange = getDateRange(parseInt(tradeRecord.duration));
+        tradeRecord.startDate = dateRange.startDate;
+        tradeRecord.endDate = dateRange.endDate
+      }
       
       return await tradeRecord.save();
     } catch (e) {

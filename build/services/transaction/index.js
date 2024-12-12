@@ -40,7 +40,8 @@ let TransactionService = class TransactionService {
     }
     async createTransaction(tx) {
         try {
-            const walletRecord = await this.walletModel.findOne({ user: tx.walletId });
+            console.log("start trade tx:", tx);
+            // const walletRecord = await this.walletModel.findOne({ user: tx.walletId });
             this.logger.silly('creating transaction.');
             const userTransaction = await this.transactionModel.create({
                 user: tx.walletId,
@@ -241,7 +242,7 @@ let TransactionService = class TransactionService {
             throw new utils_1.SystemError(e.statusCode || 500, e.message);
         }
     }
-    async verifyPayment(ref) {
+    async verifyPayment_webhookhandler(ref) {
         try {
             const { verifyPayment } = (0, utils_2.paystack)();
             const { status, message, data } = await verifyPayment(ref);
@@ -259,6 +260,33 @@ let TransactionService = class TransactionService {
                 }
             }
             const { reference, metadata, amount } = data;
+            const transactionDoc = await this.transactionModel.findOne({ txid: reference, status: 'pending', });
+            console.log('transactionDoc', transactionDoc);
+            if (!transactionDoc) {
+                throw new Error('no pending transaction found');
+            }
+            if (transactionDoc.metadata.entity === 'safe') {
+                verifiedEntity = await this.safe.addfund(transactionDoc.metadata.entityId, transactionDoc.to.amount);
+            }
+            if (transactionDoc.metadata.entity === 'trade') {
+                verifiedEntity = await this.trade.activateTrade(transactionDoc.metadata.entityId, transactionDoc.to.amount);
+            }
+            // else{
+            //   verifiedEntity = await this.contract.signContract(transactionDoc.metadata.entityId, transactionDoc.user, amount);
+            // }
+            transactionDoc.status = 'completed';
+            // transactionDoc.to.amount = amount;
+            transactionDoc.save();
+            return verifiedEntity;
+        }
+        catch (e) {
+            this.logger.error(e);
+            throw new utils_1.SystemError(e.statusCode || 500, e.message);
+        }
+    }
+    async verifyPayment(reference) {
+        try {
+            let verifiedEntity = null;
             const transactionDoc = await this.transactionModel.findOne({ txid: reference, status: 'pending', });
             console.log('transactionDoc', transactionDoc);
             if (!transactionDoc) {

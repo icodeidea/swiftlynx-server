@@ -9,7 +9,7 @@ import { randomBytes } from 'crypto';
 import { IUser, IUserInputDTO, IUserUpdateDTO } from '../../interfaces';
 import { EventDispatcher, EventDispatcherInterface } from '../../decorators/eventDispatcher';
 import events from '../../subscribers/events';
-import { SystemError, isToday } from '../../utils';
+import { SystemError, isToday, isTimestampExpired } from '../../utils';
 import { Document } from 'mongoose';
 import { OAuth2Client } from 'google-auth-library';
 import slugify from 'slugify';
@@ -35,7 +35,8 @@ export class AuthService {
 
       const exists = await this.isUsed({ email: userInputDTO.email });
       if (exists) {
-        throw new SystemError(401, 'email or username already in use');
+        console.log("userInputDTO", userInputDTO)
+        throw new SystemError(200, 'email already in use');
       }
       if(userInputDTO?.referer){
         const refUser = await this.userModel.findOne({refId: userInputDTO.referer});
@@ -64,6 +65,7 @@ export class AuthService {
           token: {
             value: Math.floor(100000 + Math.random() * 900000), // Generates a six-digit number
           },
+          expires: Date.now() + 30 * 60 * 1000 // 30 minutes in milliseconds
         },
       });
       
@@ -73,7 +75,7 @@ export class AuthService {
       userRecord.wallet = walletRecord.id;
       await userRecord.save();
       if (!userRecord) {
-        throw new SystemError(500, 'User cannot be created');
+        throw new SystemError(200, 'User cannot be created retry in a moment');
       }
       this.logger.silly('Generating JWT...');
       this.logger.silly('Welcome Email will be sent at this point...');
@@ -184,21 +186,25 @@ export class AuthService {
     }
   }
 
-  public async VerifyMail({email, token, type }: { email: string, token: string, type: string }): Promise<{ user: IUser; accessToken: string; refreshToken: string; wallet?: {} } | string>  {
+  public async VerifyMail({email, token, type }: { email: string, token: string, type: string }): Promise<{ user: IUser; accessToken: string; refreshToken: string; wallet?: {} }>  {
     let userRecord: any = {}
     if (type === "reset"){
-      console.log("email", email)
-      console.log("token", token)
-      console.log("type", type)
       userRecord = await this.userModel.findOne({email, 'reset.token': token });
       if (!userRecord) {
-        throw new SystemError(200, 'User not registered or the token has expired please, request a new one!');
+        throw new SystemError(200, 'token is incorrect!');
       }
-      userRecord.reset.token = null;
+      if(!isTimestampExpired(userRecord.reset.token)){
+        throw new SystemError(200, 'token has expired');
+      }
+      // userRecord.reset.token = null;
     } else {
       userRecord = await this.userModel.findOne({email, 'verified.token.value': token });
       if (!userRecord) {
-        throw new SystemError(200, 'User not registered or the token has expired please, request a new one!');
+        throw new SystemError(200, 'token is incorrect!');
+      }
+
+      if(!isTimestampExpired(userRecord.verified.token.value)){
+        throw new SystemError(200, 'token has expired!');
       }
 
       if (!userRecord?.verified.isVerified) {
@@ -210,9 +216,11 @@ export class AuthService {
 
         // return 'Your email has now been verified. Thank you for using our service';
       } else if (userRecord?.verified.isVerified) {
-        throw new SystemError(200, 'Your email has already been verified');
+        throw new SystemError(200, 'Your email has already been verified!');
       }
     }
+
+    userRecord.lastLogin = new Date();
 
     await userRecord.save();
 
@@ -251,6 +259,7 @@ export class AuthService {
     if(type === "reset"){
       const resetToken = `${Math.floor(100000 + Math.random() * 900000)}`;
       userRecord.reset.token = resetToken;
+      userRecord.reset.expires = Date.now() + 30 * 60 * 1000 // 30 minutes in milliseconds
       await userRecord.save();
       await this.mailer.SendPasswordResetMail(userRecord);
       // this.eventDispatcher.dispatch(events.user.resendVerification, { user: userRecord });
@@ -261,6 +270,7 @@ export class AuthService {
         const saltHex = salt.toString('hex');
 
         userRecord.verified.token.value = `${Math.floor(100000 + Math.random() * 900000)}` // Generates a six-digit number
+        userRecord.verified["expires"] = Date.now() + 30 * 60 * 1000 // 30 minutes in milliseconds
 
         const userWithNewVerifyToken = await userRecord.save();
 
@@ -369,6 +379,7 @@ export class AuthService {
     }
     const resetToken = `${Math.floor(100000 + Math.random() * 900000)}`;
     userRecord.reset.token = resetToken;
+    userRecord.reset.expires = Date.now() + 30 * 60 * 1000 // 30 minutes in milliseconds
     await userRecord.save();
     await this.mailer.SendPasswordResetMail(userRecord);
     // this.eventDispatcher.dispatch(events.user.resendVerification, { user: userRecord });
@@ -410,16 +421,22 @@ export class AuthService {
         throw new SystemError(404, 'user not found');
       }
 
+      const user_with_token = await this.userModel.findOne({ 'reset.token':  current, _id: user });
+
       const validPassword = await argon2.verify(userRecord.password, current);
-      if (!validPassword) { 
+      if (!validPassword && !user_with_token) { 
         this.logger.silly('current password is invalid');
         throw new SystemError(200, 'current password is invalid');
       }
 
       const samePassword = await argon2.verify(userRecord.password, password);
-      if(samePassword) throw new SystemError(404, 'new password is the same with the current password');
+      if(samePassword) throw new SystemError(200, 'new password is the same with the current password');
     
       userRecord.password = await argon2.hash(password);
+      if(user_with_token){
+        // only allowed once
+        userRecord.reset.token = null
+      }
       await userRecord.save();
       return 'Password reset successful';
 
@@ -674,7 +691,8 @@ export class AuthService {
         totalTrade: totalTradesAmount[0]?.total || 0,
         totalTradeRoi: totalTradeRoi || 0, 
         totalSafe: totalAmountInSafe[0]?.total || 0,
-        totalDebt: totalActiveLoansAmount[0]?.total || 0
+        totalDebt: totalActiveLoansAmount[0]?.total || 0,
+        totalInterest: totalTradesInterest[0]?.total || 0
       }
     } catch(e) {
       this.logger.error(e);

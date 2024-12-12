@@ -60,9 +60,10 @@ exports.default = ({ app }) => {
         next(err);
     });
     app.use((err, req, res, next) => {
+        console.log(err);
         //const status = parseInt(err.message.slice(err.message.lastIndexOf(' '), err.message.length - 1)) || 500;
-        res.status(err.statusCode || 500).json({ success: false, data: {
-                message: err.message,
+        res.status(err.statusCode || 200).json({ success: false, data: {
+                message: err.message || err,
             },
         });
     });

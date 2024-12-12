@@ -38,6 +38,20 @@ ProjectController.getProject = async (req, res, next) => {
         return next(e);
     }
 };
+// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
+ProjectController.getFeaturedProjects = async (req, res, next) => {
+    const logger = typedi_1.Container.get('logger');
+    logger.debug('Calling get featued project endpoint');
+    try {
+        const projectServiceInstance = typedi_1.Container.get(services_1.ProjectService);
+        const data = await projectServiceInstance.getFeaturedProjects();
+        return res.status(201).json({ success: true, data, message: 'featured project retrived successfully' });
+    }
+    catch (e) {
+        logger.error('🔥 error: %o', e);
+        return next(e);
+    }
+};
 ProjectController.updateProject = async (req, res, next) => {
     const logger = typedi_1.Container.get('logger');
     logger.debug('Calling Update Project with userId: %s', req.currentUser.id);

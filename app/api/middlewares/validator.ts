@@ -19,7 +19,7 @@ class Validator {
         ...req.body
       });
       if (validation.error) {
-        return next(validation.error);
+        return next(validation.error.message);
       }
       return next();
     } catch (e) {

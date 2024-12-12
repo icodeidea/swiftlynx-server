@@ -19,14 +19,15 @@ exports.TradeService = void 0;
 const typedi_1 = require("typedi");
 const mongoose_1 = require("mongoose");
 const mongoose_2 = __importDefault(require("mongoose"));
-const transaction_1 = require("../transaction");
 const utils_1 = require("../../utils");
+const utils_2 = require("../../utils");
 let TradeService = class TradeService {
-    constructor(tradeModel, contractModel, transactionModel, transactor, logger) {
+    constructor(tradeModel, contractModel, transactionModel, 
+    // private transactor: TransactionService,
+    logger) {
         this.tradeModel = tradeModel;
         this.contractModel = contractModel;
         this.transactionModel = transactionModel;
-        this.transactor = transactor;
         this.logger = logger;
     }
     async startTrade(contract) {
@@ -44,19 +45,31 @@ let TradeService = class TradeService {
                 endDate: contract.endDate,
                 duration: contract.duration,
             });
-            //instantiate transaction record keeping
-            this.transactor.createTransaction({
-                walletId: contract.userId,
-                amount: contract.amount,
-                type: 'trade',
-                status: 'pending',
-                fee: 0,
-                subject: (startedTrade === null || startedTrade === void 0 ? void 0 : startedTrade.id) || (startedTrade === null || startedTrade === void 0 ? void 0 : startedTrade._id),
-                subjectRef: 'Trade',
-                reason: "supply liquididy",
-                recipient: "swiftlynx",
-                metadata: {}
-            });
+            console.log("startedTrade", startedTrade);
+            if (startedTrade) {
+                //instantiate transaction record keeping
+                this.logger.silly('creating transaction.');
+                this.transactionModel.create({
+                    user: contract.userId,
+                    subject: (startedTrade === null || startedTrade === void 0 ? void 0 : startedTrade._id) || (startedTrade === null || startedTrade === void 0 ? void 0 : startedTrade.id),
+                    subjectRef: 'Trade',
+                    type: 'credit',
+                    txid: Math.floor(100000 + Math.random() * 900000),
+                    reason: "Supply Liquidity",
+                    status: 'pending',
+                    from: null,
+                    confirmations: true,
+                    fee: 0,
+                    metadata: {
+                        entity: "trade",
+                        entityId: (startedTrade === null || startedTrade === void 0 ? void 0 : startedTrade.id) || (startedTrade === null || startedTrade === void 0 ? void 0 : startedTrade._id),
+                    },
+                    to: {
+                        amount: contract.amount,
+                        recipient: "swiftlynx" || null
+                    },
+                });
+            }
             return startedTrade;
         }
         catch (e) {
@@ -241,6 +254,11 @@ let TradeService = class TradeService {
                 throw new utils_1.SystemError(200, 'trade not found');
             }
             tradeRecord.status = state;
+            if (state === "ACTIVE") {
+                const dateRange = (0, utils_2.getDateRange)(parseInt(tradeRecord.duration));
+                tradeRecord.startDate = dateRange.startDate;
+                tradeRecord.endDate = dateRange.endDate;
+            }
             return await tradeRecord.save();
         }
         catch (e) {
@@ -254,8 +272,8 @@ TradeService = __decorate([
     __param(0, (0, typedi_1.Inject)('tradeModel')),
     __param(1, (0, typedi_1.Inject)('contractModel')),
     __param(2, (0, typedi_1.Inject)('transactionModel')),
-    __param(4, (0, typedi_1.Inject)('logger')),
-    __metadata("design:paramtypes", [Object, Object, Object, transaction_1.TransactionService, Object])
+    __param(3, (0, typedi_1.Inject)('logger')),
+    __metadata("design:paramtypes", [Object, Object, Object, Object])
 ], TradeService);
 exports.TradeService = TradeService;
 //# sourceMappingURL=index.js.map

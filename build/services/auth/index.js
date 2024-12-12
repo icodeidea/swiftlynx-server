@@ -46,7 +46,8 @@ let AuthService = class AuthService {
             // throw new SystemError(401, 'System under maintenance, try again later');
             const exists = await this.isUsed({ email: userInputDTO.email });
             if (exists) {
-                throw new utils_1.SystemError(401, 'email or username already in use');
+                console.log("userInputDTO", userInputDTO);
+                throw new utils_1.SystemError(200, 'email already in use');
             }
             if (userInputDTO === null || userInputDTO === void 0 ? void 0 : userInputDTO.referer) {
                 const refUser = await this.userModel.findOne({ refId: userInputDTO.referer });
@@ -64,6 +65,7 @@ let AuthService = class AuthService {
                     token: {
                         value: Math.floor(100000 + Math.random() * 900000), // Generates a six-digit number
                     },
+                    expires: Date.now() + 30 * 60 * 1000 // 30 minutes in milliseconds
                 } }));
             const walletRecord = await this.walletModel.create({
                 user: userRecord.id,
@@ -71,7 +73,7 @@ let AuthService = class AuthService {
             userRecord.wallet = walletRecord.id;
             await userRecord.save();
             if (!userRecord) {
-                throw new utils_1.SystemError(500, 'User cannot be created');
+                throw new utils_1.SystemError(200, 'User cannot be created retry in a moment');
             }
             this.logger.silly('Generating JWT...');
             this.logger.silly('Welcome Email will be sent at this point...');
@@ -172,19 +174,22 @@ let AuthService = class AuthService {
     async VerifyMail({ email, token, type }) {
         let userRecord = {};
         if (type === "reset") {
-            console.log("email", email);
-            console.log("token", token);
-            console.log("type", type);
             userRecord = await this.userModel.findOne({ email, 'reset.token': token });
             if (!userRecord) {
-                throw new utils_1.SystemError(200, 'User not registered or the token has expired please, request a new one!');
+                throw new utils_1.SystemError(200, 'token is incorrect!');
             }
-            userRecord.reset.token = null;
+            if (!(0, utils_1.isTimestampExpired)(userRecord.reset.token)) {
+                throw new utils_1.SystemError(200, 'token has expired');
+            }
+            // userRecord.reset.token = null;
         }
         else {
             userRecord = await this.userModel.findOne({ email, 'verified.token.value': token });
             if (!userRecord) {
-                throw new utils_1.SystemError(200, 'User not registered or the token has expired please, request a new one!');
+                throw new utils_1.SystemError(200, 'token is incorrect!');
+            }
+            if (!(0, utils_1.isTimestampExpired)(userRecord.verified.token.value)) {
+                throw new utils_1.SystemError(200, 'token has expired!');
             }
             if (!(userRecord === null || userRecord === void 0 ? void 0 : userRecord.verified.isVerified)) {
                 userRecord.verified.isVerified = true;
@@ -195,9 +200,10 @@ let AuthService = class AuthService {
                 // return 'Your email has now been verified. Thank you for using our service';
             }
             else if (userRecord === null || userRecord === void 0 ? void 0 : userRecord.verified.isVerified) {
-                throw new utils_1.SystemError(200, 'Your email has already been verified');
+                throw new utils_1.SystemError(200, 'Your email has already been verified!');
             }
         }
+        userRecord.lastLogin = new Date();
         await userRecord.save();
         this.logger.silly('Password is valid!');
         this.logger.silly('Generating Access and Refresh Tokens...');
@@ -232,6 +238,7 @@ let AuthService = class AuthService {
         if (type === "reset") {
             const resetToken = `${Math.floor(100000 + Math.random() * 900000)}`;
             userRecord.reset.token = resetToken;
+            userRecord.reset.expires = Date.now() + 30 * 60 * 1000; // 30 minutes in milliseconds
             await userRecord.save();
             await this.mailer.SendPasswordResetMail(userRecord);
             // this.eventDispatcher.dispatch(events.user.resendVerification, { user: userRecord });
@@ -242,6 +249,7 @@ let AuthService = class AuthService {
                 const salt = (0, crypto_1.randomBytes)(32);
                 const saltHex = salt.toString('hex');
                 userRecord.verified.token.value = `${Math.floor(100000 + Math.random() * 900000)}`; // Generates a six-digit number
+                userRecord.verified["expires"] = Date.now() + 30 * 60 * 1000; // 30 minutes in milliseconds
                 const userWithNewVerifyToken = await userRecord.save();
                 await this.mailer.ResendVerificationMail(userWithNewVerifyToken);
                 this.eventDispatcher.dispatch(events_1.default.user.resendVerification, { user: userWithNewVerifyToken });
@@ -335,6 +343,7 @@ let AuthService = class AuthService {
         }
         const resetToken = `${Math.floor(100000 + Math.random() * 900000)}`;
         userRecord.reset.token = resetToken;
+        userRecord.reset.expires = Date.now() + 30 * 60 * 1000; // 30 minutes in milliseconds
         await userRecord.save();
         await this.mailer.SendPasswordResetMail(userRecord);
         // this.eventDispatcher.dispatch(events.user.resendVerification, { user: userRecord });
@@ -371,15 +380,20 @@ let AuthService = class AuthService {
                 this.logger.silly('user not found');
                 throw new utils_1.SystemError(404, 'user not found');
             }
+            const user_with_token = await this.userModel.findOne({ 'reset.token': current, _id: user });
             const validPassword = await argon2_1.default.verify(userRecord.password, current);
-            if (!validPassword) {
+            if (!validPassword && !user_with_token) {
                 this.logger.silly('current password is invalid');
                 throw new utils_1.SystemError(200, 'current password is invalid');
             }
             const samePassword = await argon2_1.default.verify(userRecord.password, password);
             if (samePassword)
-                throw new utils_1.SystemError(404, 'new password is the same with the current password');
+                throw new utils_1.SystemError(200, 'new password is the same with the current password');
             userRecord.password = await argon2_1.default.hash(password);
+            if (user_with_token) {
+                // only allowed once
+                userRecord.reset.token = null;
+            }
             await userRecord.save();
             return 'Password reset successful';
         }
@@ -533,7 +547,7 @@ let AuthService = class AuthService {
         }
     }
     async GetUserKpi({ userId, }) {
-        var _a, _b, _c, _d, _e, _f, _g;
+        var _a, _b, _c, _d, _e, _f, _g, _h;
         this.logger.silly('Getting Account...');
         try {
             // total trade amount
@@ -585,7 +599,8 @@ let AuthService = class AuthService {
                 totalTrade: ((_e = totalTradesAmount[0]) === null || _e === void 0 ? void 0 : _e.total) || 0,
                 totalTradeRoi: totalTradeRoi || 0,
                 totalSafe: ((_f = totalAmountInSafe[0]) === null || _f === void 0 ? void 0 : _f.total) || 0,
-                totalDebt: ((_g = totalActiveLoansAmount[0]) === null || _g === void 0 ? void 0 : _g.total) || 0
+                totalDebt: ((_g = totalActiveLoansAmount[0]) === null || _g === void 0 ? void 0 : _g.total) || 0,
+                totalInterest: ((_h = totalTradesInterest[0]) === null || _h === void 0 ? void 0 : _h.total) || 0
             };
         }
         catch (e) {

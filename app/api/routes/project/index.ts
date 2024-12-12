@@ -2,7 +2,7 @@ import { Router } from 'express'
 import middlewares, { validator } from '../../middlewares';
 import { ProjectController } from '../../controllers'
 
-const { startProject, getProject, updateProject, deleteProject} = ProjectController;
+const { startProject, getProject, getFeaturedProjects, updateProject, deleteProject} = ProjectController;
 
 const projectRouter = Router();
 
@@ -14,6 +14,9 @@ export default (app: Router): Router => {
 
   //list project
   projectRouter.route('/list-project').get(getProject);
+
+  //list featured project
+  projectRouter.route('/list-featured-projects').get(getFeaturedProjects);
 
   //update project
   projectRouter.route('/update').put(middlewares.isAuth, middlewares.attachCurrentUser, validator.updateProject, updateProject);

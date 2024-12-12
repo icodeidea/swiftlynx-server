@@ -73,7 +73,7 @@ const User = new mongoose.Schema(
       enum: ['male', 'female', 'undecided'],
       default: 'undecided',
     },
-    picture: { type: String, default: "https://www.allthetests.com/quiz22/picture/pic_1171831236_1.png?1592828498"},
+    picture: { type: String, default: "https://res.cloudinary.com/diituo7sj/image/upload/v1734017844/default-profile-picture1-705x705_bazo4q.jpg"},
     locale: { type: String }, // we track Ips this is where tracked Ips will be placed for good analytics
     lastLogin: {
       type: Date,

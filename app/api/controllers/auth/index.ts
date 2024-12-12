@@ -88,12 +88,20 @@ export class AuthController {
       console.log(req);
       const authServiceInstance = Container.get(AuthService);
 
-      const result = await authServiceInstance.VerifyMail({ 
+      const { user, accessToken, refreshToken, wallet } = await authServiceInstance.VerifyMail({ 
         token: req.params.token, 
         email: req.params.email,
         type: req.params.type
       });
-      return res.status(200).json({ success: true, data: result, message: "Your email has now been verified. Thank you for using our service" });
+
+      res.cookie('user-id', refreshToken, {
+        httpOnly: true,
+        expires: new Date(Date.now() + 1000 * 60 * 60 * 24 * 7),
+        secure: config.environment !== 'development',
+      });
+      return res
+        .status(200)
+        .json({ success: true, data: { user, token: accessToken, refreshToken, wallet }, message: "Your email has now been verified. Thank you for using our service" });
     } catch (e) {
       logger.error('🔥 error %o', e);
       return next(e);
