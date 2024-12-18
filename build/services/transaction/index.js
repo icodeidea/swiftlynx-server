@@ -99,7 +99,8 @@ let TransactionService = class TransactionService {
             // First let's see what kind of documents we're working with
             const sampleDocs = await this.transactionModel.find({
                 user: new mongoose_1.default.Types.ObjectId(userId),
-                type: { $in: ["credit", "debit"] }
+                type: { $in: ["credit", "debit"] },
+                status: { $in: ["compl", "debit"] },
             }).limit(2);
             console.log("Sample docs:", JSON.stringify(sampleDocs, null, 2));
             const result = await this.transactionModel.aggregate([

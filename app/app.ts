@@ -6,6 +6,8 @@ import express from 'express';
 
 import Logger from './loaders/logger';
 
+import { initExchangeRateTracking } from "./utils/exchange_rates"
+
 async function startServer() {
   const app = express();
 
@@ -19,6 +21,9 @@ async function startServer() {
       🛡️  Server listening on port: ${config.port} 🛡🙏🙏🙏
       ################################################
     `);
+
+    // Start tracking exchange rates
+    initExchangeRateTracking();
     })
     .on('error', err => {
       Logger.error(err);

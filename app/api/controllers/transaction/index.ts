@@ -4,6 +4,7 @@ import { Logger } from 'winston';
 
 import { TransactionService } from '../../../services';
 import { ITransaction } from '../../../interfaces/ITransaction';
+import { getStoredExchangeRates, displayRecentRates } from "../../../utils"
 
 export class TransactionController {
 
@@ -86,6 +87,20 @@ export class TransactionController {
       const transactionServiceInstance = Container.get(TransactionService);
       const data = await transactionServiceInstance.getBusinessKpi({userId: 'adminId'});
       return res.status(201).json({ success: true, data, message: 'data retrived' });
+    } catch (e) {
+      logger.error('🔥 error: %o', e);
+      return next(e);
+    }
+  };
+
+  // eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
+  static getExchangeRate = async (req: Request, res: Response, next: NextFunction): Promise<Response | void> => {
+    const logger: Logger = Container.get('logger');
+    logger.debug('Calling get exchange-rate endpoint');
+    try {
+      const data = await getStoredExchangeRates(1)
+      await displayRecentRates()
+      return res.status(201).json({ success: true, data, message: 'exchange rates data retrived' });
     } catch (e) {
       logger.error('🔥 error: %o', e);
       return next(e);

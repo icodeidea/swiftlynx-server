@@ -2,7 +2,7 @@ import { Router } from 'express'
 import middlewares, { validator } from '../../middlewares';
 import { TransactionController } from '../../controllers'
 
-const { getTransactions, getEntityTransactions, initPayment, paymentCallback, getBusinessKpi, filterTransactions } = TransactionController;
+const { getTransactions, getEntityTransactions, initPayment, paymentCallback, getBusinessKpi, filterTransactions, getExchangeRate } = TransactionController;
 
 const transactionRouter = Router();
 
@@ -17,6 +17,8 @@ export default (app: Router): Router => {
   transactionRouter.route('/filter-tnx/:reason/:status').get(filterTransactions);
 
   transactionRouter.route('/business-kpi').get(getBusinessKpi);
+
+  transactionRouter.route('/exchange-rates').get(getExchangeRate);
 
   transactionRouter.route('/initialise-payment').post(validator.initPayment, middlewares.isAuth, middlewares.attachCurrentUser, initPayment);
 

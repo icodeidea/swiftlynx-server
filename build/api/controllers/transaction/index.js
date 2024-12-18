@@ -4,6 +4,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.TransactionController = void 0;
 const typedi_1 = require("typedi");
 const services_1 = require("../../../services");
+const utils_1 = require("../../../utils");
 class TransactionController {
 }
 exports.TransactionController = TransactionController;
@@ -90,6 +91,20 @@ TransactionController.getBusinessKpi = async (req, res, next) => {
         const transactionServiceInstance = typedi_1.Container.get(services_1.TransactionService);
         const data = await transactionServiceInstance.getBusinessKpi({ userId: 'adminId' });
         return res.status(201).json({ success: true, data, message: 'data retrived' });
+    }
+    catch (e) {
+        logger.error('🔥 error: %o', e);
+        return next(e);
+    }
+};
+// eslint-disable-next-line @typescript-eslint/explicit-module-boundary-types
+TransactionController.getExchangeRate = async (req, res, next) => {
+    const logger = typedi_1.Container.get('logger');
+    logger.debug('Calling get exchange-rate endpoint');
+    try {
+        const data = await (0, utils_1.getStoredExchangeRates)(1);
+        await (0, utils_1.displayRecentRates)();
+        return res.status(201).json({ success: true, data, message: 'exchange rates data retrived' });
     }
     catch (e) {
         logger.error('🔥 error: %o', e);

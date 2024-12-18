@@ -34,5 +34,7 @@ var error_1 = require("./error");
 Object.defineProperty(exports, "SystemError", { enumerable: true, get: function () { return __importDefault(error_1).default; } });
 __exportStar(require("./helpers"), exports);
 __exportStar(require("./payment"), exports);
+__exportStar(require("./exchange_rates"), exports);
+__exportStar(require("./redis"), exports);
 exports.mail = __importStar(require("./mail"));
 //# sourceMappingURL=index.js.map
