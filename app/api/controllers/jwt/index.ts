@@ -12,7 +12,7 @@ export const renewRefreshToken = async (req: Request, res: Response, next: NextF
     logger.debug('Getting refresh token...');
     //const token = req.cookies['user-id'];
     const token = req.get('reftoken');
-    console.log(token);
+    console.log("refresh token: ", token);
     const authServiceInstance = Container.get(AuthService);
     const { clientTokenVersion, tokenVersion, user } = await authServiceInstance.decodeRefreshToken({ token });
     if (tokenVersion !== clientTokenVersion) {

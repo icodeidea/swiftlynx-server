@@ -100,7 +100,7 @@ let TransactionService = class TransactionService {
             const sampleDocs = await this.transactionModel.find({
                 user: new mongoose_1.default.Types.ObjectId(userId),
                 type: { $in: ["credit", "debit"] },
-                status: { $in: ["compl", "debit"] },
+                status: { $in: ["completed", "success"] },
             }).limit(2);
             console.log("Sample docs:", JSON.stringify(sampleDocs, null, 2));
             const result = await this.transactionModel.aggregate([
@@ -108,7 +108,8 @@ let TransactionService = class TransactionService {
                 {
                     $match: {
                         user: new mongoose_1.default.Types.ObjectId(userId),
-                        type: { $in: ["credit", "debit"] }
+                        type: { $in: ["credit", "debit"] },
+                        status: { $in: ["completed", "success"] },
                     }
                 },
                 // Add a stage to ensure amount is treated as a number

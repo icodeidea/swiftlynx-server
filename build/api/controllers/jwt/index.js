@@ -14,7 +14,7 @@ const renewRefreshToken = async (req, res, next) => {
         logger.debug('Getting refresh token...');
         //const token = req.cookies['user-id'];
         const token = req.get('reftoken');
-        console.log(token);
+        console.log("refresh token: ", token);
         const authServiceInstance = typedi_1.Container.get(services_1.AuthService);
         const { clientTokenVersion, tokenVersion, user } = await authServiceInstance.decodeRefreshToken({ token });
         if (tokenVersion !== clientTokenVersion) {

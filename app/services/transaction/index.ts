@@ -86,19 +86,20 @@ export class TransactionService {
   public async getTransactionSums(userId: string): Promise<any> {
     try {
       // First let's see what kind of documents we're working with
-      const sampleDocs = await this.transactionModel.find({ 
-        user: new mongoose.Types.ObjectId(userId),
-        type: { $in: ["credit", "debit"] },
-        status: { $in: ["compl", "debit"] },
-      }).limit(2);
-      console.log("Sample docs:", JSON.stringify(sampleDocs, null, 2));
+      // const sampleDocs = await this.transactionModel.find({ 
+      //   user: new mongoose.Types.ObjectId(userId),
+      //   type: { $in: ["credit", "debit"] },
+      //   status: { $in: ["completed", "success"] },
+      // }).limit(2);
+      // console.log("Sample docs:", JSON.stringify(sampleDocs, null, 2));
   
       const result = await this.transactionModel.aggregate([
         // Match documents for the specific user
         {
           $match: {
             user: new mongoose.Types.ObjectId(userId),
-            type: { $in: ["credit", "debit"] }
+            type: { $in: ["credit", "debit"] },
+            status: { $in: ["completed", "success"] },
           }
         },
         // Add a stage to ensure amount is treated as a number
