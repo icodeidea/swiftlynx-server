@@ -66,6 +66,7 @@ const User = new mongoose.Schema(
     kpi: {
       usersRefered: { type : Number, default: 0 },
     },
+    metadata: {},
     country: { type: String },
     dob: { type: String },
     gender: {

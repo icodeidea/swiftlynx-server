@@ -66,7 +66,7 @@ let TradeService = class TradeService {
                     },
                     to: {
                         amount: contract.amount,
-                        recipient: "swiftlynx" || null
+                        recipient: "swiftlynx"
                     },
                 });
             }

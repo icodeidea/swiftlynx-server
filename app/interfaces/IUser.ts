@@ -13,6 +13,7 @@ export interface IUser {
     role?: string;
     deactivated?: boolean;
     tokenVersion?: number;
+    metadata?: any,
     country?: string;
     locale?: string;
     picture?: string;
